@@ -1,73 +1,154 @@
-# React + TypeScript + Vite
+# Recruitment & Career Opportunities Platform (Frontend)
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+A modern, responsive frontend application for the Recruitment & Career Opportunities Platform. This interface allows job seekers to explore and apply for jobs, employers to manage job postings, and admins to monitor platform activity.
 
-Currently, two official plugins are available:
+________________________________________
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+## Project Overview
 
-## React Compiler
+The frontend is a React + TypeScript application that consumes the backend REST API. It focuses on usability, performance, and responsive design to deliver a smooth experience across devices.
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+### Main Goals
+- Help job seekers easily find and apply for jobs
+- Allow employers to manage job postings and applications
+- Provide admins with dashboards and reports
 
-## Expanding the ESLint configuration
+________________________________________
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+## Team Members
+- Patrick Niyigena
+- Polycarpe Tuyishime
+- Teta hugutte
+- Tresor Mugisha
 
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
+________________________________________
 
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
+## Tech Stack
+- **Framework:** React
+- **Language:** TypeScript
+- **Styling:** Tailwind CSS
+- **Routing:** React Router
+- **State Management:** React Query / Context API
+- **HTTP Client:** Axios
+- **Build Tool:** Vite
 
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+________________________________________
+
+## Project Structure
+
+```
+src/
+│── components/       # Reusable UI components
+│── pages/            # Page-level components
+│── layouts/          # App layouts (Auth, Dashboard)
+│── services/         # API calls (Axios)
+│── routes/           # Route definitions
+│── assets/           # Images & static files
+│── App.tsx
+│── main.tsx
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+________________________________________
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+## Core Features
 
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+### Job Seeker Features
+- Browse job listings
+- Search jobs by keyword
+- Filter by category, location, or company
+- View job details
+- Apply for jobs
+- Track application status
+
+### Employer Features
+- Create, edit, and delete job postings
+- View applications per job
+- Update application status
+- View job performance (views & applications)
+
+### Admin Features (Optional)
+- Manage users and employers
+- View platform statistics
+- Access reports and analytics
+
+________________________________________
+
+## Authentication & Authorization
+- JWT-based authentication
+- Protected routes based on roles:
+  - Job Seeker
+  - Employer
+  - Admin
+- Unauthorized users are redirected to login
+
+________________________________________
+
+## API Integration
+
+The frontend communicates with the backend using Axios.
+
+```typescript
+const api = axios.create({
+  baseURL: import.meta.env.VITE_API_URL,
+});
 ```
+
+Environment variables are used to configure API endpoints.
+
+________________________________________
+
+## Setup & Installation
+
+### 1. Clone the Repository
+```bash
+git clone https://github.com/your-repo/recruitment-platform-frontend.git
+cd recruitment-platform-frontend
+```
+
+### 2. Install Dependencies
+```bash
+npm install
+```
+
+### 3. Environment Variables
+Create a `.env` file:
+```
+VITE_API_URL=http://localhost:3000/api
+```
+
+### 4. Run the App
+```bash
+npm run dev
+```
+
+________________________________________
+
+## Responsiveness & UX
+- Fully responsive for desktop and mobile
+- Accessible UI with clean layouts
+- Fast loading using optimized API calls
+
+________________________________________
+
+## Future Enhancements
+- AI-powered job recommendations
+- Push notifications for new jobs
+- Saved jobs feature
+- Dark mode
+- Progressive Web App (PWA)
+
+________________________________________
+
+## License
+
+This project is developed for academic and learning purposes.
+
+________________________________________
+
+## Contribution Guidelines
+- Follow component-based architecture
+- Keep components reusable and clean
+- Use meaningful commit messages
+- Coordinate changes with the team
+
+Happy building 🚀
