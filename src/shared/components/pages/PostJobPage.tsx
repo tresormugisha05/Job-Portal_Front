@@ -7,7 +7,6 @@ export default function PostJobPage() {
           <p className="text-gray-600 mb-8">Find the perfect candidate for your position</p>
 
           <form className="space-y-6">
-            {/* Job Details Section */}
             <div className="border-b pb-6">
               <h2 className="text-xl font-semibold mb-4">Job Details</h2>
               
