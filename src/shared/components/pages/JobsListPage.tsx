@@ -1,8 +1,9 @@
 import { MapPin, Briefcase, DollarSign, Heart } from "lucide-react";
+import PageWrapper from "../layouts/PageWrapper";
 
 export default function JobsListPage() {
   return (
-    <div className="min-h-screen bg-gray-50">
+    <PageWrapper>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <h1 className="text-3xl font-bold text-gray-900 mb-8">Browse Jobs</h1>
 
@@ -154,7 +155,7 @@ export default function JobsListPage() {
                     </div>
                     <div className="flex flex-col items-end gap-2 mt-4 sm:mt-0">
                       <button className="px-4 py-2 border border-gray-300 text-gray-700 rounded-md hover:bg-gray-50 transition-colors flex items-center gap-2">
-                        <Heart className="w-4 h-4" /> Save
+                        <Heart className="w-9 h-4" /> Save
                       </button>
                       <button className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors">
                         Apply Now
@@ -192,6 +193,6 @@ export default function JobsListPage() {
           </div>
         </div>
       </div>
-    </div>
+    </PageWrapper>
   );
 }

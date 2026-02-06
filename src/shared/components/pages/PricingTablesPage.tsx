@@ -1,6 +1,8 @@
+import PageWrapper from "../layouts/PageWrapper";
+
 export default function PricingTablesPage() {
   return (
-    <div className="min-h-screen bg-gray-50">
+    <PageWrapper>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         <div className="text-center mb-12">
           <h1 className="text-4xl font-bold text-gray-900 mb-4">Choose Your Plan</h1>
@@ -20,7 +22,7 @@ export default function PricingTablesPage() {
               </div>
               <p className="mt-2 text-gray-600">Perfect for small businesses</p>
             </div>
-            
+
             <div className="p-6">
               <ul className="space-y-4">
                 <li className="flex items-start">
@@ -60,7 +62,7 @@ export default function PricingTablesPage() {
                   <span className="text-gray-700">Basic Support</span>
                 </li>
               </ul>
-              
+
               <button className="w-full mt-8 px-6 py-3 border border-gray-300 text-gray-700 rounded-md hover:bg-gray-50 transition-colors font-semibold">
                 Get Started
               </button>
@@ -80,7 +82,7 @@ export default function PricingTablesPage() {
               </div>
               <p className="mt-2 text-gray-600">Great for growing companies</p>
             </div>
-            
+
             <div className="p-6">
               <ul className="space-y-4">
                 <li className="flex items-start">
@@ -126,7 +128,7 @@ export default function PricingTablesPage() {
                   <span className="text-gray-700">Company Profile</span>
                 </li>
               </ul>
-              
+
               <button className="w-full mt-8 px-6 py-3 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors font-semibold">
                 Get Started
               </button>
@@ -143,7 +145,7 @@ export default function PricingTablesPage() {
               </div>
               <p className="mt-2 text-gray-600">Perfect for enterprises</p>
             </div>
-            
+
             <div className="p-6">
               <ul className="space-y-4">
                 <li className="flex items-start">
@@ -195,7 +197,7 @@ export default function PricingTablesPage() {
                   <span className="text-gray-700">API Access</span>
                 </li>
               </ul>
-              
+
               <button className="w-full mt-8 px-6 py-3 bg-purple-600 text-white rounded-md hover:bg-purple-700 transition-colors font-semibold">
                 Get Started
               </button>
@@ -233,6 +235,6 @@ export default function PricingTablesPage() {
           </button>
         </div>
       </div>
-    </div>
+    </PageWrapper>
   );
 }
