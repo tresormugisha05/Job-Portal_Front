@@ -1,5 +1,10 @@
 import { Link, useLocation } from "react-router-dom";
 import { Briefcase, User, X, Menu, LogIn } from "lucide-react";
+import { useState } from "react";
+import SignupModal from "../SignupModal";
+import SigninModal from "../SigninModal";
+import CandidatesModal from "../CandidatesModal";
+import EmployersModal from "../EmployersModal";
 
 interface HeaderProps {
   isMobileMenuOpen: boolean;
@@ -11,6 +16,10 @@ export default function Header({
   setIsMobileMenuOpen,
 }: HeaderProps) {
   const { pathname } = useLocation();
+  const [isSignupOpen, setIsSignupOpen] = useState(false);
+  const [isSigninOpen, setIsSigninOpen] = useState(false);
+  const [isCandidatesOpen, setIsCandidatesOpen] = useState(false);
+  const [isEmployersOpen, setIsEmployersOpen] = useState(false);
 
   const getLinkClass = (path: string) => {
     const baseClass =
@@ -48,12 +57,18 @@ export default function Header({
           <Link to="/jobs" className={getLinkClass("/jobs")}>
             Jobs
           </Link>
-          <Link to="/candidates" className={getLinkClass("/candidates")}>
+          <button
+            onClick={() => setIsCandidatesOpen(true)}
+            className="flex items-center gap-1 text-white hover:text-[#00b4d8] transition-colors cursor-pointer"
+          >
             Candidates
-          </Link>
-          <Link to="/employers" className={getLinkClass("/employers")}>
+          </button>
+          <button
+            onClick={() => setIsEmployersOpen(true)}
+            className="flex items-center gap-1 text-white hover:text-[#00b4d8] transition-colors cursor-pointer"
+          >
             Employers
-          </Link>
+          </button>
           <Link to="/blog" className={getLinkClass("/blog")}>
             Blog
           </Link>
@@ -64,18 +79,18 @@ export default function Header({
 
         {/* Auth Buttons */}
         <div className="hidden md:flex gap-4 items-center">
-          <Link
-            to="/signup"
+          <button
+            onClick={() => setIsSignupOpen(true)}
             className="border border-white/30 px-6 py-2 rounded hover:bg-white/10 transition-colors flex items-center gap-2 text-sm font-semibold"
           >
             <User className="w-4 h-4" /> SIGN UP
-          </Link>
-          <Link
-            to="/signin"
+          </button>
+          <button
+            onClick={() => setIsSigninOpen(true)}
             className="bg-[#ff6b6b] px-6 py-2 rounded hover:bg-[#ff5252] transition-colors flex items-center gap-2 text-sm font-semibold"
           >
             <LogIn className="w-4 h-4" /> LOGIN
-          </Link>
+          </button>
         </div>
 
         {/* Mobile Menu Toggle */}
@@ -101,15 +116,24 @@ export default function Header({
             <Link to="/jobs" className={getMobileLinkClass("/jobs")}>
               Jobs
             </Link>
-            <Link
-              to="/candidates"
-              className={getMobileLinkClass("/candidates")}
+            <button
+              onClick={() => {
+                setIsCandidatesOpen(true);
+                setIsMobileMenuOpen(false);
+              }}
+              className="flex items-center justify-between text-white hover:text-[#00b4d8] transition-colors text-left w-full"
             >
               Candidates
-            </Link>
-            <Link to="/employers" className={getMobileLinkClass("/employers")}>
+            </button>
+            <button
+              onClick={() => {
+                setIsEmployersOpen(true);
+                setIsMobileMenuOpen(false);
+              }}
+              className="flex items-center justify-between text-white hover:text-[#00b4d8] transition-colors text-left w-full"
+            >
               Employers
-            </Link>
+            </button>
             <Link to="/blog" className={getMobileLinkClass("/blog")}>
               Blog
             </Link>
@@ -118,22 +142,60 @@ export default function Header({
             </Link>
 
             <div className="pt-4 flex flex-col gap-3">
-              <Link
-                to="/signup"
+              <button
+                onClick={() => {
+                  setIsSignupOpen(true);
+                  setIsMobileMenuOpen(false);
+                }}
                 className="border border-white/30 px-4 py-2 rounded text-center hover:bg-white/10 transition-colors flex items-center justify-center gap-2"
               >
                 <User className="w-4 h-4" /> SIGN UP
-              </Link>
-              <Link
-                to="/signin"
+              </button>
+              <button
+                onClick={() => {
+                  setIsSigninOpen(true);
+                  setIsMobileMenuOpen(false);
+                }}
                 className="bg-[#ff6b6b] px-4 py-2 rounded text-center hover:bg-[#ff5252] transition-colors flex items-center justify-center gap-2"
               >
                 <LogIn className="w-4 h-4" /> LOGIN
-              </Link>
+              </button>
             </div>
           </nav>
         </div>
       )}
+
+      {/* Signup Modal */}
+      <SignupModal
+        isOpen={isSignupOpen}
+        onClose={() => setIsSignupOpen(false)}
+        onSignInClick={() => {
+          setIsSignupOpen(false);
+          setIsSigninOpen(true);
+        }}
+      />
+
+      {/* Signin Modal */}
+      <SigninModal
+        isOpen={isSigninOpen}
+        onClose={() => setIsSigninOpen(false)}
+        onSignUpClick={() => {
+          setIsSigninOpen(false);
+          setIsSignupOpen(true);
+        }}
+      />
+
+      {/* Candidates Modal */}
+      <CandidatesModal
+        isOpen={isCandidatesOpen}
+        onClose={() => setIsCandidatesOpen(false)}
+      />
+
+      {/* Employers Modal */}
+      <EmployersModal
+        isOpen={isEmployersOpen}
+        onClose={() => setIsEmployersOpen(false)}
+      />
     </header>
   );
 }
