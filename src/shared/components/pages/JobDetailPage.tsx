@@ -1,3 +1,5 @@
+import { MapPin, Briefcase, DollarSign, Calendar, Heart } from "lucide-react";
+
 export default function JobDetailPage() {
   return (
     <div className="min-h-screen bg-gray-50">
@@ -18,33 +20,39 @@ export default function JobDetailPage() {
                   <p className="text-blue-600 text-lg mb-3">Pay Walt</p>
                   <div className="flex flex-wrap gap-3 text-sm text-gray-600">
                     <span className="flex items-center gap-1">
-                      📍 New York, USA
+                      <MapPin className="w-4 h-4" /> New York, USA
                     </span>
                     <span className="flex items-center gap-1">
-                      💼 Full Time
+                      <Briefcase className="w-4 h-4" /> Full Time
                     </span>
                     <span className="flex items-center gap-1">
-                      💰 $80k - $120k
+                      <DollarSign className="w-4 h-4" /> $80k - $120k
                     </span>
                     <span className="flex items-center gap-1">
-                      📅 Posted 2 days ago
+                      <Calendar className="w-4 h-4" /> Posted 2 days ago
                     </span>
                   </div>
                 </div>
               </div>
 
               <div className="flex flex-wrap gap-2 mb-6">
-                <span className="px-3 py-1 bg-blue-100 text-blue-700 text-sm rounded-full">Media</span>
-                <span className="px-3 py-1 bg-green-100 text-green-700 text-sm rounded-full">Medical</span>
-                <span className="px-3 py-1 bg-purple-100 text-purple-700 text-sm rounded-full">Restaurants</span>
+                <span className="px-3 py-1 bg-blue-100 text-blue-700 text-sm rounded-full">
+                  Media
+                </span>
+                <span className="px-3 py-1 bg-green-100 text-green-700 text-sm rounded-full">
+                  Medical
+                </span>
+                <span className="px-3 py-1 bg-purple-100 text-purple-700 text-sm rounded-full">
+                  Restaurants
+                </span>
               </div>
 
               <div className="flex gap-3">
                 <button className="px-6 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors">
                   Apply Now
                 </button>
-                <button className="px-6 py-2 border border-gray-300 text-gray-700 rounded-md hover:bg-gray-50 transition-colors">
-                  ❤️ Save Job
+                <button className="px-6 py-2 border border-gray-300 text-gray-700 rounded-md hover:bg-gray-50 transition-colors flex items-center gap-2">
+                  <Heart className="w-4 h-4" /> Save Job
                 </button>
               </div>
             </div>
@@ -54,10 +62,14 @@ export default function JobDetailPage() {
               <h2 className="text-xl font-semibold mb-4">Job Description</h2>
               <div className="prose max-w-none text-gray-700">
                 <p className="mb-4">
-                  We are seeking an experienced Senior Health and Food Specialist to join our dynamic team. 
-                  This role requires a passionate individual who can drive innovation in health and food safety standards.
+                  We are seeking an experienced Senior Health and Food
+                  Specialist to join our dynamic team. This role requires a
+                  passionate individual who can drive innovation in health and
+                  food safety standards.
                 </p>
-                <h3 className="text-lg font-semibold mb-2">Responsibilities:</h3>
+                <h3 className="text-lg font-semibold mb-2">
+                  Responsibilities:
+                </h3>
                 <ul className="list-disc pl-6 mb-4">
                   <li>Develop and implement health and safety protocols</li>
                   <li>Conduct regular food safety audits</li>
@@ -88,19 +100,22 @@ export default function JobDetailPage() {
             <div className="bg-white rounded-lg shadow p-6">
               <h2 className="text-xl font-semibold mb-4">About Pay Walt</h2>
               <p className="text-gray-700 mb-4">
-                Pay Walt is a leading company in the health and food industry, dedicated to providing 
-                innovative solutions that improve food safety and health standards. We pride ourselves on 
-                our commitment to excellence and our supportive work environment.
+                Pay Walt is a leading company in the health and food industry,
+                dedicated to providing innovative solutions that improve food
+                safety and health standards. We pride ourselves on our
+                commitment to excellence and our supportive work environment.
               </p>
               <div className="grid grid-cols-2 gap-4 text-sm">
                 <div>
-                  <span className="font-semibold">Company Size:</span> 100-500 employees
+                  <span className="font-semibold">Company Size:</span> 100-500
+                  employees
                 </div>
                 <div>
                   <span className="font-semibold">Founded:</span> 2010
                 </div>
                 <div>
-                  <span className="font-semibold">Industry:</span> Health & Food Services
+                  <span className="font-semibold">Industry:</span> Health & Food
+                  Services
                 </div>
                 <div>
                   <span className="font-semibold">Location:</span> New York, USA
@@ -147,19 +162,29 @@ export default function JobDetailPage() {
               <h3 className="text-lg font-semibold mb-4">Similar Jobs</h3>
               <div className="space-y-4">
                 <div className="border-b pb-3">
-                  <h4 className="font-medium text-gray-900 mb-1">iOS Developer</h4>
+                  <h4 className="font-medium text-gray-900 mb-1">
+                    iOS Developer
+                  </h4>
                   <p className="text-blue-600 text-sm mb-1">Apus Inc.</p>
-                  <p className="text-gray-600 text-sm">New York • $90k - $130k</p>
+                  <p className="text-gray-600 text-sm">
+                    New York • $90k - $130k
+                  </p>
                 </div>
                 <div className="border-b pb-3">
-                  <h4 className="font-medium text-gray-900 mb-1">Front-End Web Developer</h4>
+                  <h4 className="font-medium text-gray-900 mb-1">
+                    Front-End Web Developer
+                  </h4>
                   <p className="text-blue-600 text-sm mb-1">Envato Inc.</p>
                   <p className="text-gray-600 text-sm">India • $70k - $100k</p>
                 </div>
                 <div>
-                  <h4 className="font-medium text-gray-900 mb-1">Medical Logo Designer</h4>
+                  <h4 className="font-medium text-gray-900 mb-1">
+                    Medical Logo Designer
+                  </h4>
                   <p className="text-blue-600 text-sm mb-1">FShop Inc.</p>
-                  <p className="text-gray-600 text-sm">Australia • $60k - $80k</p>
+                  <p className="text-gray-600 text-sm">
+                    Australia • $60k - $80k
+                  </p>
                 </div>
               </div>
             </div>
