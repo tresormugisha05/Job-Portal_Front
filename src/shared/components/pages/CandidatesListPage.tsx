@@ -1,4 +1,5 @@
 import { MapPin, Briefcase, GraduationCap, Eye, Mail } from "lucide-react";
+import { Link } from "react-router-dom";
 import PageWrapper from "../layouts/PageWrapper";
 import Loader from "../ui/Loader";
 import usePageLoader from "../../hooks/usePageLoader";
@@ -190,12 +191,12 @@ export default function CandidatesListPage() {
                       </div>
                     </div>
                     <div className="flex flex-col items-end gap-2 mt-4 sm:mt-0">
-                      <button className="px-4 py-2 border border-gray-300 text-gray-700 rounded-md hover:bg-gray-50 transition-colors flex items-center gap-2">
+                      <Link to={`/candidates/${candidate}`} className="px-4 py-2 border border-gray-300 text-gray-700 rounded-md hover:bg-gray-50 transition-colors flex items-center gap-2">
                         <Eye className="w-4 h-4" /> View Profile
-                      </button>
-                      <button className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors flex items-center gap-2">
-                        <Mail className="w-12 h-4" /> Contact
-                      </button>
+                      </Link>
+                      <Link to={`/candidates/${candidate}`} className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors flex items-center gap-2">
+                        <Mail className="w-4 h-4" /> Contact
+                      </Link>
                     </div>
                   </div>
                 </div>

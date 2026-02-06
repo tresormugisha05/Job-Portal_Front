@@ -1,5 +1,6 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import CandidatesListPage from "./shared/components/pages/CandidatesListPage";
+import CandidateDetailPage from "./shared/components/pages/CandidateDetailPage";
 import JobDetailPage from "./shared/components/pages/JobDetailPage";
 import JobsListPage from "./shared/components/pages/JobsListPage";
 import PostJobPage from "./shared/components/pages/PostJobPage";
@@ -20,6 +21,7 @@ export default function App() {
         <Route path="/jobs" element={<JobsListPage />} />
         <Route path="/jobs:id" element={<JobDetailPage />} />
         <Route path="/candidates" element={<CandidatesListPage />} />
+        <Route path="/candidates/:id" element={<CandidateDetailPage />} />
         <Route path="/employers" element={<EmployerListPage />} />
         <Route path="/employers/:id" element={<EmployerDetailPage />} />
         <Route path="/blog" element={<BlogPage />} />
