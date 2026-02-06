@@ -1,6 +1,8 @@
 import { useState, useMemo } from "react";
 import { Link } from "react-router-dom";
 import PageWrapper from "../layouts/PageWrapper";
+import Loader from "../ui/Loader";
+import usePageLoader from "../../hooks/usePageLoader";
 import {
   FaFacebook,
   FaTwitter,
@@ -100,10 +102,15 @@ const categories = [
 ];
 
 export default function BlogPage() {
+  const isLoading = usePageLoader(1000);
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
   const [currentPage, setCurrentPage] = useState(1);
   const postsPerPage = 3;
+
+  if (isLoading) {
+    return <Loader />;
+  }
 
   // Filter posts based on search and category
   const filteredPosts = useMemo(() => {

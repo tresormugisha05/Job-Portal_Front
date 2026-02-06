@@ -1,69 +1,74 @@
 import { Search, MapPin, Briefcase } from "lucide-react";
+import HomeCategories from "./HomeCategories";
 
 export default function HomeHero() {
-    return (
-        <section className="relative bg-[#0b2c3d] text-white pb-20 pt-32 lg:pb-32 lg:pt-40 overflow-hidden">
-            {/* Background Overlay or Image Placeholder */}
-            <div className="absolute inset-0 bg-[#0b2c3d]/90 z-0"></div>
+  return (
+    <section className="relative min-h-[90vh] bg-[#0b1f33] text-white overflow-hidden">
+      {/* Background image */}
+      <div
+        className="absolute inset-0 bg-cover bg-center"
+        style={{
+          backgroundImage:
+            "url('https://images.unsplash.com/photo-1521737604893-d14cc237f11d')",
+        }}
+      />
+      {/* Dark overlay */}
+      <div className="absolute inset-0 bg-[#0b1f33]/85" />
 
-            {/* Decorative Circles (optional to match "modern" feel) */}
-            <div className="absolute top-0 right-0 w-64 h-64 bg-[#00b4d8] rounded-full blur-3xl opacity-10 translate-x-1/2 -translate-y-1/2"></div>
-            <div className="absolute bottom-0 left-0 w-64 h-64 bg-[#ff6b6b] rounded-full blur-3xl opacity-10 -translate-x-1/2 translate-y-1/2"></div>
+      <div className="relative z-10 max-w-7xl mx-auto px-4 pt-32 pb-16">
+        {/* Headline */}
+        <h1 className="text-4xl md:text-6xl font-light leading-tight mb-4">
+          <span className="text-[#00b4d8] font-bold">3,000+</span> Browse Jobs
+        </h1>
+        <p className="text-gray-300 text-lg mb-10">
+          Find Jobs, Employment & Career Opportunities
+        </p>
 
-            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-                <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
-
-                    {/* Left Content */}
-                    <div className="text-left">
-                        <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold leading-tight mb-6">
-                            Let's Start Your Job <br />
-                            With <span className="text-[#00b4d8]">Job Stock Team</span>
-                        </h1>
-                        <p className="text-lg text-gray-300 mb-8 max-w-lg">
-                            Find Jobs, Employment & Career Opportunities. The most complete job portal to start your career.
-                        </p>
-                        <button className="bg-[#ff6b6b] hover:bg-[#ff5252] text-white px-8 py-3 rounded font-semibold transition-colors">
-                            Upload Resume
-                        </button>
-                    </div>
-
-                    {/* Right Content - Search Form Mockup */}
-                    <div className="bg-white/10 backdrop-blur-md p-6 rounded-lg border border-white/20">
-                        <h3 className="text-xl font-semibold mb-4">Find Your Area</h3>
-                        <form className="space-y-4">
-                            <div className="relative">
-                                <Search className="absolute left-3 top-3 text-gray-400 w-5 h-5" />
-                                <input
-                                    type="text"
-                                    placeholder="Job Title, Keywords..."
-                                    className="w-full pl-10 pr-4 py-3 rounded bg-white text-gray-900 focus:outline-none focus:ring-2 focus:ring-[#00b4d8]"
-                                />
-                            </div>
-                            <div className="relative">
-                                <MapPin className="absolute left-3 top-3 text-gray-400 w-5 h-5" />
-                                <input
-                                    type="text"
-                                    placeholder="City, State, Zip"
-                                    className="w-full pl-10 pr-4 py-3 rounded bg-white text-gray-900 focus:outline-none focus:ring-2 focus:ring-[#00b4d8]"
-                                />
-                            </div>
-                            <div className="relative">
-                                <Briefcase className="absolute left-3 top-3 text-gray-400 w-5 h-5" />
-                                <select className="w-full pl-10 pr-4 py-3 rounded bg-white text-gray-900 focus:outline-none focus:ring-2 focus:ring-[#00b4d8] appearance-none">
-                                    <option>Select Category</option>
-                                    <option>Development</option>
-                                    <option>Marketing</option>
-                                    <option>Design</option>
-                                </select>
-                            </div>
-                            <button type="button" className="w-full bg-[#00b4d8] hover:bg-[#009dc4] text-white font-bold py-3 rounded transition-colors">
-                                Search Job
-                            </button>
-                        </form>
-                    </div>
-
-                </div>
+        {/* Search Bar */}
+        <div className="bg-white/10 backdrop-blur-md rounded-lg p-4">
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+            <div className="relative">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 w-5 h-5" />
+              <input
+                placeholder="What are you looking for?"
+                className="w-full pl-10 pr-4 py-3 rounded text-gray-900 focus:bg-white transition-colors"
+              />
             </div>
-        </section>
-    );
+
+            <div className="relative">
+              <MapPin className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 w-5 h-5" />
+              <select className="w-full pl-10 pr-4 py-3 rounded text-gray-900 focus:bg-white transition-colors">
+                <option>All Regions</option>
+                <option>Kigali</option>
+                <option>Musanze</option>
+              </select>
+            </div>
+
+            <div className="relative">
+              <Briefcase className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 w-5 h-5" />
+              <select className="w-full pl-10 pr-4 py-3 rounded text-gray-900 focus:bg-white transition-colors">
+                <option>Choose a category</option>
+                <option>Technology</option>
+                <option>Accounting</option>
+                <option>Medical</option>
+              </select>
+            </div>
+
+            <button className="bg-[#00b4d8] hover:bg-[#009dc4] font-semibold rounded text-white">
+              SEARCH
+            </button>
+          </div>
+        </div>
+
+        {/* Trending keywords */}
+        <p className="mt-6 text-sm text-gray-300">
+          <span className="text-[#00b4d8] font-semibold">Trending Keywords:</span>{" "}
+          Developer, Design, IT Company, Media, Jobs, Medical
+        </p>
+
+        {/* Categories */}
+        <HomeCategories />
+      </div>
+    </section>
+  );
 }

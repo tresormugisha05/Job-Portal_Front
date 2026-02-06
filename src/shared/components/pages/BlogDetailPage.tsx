@@ -1,6 +1,8 @@
 import { useState } from "react";
 import { useParams, Link } from "react-router-dom";
 import PageWrapper from "../layouts/PageWrapper";
+import Loader from "../ui/Loader";
+import usePageLoader from "../../hooks/usePageLoader";
 import {
   FaFacebook,
   FaTwitter,
@@ -158,8 +160,13 @@ interface Comment {
 }
 
 export default function BlogDetailPage() {
+  const isLoading = usePageLoader(1000);
   const { id } = useParams<{ id: string }>();
   const [comments, setComments] = useState<Comment[]>([]);
+
+  if (isLoading) {
+    return <Loader />;
+  }
   const [formData, setFormData] = useState({
     name: "",
     email: "",

@@ -1,6 +1,14 @@
 import PageWrapper from "../layouts/PageWrapper";
+import Loader from "../ui/Loader";
+import usePageLoader from "../../hooks/usePageLoader";
 
 export default function PostJobPage() {
+  const isLoading = usePageLoader(1000);
+  
+  if (isLoading) {
+    return <Loader />;
+  }
+  
   return (
     <PageWrapper>
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
