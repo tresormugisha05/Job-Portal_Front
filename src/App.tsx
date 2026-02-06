@@ -5,6 +5,9 @@ import JobsListPage from "./shared/components/pages/JobsListPage";
 import PostJobPage from "./shared/components/pages/PostJobPage";
 import PricingTablesPage from "./shared/components/pages/PricingTablesPage";
 import HomePage from "./shared/components/pages/HomePage";
+import BlogPage from "./shared/components/pages/BlogPage";
+import BlogDetailPage from "./shared/components/pages/BlogDetailPage";
+import ContactPage from "./shared/components/pages/contactPage";
 
 export default function App() {
   return (
@@ -14,14 +17,9 @@ export default function App() {
         <Route path="/jobs" element={<JobsListPage />} />
         <Route path="/jobs:id" element={<JobDetailPage />} />
         <Route path="/candidates" element={<CandidatesListPage />} />
-        <Route
-          path="/blog"
-          element={<div className="pt-20 p-8">Blog Page</div>}
-        />
-        <Route
-          path="/contact"
-          element={<div className="pt-20 p-8">Contact Page</div>}
-        />
+        <Route path="/blog" element={<BlogPage />} />
+        <Route path="/blog/:id" element={<BlogDetailPage />} />
+        <Route path="/contact" element={<ContactPage />} />
         <Route path="/pricing" element={<PricingTablesPage />} />
         <Route path="/post-job" element={<PostJobPage />} />
       </Routes>
