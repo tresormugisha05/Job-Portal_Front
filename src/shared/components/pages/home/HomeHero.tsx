@@ -2,7 +2,7 @@ import { Search, MapPin, Briefcase } from "lucide-react";
 
 export default function HomeHero() {
     return (
-        <section className="relative bg-[#0b2c3d] text-white py-20 lg:py-32 overflow-hidden">
+        <section className="relative bg-[#0b2c3d] text-white pb-20 pt-32 lg:pb-32 lg:pt-40 overflow-hidden">
             {/* Background Overlay or Image Placeholder */}
             <div className="absolute inset-0 bg-[#0b2c3d]/90 z-0"></div>
 
