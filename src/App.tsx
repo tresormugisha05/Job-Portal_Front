@@ -8,6 +8,9 @@ import HomePage from "./shared/components/pages/HomePage";
 import EmployerListPage from "./shared/components/pages/EmployerListPage";
 
 import EmployerDetailPage from "./shared/components/pages/EmployerDetailPage";
+import BlogPage from "./shared/components/pages/BlogPage";
+import BlogDetailPage from "./shared/components/pages/BlogDetailPage";
+import ContactPage from "./shared/components/pages/contactPage";
 
 export default function App() {
   return (
@@ -27,6 +30,9 @@ export default function App() {
           path="/contact"
           element={<div className="pt-20 p-8">Contact Page</div>}
         />
+        <Route path="/blog" element={<BlogPage />} />
+        <Route path="/blog/:id" element={<BlogDetailPage />} />
+        <Route path="/contact" element={<ContactPage />} />
         <Route path="/pricing" element={<PricingTablesPage />} />
         <Route path="/post-job" element={<PostJobPage />} />
       </Routes>
