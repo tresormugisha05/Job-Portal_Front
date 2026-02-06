@@ -5,6 +5,7 @@ export interface Employer {
     openings: number;
     location: string;
     description: string;
+    fullDescription?: string;
     logo: string;
     socials: {
         website?: string;
@@ -25,6 +26,7 @@ export const employers: Employer[] = [
         openings: 3,
         location: "12 Lane No 5 Jain Nagar Delhi, 110039",
         description: "Akshay Technology Ltd.",
+        fullDescription: "Akshay INC. is a leading technology company specializing in innovative software solutions. We are dedicated to pushing the boundaries of what is possible with code, delivering high-quality products to clients worldwide. Our team is composed of passionate developers and designers who thrive on challenges.",
         logo: "https://upload.wikimedia.org/wikipedia/commons/9/98/WordPress_blue_logo.svg", // Placeholder
         socials: {
             website: "http://apusthemes.com",
@@ -42,6 +44,7 @@ export const employers: Employer[] = [
         openings: 1,
         location: "New York, USA",
         description: "Innovative tech solutions provided by Apus Inc.",
+        fullDescription: "Apus Inc. provides cutting-edge tech solutions for businesses of all sizes. From cloud computing to AI-driven analytics, we help companies stay ahead of the curve.",
         logo: "https://upload.wikimedia.org/wikipedia/commons/thumb/a/a7/React-icon.svg/1200px-React-icon.svg.png",
         socials: {
             website: "http://apusinc.com",
@@ -126,6 +129,7 @@ export const employers: Employer[] = [
         openings: 2,
         location: "San Francisco, USA",
         description: "Secure payment processing systems.",
+        fullDescription: "Pay Walt is a fintech leader providing secure and efficient payment processing systems. We enable businesses to accept payments from customers globally with ease and confidence.",
         logo: "https://upload.wikimedia.org/wikipedia/commons/3/36/McDonald%27s_Golden_Arches.svg",
         socials: {
             website: "http://paywalt.com",

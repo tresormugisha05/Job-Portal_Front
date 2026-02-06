@@ -239,10 +239,11 @@ export default function EmployerDetailPage() {
 
                         {/* Right Content: Company Details */}
                         <div className="flex-1 order-1 lg:order-2">
-                            <div className="bg-white p-8 border border-gray-100 shadow-sm rounded-sm">
+                            {/* Company Header Card */}
+                            <div className="bg-white p-8 border border-gray-100 shadow-sm rounded-sm mb-8">
                                 <div className="flex flex-col md:flex-row gap-6 items-start">
                                     {/* Logo */}
-                                    <div className="w-32 h-32 border border-gray-200 flex items-center justify-center p-2 bg-white">
+                                    <div className="w-32 h-32 border border-gray-200 flex items-center justify-center p-2 bg-white flex-shrink-0">
                                         <img
                                             src={employer.logo}
                                             alt={`${employer.name} Logo`}
@@ -352,16 +353,27 @@ export default function EmployerDetailPage() {
                                 </div>
                             </div>
 
+                            {/* Company Description */}
+                            <div className="bg-white p-8 border border-gray-100 shadow-sm rounded-sm mb-8">
+                                <h3 className="text-xl font-bold text-gray-900 mb-4">
+                                    About {employer.name}
+                                </h3>
+                                <div className="prose prose-sm max-w-none text-gray-600 leading-relaxed">
+                                    {employer.fullDescription || "No description added."}
+                                </div>
+                            </div>
+
                             {/* Company Jobs */}
-                            <div className="mt-8">
-                                <h3 className="text-xl font-bold text-gray-900 mb-4">Open Positions</h3>
+                            <div>
+                                <h3 className="text-xl font-bold text-gray-900 mb-4">
+                                    Open Positions
+                                </h3>
                                 <div className="grid grid-cols-1 gap-6">
-                                    {jobs.filter(job => job.employerId === employer.id).length > 0 ? (
+                                    {jobs.filter((job) => job.employerId === employer.id)
+                                        .length > 0 ? (
                                         jobs
-                                            .filter(job => job.employerId === employer.id)
-                                            .map(job => (
-                                                <JobCard key={job.id} job={job} />
-                                            ))
+                                            .filter((job) => job.employerId === employer.id)
+                                            .map((job) => <JobCard key={job.id} job={job} />)
                                     ) : (
                                         <div className="bg-white p-6 rounded border border-gray-100 text-center text-gray-500">
                                             No open positions found.
