@@ -1,18 +1,25 @@
+import { MapPin, Briefcase, GraduationCap, Eye, Mail } from "lucide-react";
+import PageWrapper from "../layouts/PageWrapper";
+
 export default function CandidatesListPage() {
   return (
-    <div className="min-h-screen bg-gray-50">
+    <PageWrapper>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <h1 className="text-3xl font-bold text-gray-900 mb-8">Browse Candidates</h1>
-        
+        <h1 className="text-3xl font-bold text-gray-900 mb-8">
+          Browse Candidates
+        </h1>
+
         <div className="flex flex-col lg:flex-row gap-8">
           {/* Filters Sidebar */}
           <div className="lg:w-1/4">
             <div className="bg-white rounded-lg shadow p-6">
               <h3 className="font-semibold text-lg mb-4">Filter Candidates</h3>
-              
+
               {/* Keywords */}
               <div className="mb-6">
-                <label className="block text-sm font-medium text-gray-700 mb-2">Keywords</label>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Keywords
+                </label>
                 <input
                   type="text"
                   className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
@@ -22,7 +29,9 @@ export default function CandidatesListPage() {
 
               {/* Location */}
               <div className="mb-6">
-                <label className="block text-sm font-medium text-gray-700 mb-2">Location</label>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Location
+                </label>
                 <select className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
                   <option>All Locations</option>
                   <option>New York</option>
@@ -34,7 +43,9 @@ export default function CandidatesListPage() {
 
               {/* Experience Level */}
               <div className="mb-6">
-                <label className="block text-sm font-medium text-gray-700 mb-2">Experience Level</label>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Experience Level
+                </label>
                 <div className="space-y-2">
                   <label className="flex items-center">
                     <input type="checkbox" className="mr-2" />
@@ -53,7 +64,9 @@ export default function CandidatesListPage() {
 
               {/* Skills */}
               <div className="mb-6">
-                <label className="block text-sm font-medium text-gray-700 mb-2">Skills</label>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Skills
+                </label>
                 <div className="space-y-2">
                   <label className="flex items-center">
                     <input type="checkbox" className="mr-2" />
@@ -76,7 +89,9 @@ export default function CandidatesListPage() {
 
               {/* Education */}
               <div className="mb-6">
-                <label className="block text-sm font-medium text-gray-700 mb-2">Education</label>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Education
+                </label>
                 <div className="space-y-2">
                   <label className="flex items-center">
                     <input type="checkbox" className="mr-2" />
@@ -103,7 +118,9 @@ export default function CandidatesListPage() {
           <div className="lg:w-3/4">
             <div className="bg-white rounded-lg shadow mb-6 p-4">
               <div className="flex flex-col sm:flex-row justify-between items-center">
-                <p className="text-gray-600 mb-2 sm:mb-0">Showing 1-10 of 500+ candidates</p>
+                <p className="text-gray-600 mb-2 sm:mb-0">
+                  Showing 1-10 of 500+ candidates
+                </p>
                 <select className="px-3 py-2 border border-gray-300 rounded-md">
                   <option>Sort by: Latest</option>
                   <option>Sort by: Most Experienced</option>
@@ -115,7 +132,10 @@ export default function CandidatesListPage() {
             {/* Candidate Cards */}
             <div className="space-y-4">
               {[1, 2, 3, 4, 5].map((candidate) => (
-                <div key={candidate} className="bg-white rounded-lg shadow p-6 hover:shadow-lg transition-shadow">
+                <div
+                  key={candidate}
+                  className="bg-white rounded-lg shadow p-6 hover:shadow-lg transition-shadow"
+                >
                   <div className="flex flex-col sm:flex-row justify-between">
                     <div className="flex-1">
                       <div className="flex items-start gap-4">
@@ -129,33 +149,44 @@ export default function CandidatesListPage() {
                           <p className="text-blue-600 mb-2">Project Manager</p>
                           <div className="flex flex-wrap gap-2 text-sm text-gray-600 mb-3">
                             <span className="flex items-center gap-1">
-                              📍 New York
+                              <MapPin className="w-4 h-4" /> New York
                             </span>
                             <span className="flex items-center gap-1">
-                              💼 5+ years experience
+                              <Briefcase className="w-4 h-4" /> 5+ years
+                              experience
                             </span>
                             <span className="flex items-center gap-1">
-                              🎓 Bachelor's Degree
+                              <GraduationCap className="w-4 h-4" /> Bachelor's
+                              Degree
                             </span>
                           </div>
                           <div className="flex flex-wrap gap-2 mb-3">
-                            <span className="px-2 py-1 bg-blue-100 text-blue-700 text-xs rounded">Leadership</span>
-                            <span className="px-2 py-1 bg-green-100 text-green-700 text-xs rounded">Agile</span>
-                            <span className="px-2 py-1 bg-purple-100 text-purple-700 text-xs rounded">Scrum</span>
-                            <span className="px-2 py-1 bg-yellow-100 text-yellow-700 text-xs rounded">PMP</span>
+                            <span className="px-2 py-1 bg-blue-100 text-blue-700 text-xs rounded">
+                              Leadership
+                            </span>
+                            <span className="px-2 py-1 bg-green-100 text-green-700 text-xs rounded">
+                              Agile
+                            </span>
+                            <span className="px-2 py-1 bg-purple-100 text-purple-700 text-xs rounded">
+                              Scrum
+                            </span>
+                            <span className="px-2 py-1 bg-yellow-100 text-yellow-700 text-xs rounded">
+                              PMP
+                            </span>
                           </div>
                           <p className="text-gray-600 text-sm line-clamp-2">
-                            Experienced Project Manager with 5+ years in software development projects...
+                            Experienced Project Manager with 5+ years in
+                            software development projects...
                           </p>
                         </div>
                       </div>
                     </div>
                     <div className="flex flex-col items-end gap-2 mt-4 sm:mt-0">
-                      <button className="px-4 py-2 border border-gray-300 text-gray-700 rounded-md hover:bg-gray-50 transition-colors">
-                        👁️ View Profile
+                      <button className="px-4 py-2 border border-gray-300 text-gray-700 rounded-md hover:bg-gray-50 transition-colors flex items-center gap-2">
+                        <Eye className="w-4 h-4" /> View Profile
                       </button>
-                      <button className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors">
-                        ✉️ Contact
+                      <button className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors flex items-center gap-2">
+                        <Mail className="w-12 h-4" /> Contact
                       </button>
                     </div>
                   </div>
@@ -166,18 +197,30 @@ export default function CandidatesListPage() {
             {/* Pagination */}
             <div className="mt-8 flex justify-center">
               <nav className="flex items-center gap-2">
-                <button className="px-3 py-2 border border-gray-300 rounded-md hover:bg-gray-50">Previous</button>
-                <button className="px-3 py-2 bg-blue-600 text-white rounded-md">1</button>
-                <button className="px-3 py-2 border border-gray-300 rounded-md hover:bg-gray-50">2</button>
-                <button className="px-3 py-2 border border-gray-300 rounded-md hover:bg-gray-50">3</button>
+                <button className="px-3 py-2 border border-gray-300 rounded-md hover:bg-gray-50">
+                  Previous
+                </button>
+                <button className="px-3 py-2 bg-blue-600 text-white rounded-md">
+                  1
+                </button>
+                <button className="px-3 py-2 border border-gray-300 rounded-md hover:bg-gray-50">
+                  2
+                </button>
+                <button className="px-3 py-2 border border-gray-300 rounded-md hover:bg-gray-50">
+                  3
+                </button>
                 <span className="px-3 py-2">...</span>
-                <button className="px-3 py-2 border border-gray-300 rounded-md hover:bg-gray-50">50</button>
-                <button className="px-3 py-2 border border-gray-300 rounded-md hover:bg-gray-50">Next</button>
+                <button className="px-3 py-2 border border-gray-300 rounded-md hover:bg-gray-50">
+                  50
+                </button>
+                <button className="px-3 py-2 border border-gray-300 rounded-md hover:bg-gray-50">
+                  Next
+                </button>
               </nav>
             </div>
           </div>
         </div>
       </div>
-    </div>
+    </PageWrapper>
   );
 }
