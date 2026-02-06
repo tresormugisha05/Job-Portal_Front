@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from "react";
 import PageWrapper from "../layouts/PageWrapper";
+import Loader from "../ui/Loader";
+import usePageLoader from "../../hooks/usePageLoader";
 import {
   User,
   Mail,
@@ -85,6 +87,7 @@ const SocialLink: React.FC<{
 );
 
 const ContactPage: React.FC = () => {
+  const isLoading = usePageLoader(1000);
   const [formData, setFormData] = useState<FormData>({
     name: "",
     email: "",
@@ -92,6 +95,10 @@ const ContactPage: React.FC = () => {
     subject: "",
     message: "",
   });
+
+  if (isLoading) {
+    return <Loader />;
+  }
 
   const [formErrors, setFormErrors] = useState<Record<string, string>>({});
   const [submitStatus, setSubmitStatus] = useState<{

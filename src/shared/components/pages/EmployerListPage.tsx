@@ -2,8 +2,16 @@ import PageWrapper from "../layouts/PageWrapper";
 import { ChevronRight } from "lucide-react";
 import { Link } from "react-router-dom";
 import { employers } from "../../data/employers";
+import Loader from "../ui/Loader";
+import usePageLoader from "../../hooks/usePageLoader";
 
 export default function EmployerListPage() {
+    const isLoading = usePageLoader(1000);
+    
+    if (isLoading) {
+        return <Loader />;
+    }
+    
     // Group companies by first letter
     const companyGroups = employers.reduce((groups, company) => {
         const letter = company.name.charAt(0).toUpperCase();

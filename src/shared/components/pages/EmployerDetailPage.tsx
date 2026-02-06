@@ -1,5 +1,7 @@
 import { useParams, Link } from "react-router-dom";
 import PageWrapper from "../layouts/PageWrapper";
+import Loader from "../ui/Loader";
+import usePageLoader from "../../hooks/usePageLoader";
 import {
     ChevronRight,
     MapPin,
@@ -13,8 +15,13 @@ import { jobs } from "../../data/jobs";
 import JobCard from "../ui/JobCard";
 
 export default function EmployerDetailPage() {
+    const isLoading = usePageLoader(1000);
     const { id } = useParams();
     const employer = employers.find((e) => e.id === id);
+
+    if (isLoading) {
+        return <Loader />;
+    }
 
     const categories = [
         { name: "Accounting", count: 1 },

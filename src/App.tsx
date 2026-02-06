@@ -22,14 +22,6 @@ export default function App() {
         <Route path="/candidates" element={<CandidatesListPage />} />
         <Route path="/employers" element={<EmployerListPage />} />
         <Route path="/employers/:id" element={<EmployerDetailPage />} />
-        <Route
-          path="/blog"
-          element={<div className="pt-20 p-8">Blog Page</div>}
-        />
-        <Route
-          path="/contact"
-          element={<div className="pt-20 p-8">Contact Page</div>}
-        />
         <Route path="/blog" element={<BlogPage />} />
         <Route path="/blog/:id" element={<BlogDetailPage />} />
         <Route path="/contact" element={<ContactPage />} />

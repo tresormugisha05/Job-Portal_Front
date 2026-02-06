@@ -1,10 +1,23 @@
 import { MapPin, Briefcase, DollarSign, Calendar, Heart } from "lucide-react";
+import { useParams } from "react-router-dom";
 import PageWrapper from "../layouts/PageWrapper";
+import Loader from "../ui/Loader";
+import usePageLoader from "../../hooks/usePageLoader";
 
 export default function JobDetailPage() {
+  const { id } = useParams();
+  const isLoading = usePageLoader(1000);
+  
+  if (isLoading) {
+    return <Loader />;
+  }
+  
   return (
     <PageWrapper>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <div className="mb-4 p-4 bg-blue-50 rounded-lg">
+          <p className="text-blue-800">Job ID: {id}</p>
+        </div>
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           {/* Main Content */}
           <div className="lg:col-span-2">
