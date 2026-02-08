@@ -11,6 +11,7 @@ import {
   FaPinterest,
 } from "react-icons/fa";
 import { Calendar, Folder, Tag, User, Plus, ChevronRight, Mail, UserIcon } from "lucide-react";
+import PageHeader from "../ui/PageHeader";
 
 interface BlogPost {
   id: number;
@@ -164,9 +165,6 @@ export default function BlogDetailPage() {
   const { id } = useParams<{ id: string }>();
   const [comments, setComments] = useState<Comment[]>([]);
 
-  if (isLoading) {
-    return <Loader />;
-  }
   const [formData, setFormData] = useState({
     name: "",
     email: "",
@@ -175,6 +173,10 @@ export default function BlogDetailPage() {
   const [submitted, setSubmitted] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
+
+  if (isLoading) {
+    return <Loader />;
+  }
 
   const post = blogPosts.find((p) => p.id === parseInt(id || "0"));
 
@@ -229,23 +231,8 @@ export default function BlogDetailPage() {
   };
 
   return (
-    <PageWrapper>
-      {/* Header Section */}
-      <section className="relative bg-[#1a2f4b] text-white py-16">
-        <div className="max-w-7xl mx-auto px-4">
-          <div className="flex items-center gap-2 text-sm">
-            <Link to="/" className="hover:text-cyan-400 transition-colors">
-              Home
-            </Link>
-            <span>&gt;</span>
-            <Link to="/blog" className="hover:text-cyan-400 transition-colors">
-              {post.category}
-            </Link>
-            <span>&gt;</span>
-            <span className="text-cyan-400">{post.title}</span>
-          </div>
-        </div>
-      </section>
+    <PageWrapper disableTopPadding={true}>
+      <PageHeader title={post.title} breadcrumb={post.category} />
 
       {/* Main Content */}
       <section className="bg-white py-12">
@@ -471,19 +458,17 @@ export default function BlogDetailPage() {
                             selectedCategory === cat.name ? null : cat.name,
                           )
                         }
-                        className={`flex items-center gap-2 transition-colors ${
-                          selectedCategory === cat.name
-                            ? "text-cyan-600 font-semibold"
-                            : "text-gray-700 hover:text-cyan-600"
-                        }`}
+                        className={`flex items-center gap-2 transition-colors ${selectedCategory === cat.name
+                          ? "text-cyan-600 font-semibold"
+                          : "text-gray-700 hover:text-cyan-600"
+                          }`}
                       >
                         <ChevronRight
                           size={16}
-                          className={`${
-                            selectedCategory === cat.name
-                              ? "text-cyan-600"
-                              : "text-gray-400"
-                          }`}
+                          className={`${selectedCategory === cat.name
+                            ? "text-cyan-600"
+                            : "text-gray-400"
+                            }`}
                         />
                         <span>{cat.name}</span>
                         <span className="text-cyan-500 ml-auto font-semibold">

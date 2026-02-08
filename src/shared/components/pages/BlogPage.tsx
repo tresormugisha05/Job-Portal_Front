@@ -11,6 +11,7 @@ import {
   FaPinterest,
 } from "react-icons/fa";
 import { Calendar, Folder, Plus, ChevronRight } from "lucide-react";
+import PageHeader from "../ui/PageHeader";
 
 interface BlogPost {
   id: number;
@@ -108,10 +109,6 @@ export default function BlogPage() {
   const [currentPage, setCurrentPage] = useState(1);
   const postsPerPage = 3;
 
-  if (isLoading) {
-    return <Loader />;
-  }
-
   // Filter posts based on search and category
   const filteredPosts = useMemo(() => {
     return blogPosts.filter((post) => {
@@ -123,6 +120,10 @@ export default function BlogPage() {
       return matchesSearch && matchesCategory;
     });
   }, [searchTerm, selectedCategory]);
+
+  if (isLoading) {
+    return <Loader />;
+  }
 
   // Calculate pagination
   const totalPages = Math.ceil(filteredPosts.length / postsPerPage);
@@ -144,20 +145,8 @@ export default function BlogPage() {
   };
 
   return (
-    <PageWrapper>
-      {/* Header Section */}
-      <section className="relative bg-[#1a2f4b] text-white py-16">
-        <div className="max-w-7xl mx-auto px-4">
-          <h1 className="text-4xl font-bold mb-4">The Blogs</h1>
-          <div className="flex items-center gap-2 text-sm">
-            <a href="/" className="hover:text-cyan-400 transition-colors">
-              Home
-            </a>
-            <span>&gt;</span>
-            <span className="text-cyan-400">The Blogs</span>
-          </div>
-        </div>
-      </section>
+    <PageWrapper disableTopPadding={true}>
+      <PageHeader title="The Blogs" breadcrumb="The Blogs" />
 
       {/* Main Content */}
       <section className="bg-white py-12">
@@ -275,11 +264,10 @@ export default function BlogPage() {
                         <button
                           key={page}
                           onClick={() => setCurrentPage(page)}
-                          className={`px-4 py-2 rounded-lg transition-colors ${
-                            currentPage === page
-                              ? "bg-cyan-500 text-white"
-                              : "border border-gray-300 text-gray-700 hover:bg-gray-50"
-                          }`}
+                          className={`px-4 py-2 rounded-lg transition-colors ${currentPage === page
+                            ? "bg-cyan-500 text-white"
+                            : "border border-gray-300 text-gray-700 hover:bg-gray-50"
+                            }`}
                         >
                           {page}
                         </button>
@@ -337,11 +325,10 @@ export default function BlogPage() {
                     <div key={cat.name}>
                       <button
                         onClick={() => handleCategoryClick(cat.name)}
-                        className={`flex items-center gap-2 transition-colors ${
-                          selectedCategory === cat.name
-                            ? "text-cyan-600 font-semibold"
-                            : "text-gray-700 hover:text-cyan-600"
-                        }`}
+                        className={`flex items-center gap-2 transition-colors ${selectedCategory === cat.name
+                          ? "text-cyan-600 font-semibold"
+                          : "text-gray-700 hover:text-cyan-600"
+                          }`}
                       >
                         <ChevronRight
                           size={16}

@@ -1,84 +1,120 @@
-import { Briefcase, Plus } from "lucide-react";
+import { useState, useEffect, useMemo } from "react";
+import { Briefcase, Plus, ChevronLeft, ChevronRight } from "lucide-react";
+import { candidates } from "../../../data/candidates";
+import { Link } from "react-router-dom";
 
 export default function HomeResumes() {
-  const resumes = [
-    {
-      name: "Jhon Doe",
-      role: "Project Manager",
-      image:
-        "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&h=150&fit=crop&crop=faces",
-    },
-    {
-      name: "Doe Akshay",
-      role: "Project Manager",
-      image:
-        "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=150&h=150&fit=crop&crop=faces",
-    },
-    {
-      name: "Devel Name",
-      role: "UI Designer",
-      image:
-        "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop&crop=faces",
-    },
-    {
-      name: "Akshay Handge",
-      role: "Developer",
-      image:
-        "https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?w=150&h=150&fit=crop&crop=faces",
-    },
-  ];
+  const [currentIndex, setCurrentIndex] = useState(0);
+  const [visibleCount, setVisibleCount] = useState(2);
+
+  // Use latest candidates for "Recent"
+  const recentCandidates = useMemo(() => {
+    return candidates.slice(0, 8); // Take first 8 as recent
+  }, []);
+
+  // Responsive visible count
+  useEffect(() => {
+    const updateVisibleCount = () => {
+      if (window.innerWidth >= 768) setVisibleCount(2);
+      else setVisibleCount(1);
+    };
+
+    updateVisibleCount();
+    window.addEventListener('resize', updateVisibleCount);
+    return () => window.removeEventListener('resize', updateVisibleCount);
+  }, []);
+
+  const maxIndex = Math.max(0, recentCandidates.length - visibleCount);
+
+  const nextSlide = () => {
+    setCurrentIndex((prev) => (prev >= maxIndex ? 0 : prev + 1));
+  };
+
+  const prevSlide = () => {
+    setCurrentIndex((prev) => (prev <= 0 ? maxIndex : prev - 1));
+  };
 
   return (
-    <section className="py-20 bg-gray-50">
+    <section className="py-20 bg-gray-50 overflow-hidden">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Header */}
-        <div className="text-center mb-16">
-          <h2 className="text-2xl font-bold text-gray-900 uppercase tracking-wide">
-            RECENT RESUMES
-          </h2>
-          <div className="w-12 h-0.5 bg-[#00b4d8] mx-auto mt-4"></div>
+        <div className="flex flex-col md:flex-row items-center justify-between mb-16 gap-6">
+          <div className="text-center md:text-left">
+            <h2 className="text-2xl font-bold text-gray-900 uppercase tracking-wide">
+              RECENT RESUMES
+            </h2>
+            <div className="w-12 h-0.5 bg-[#00b4d8] mt-4 mx-auto md:mx-0"></div>
+          </div>
+
+          {/* Navigation Arrows */}
+          <div className="flex gap-2">
+            <button
+              onClick={prevSlide}
+              className="w-10 h-10 rounded-full border-2 border-gray-200 flex items-center justify-center text-gray-400 hover:text-[#00b4d8] hover:border-[#00b4d8] transition-all active:scale-95"
+            >
+              <ChevronLeft className="w-5 h-5" />
+            </button>
+            <button
+              onClick={nextSlide}
+              className="w-10 h-10 rounded-full border-2 border-gray-200 flex items-center justify-center text-gray-400 hover:text-[#00b4d8] hover:border-[#00b4d8] transition-all active:scale-95"
+            >
+              <ChevronRight className="w-5 h-5" />
+            </button>
+          </div>
         </div>
 
-        {/* Resumes Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-12 max-w-5xl mx-auto">
-          {resumes.map((resume, index) => (
-            <div
-              key={index}
-              className="bg-white p-8 border border-gray-200 flex items-center justify-between hover:shadow-lg transition-shadow relative"
-            >
-              {/* Bottom border accent */}
-              <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-[#00b4d8]"></div>
+        {/* Carousel Container */}
+        <div className="relative mb-12 max-w-5xl mx-auto">
+          <div
+            className="flex transition-transform duration-500 ease-out gap-6"
+            style={{ transform: `translateX(-${currentIndex * (100 / visibleCount)}%)` }}
+          >
+            {recentCandidates.map((candidate) => (
+              <div
+                key={candidate.id}
+                className="flex-shrink-0 bg-white p-6 sm:p-8 border border-gray-100 flex flex-col sm:flex-row items-center justify-between hover:shadow-xl transition-all relative group"
+                style={{ width: `calc(${(100 / visibleCount)}% - ${(6 * (visibleCount - 1)) / visibleCount}px)` }}
+              >
+                {/* Bottom border accent */}
+                <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-gray-100 group-hover:bg-[#00b4d8] transition-colors"></div>
 
-              <div className="flex items-center gap-4">
-                <img
-                  src={resume.image}
-                  alt={resume.name}
-                  className="w-16 h-16 rounded-sm object-cover"
-                />
-                <div>
-                  <h3 className="text-base font-semibold text-gray-900 mb-1">
-                    {resume.name}
-                  </h3>
-                  <div className="flex items-center gap-1.5 text-sm">
-                    <Briefcase className="w-3.5 h-3.5 text-[#ff6b6b]" />
-                    <span className="text-gray-500">{resume.role}</span>
+                <div className="flex items-center gap-4 mb-4 sm:mb-0">
+                  {/* Initials Avatar */}
+                  <div className="w-16 h-16 bg-gradient-to-br from-gray-100 to-gray-200 rounded-sm flex items-center justify-center border border-gray-200 shrink-0 shadow-sm transition-transform group-hover:scale-105 duration-300">
+                    <span className="text-xl font-bold text-gray-500">{candidate.initials}</span>
+                  </div>
+
+                  <div>
+                    <h3 className="text-base font-bold text-gray-900 mb-1 group-hover:text-[#00b4d8] transition-colors">
+                      <Link to={`/candidates/${candidate.id}`}>{candidate.name}</Link>
+                    </h3>
+                    <div className="flex items-center gap-1.5 text-sm">
+                      <Briefcase className="w-3.5 h-3.5 text-[#ff6b6b]" />
+                      <span className="text-gray-500 font-medium">{candidate.role}</span>
+                    </div>
                   </div>
                 </div>
-              </div>
 
-              <button className="bg-[#0a0e27] hover:bg-black text-white text-xs px-5 py-2.5 rounded uppercase tracking-wider font-medium transition-colors">
-                VIEW PROFILE
-              </button>
-            </div>
-          ))}
+                <Link
+                  to={`/candidates/${candidate.id}`}
+                  className="bg-[#0a0e27] hover:bg-[#00b4d8] text-white text-[10px] px-5 py-2.5 rounded uppercase tracking-wider font-bold transition-all shadow-sm active:scale-95"
+                >
+                  VIEW PROFILE
+                </Link>
+              </div>
+            ))}
+          </div>
         </div>
 
         {/* View All Button */}
         <div className="text-center">
-          <button className="bg-[#00b4d8] hover:bg-[#009bc2] text-white px-10 py-3 rounded text-sm font-semibold uppercase tracking-wide transition-colors inline-flex items-center gap-2">
+          <Link
+            to="/candidates"
+            className="bg-[#00b4d8] hover:bg-[#009bc2] text-white px-10 py-3 rounded text-sm font-bold uppercase tracking-wide transition-all shadow-md hover:shadow-lg active:scale-95 inline-flex items-center gap-2"
+          >
             <Plus className="w-4 h-4" />
             VIEW ALL
-          </button>
+          </Link>
         </div>
       </div>
     </section>

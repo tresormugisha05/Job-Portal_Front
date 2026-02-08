@@ -1,7 +1,23 @@
+import { useState } from "react";
 import { Search, MapPin, Briefcase } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 import HomeCategories from "./HomeCategories";
 
 export default function HomeHero() {
+  const navigate = useNavigate();
+  const [keyword, setKeyword] = useState("");
+  const [region, setRegion] = useState("All Regions");
+  const [category, setCategory] = useState("Choose a category");
+
+  const handleSearch = () => {
+    const params = new URLSearchParams();
+    if (keyword) params.append("search", keyword);
+    if (region !== "All Regions") params.append("location", region);
+    if (category !== "Choose a category") params.append("category", category);
+
+    navigate(`/jobs?${params.toString()}`);
+  };
+
   return (
     <section className="relative min-h-[90vh] bg-[#0b1f33] text-white overflow-hidden">
       {/* Background image */}
@@ -31,13 +47,20 @@ export default function HomeHero() {
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 w-5 h-5" />
               <input
                 placeholder="What are you looking for?"
+                value={keyword}
+                onChange={(e) => setKeyword(e.target.value)}
                 className="w-full pl-10 pr-4 py-3 rounded text-gray-900 focus:bg-white transition-colors"
+                onKeyPress={(e) => e.key === 'Enter' && handleSearch()}
               />
             </div>
 
             <div className="relative">
               <MapPin className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 w-5 h-5" />
-              <select className="w-full pl-10 pr-4 py-3 rounded text-gray-900 focus:bg-white transition-colors">
+              <select
+                value={region}
+                onChange={(e) => setRegion(e.target.value)}
+                className="w-full pl-10 pr-4 py-3 rounded text-gray-900 focus:bg-white transition-colors"
+              >
                 <option>All Regions</option>
                 <option>Kigali</option>
                 <option>Musanze</option>
@@ -46,7 +69,11 @@ export default function HomeHero() {
 
             <div className="relative">
               <Briefcase className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 w-5 h-5" />
-              <select className="w-full pl-10 pr-4 py-3 rounded text-gray-900 focus:bg-white transition-colors">
+              <select
+                value={category}
+                onChange={(e) => setCategory(e.target.value)}
+                className="w-full pl-10 pr-4 py-3 rounded text-gray-900 focus:bg-white transition-colors"
+              >
                 <option>Choose a category</option>
                 <option>Technology</option>
                 <option>Accounting</option>
@@ -54,7 +81,10 @@ export default function HomeHero() {
               </select>
             </div>
 
-            <button className="bg-[#00b4d8] hover:bg-[#009dc4] font-semibold rounded text-white">
+            <button
+              onClick={handleSearch}
+              className="bg-[#00b4d8] hover:bg-[#009dc4] font-semibold rounded text-white"
+            >
               SEARCH
             </button>
           </div>

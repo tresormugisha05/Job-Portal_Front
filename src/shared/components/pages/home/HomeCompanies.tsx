@@ -1,6 +1,10 @@
+import { useState, useEffect } from "react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 
 export default function HomeCompanies() {
+    const [currentIndex, setCurrentIndex] = useState(0);
+    const [visibleCount, setVisibleCount] = useState(4);
+
     const companies = [
         {
             name: "AbcPay INC.",
@@ -60,6 +64,29 @@ export default function HomeCompanies() {
         },
     ];
 
+    // Responsive visible count
+    useEffect(() => {
+        const updateVisibleCount = () => {
+            if (window.innerWidth >= 1024) setVisibleCount(4);
+            else if (window.innerWidth >= 640) setVisibleCount(2);
+            else setVisibleCount(1);
+        };
+
+        updateVisibleCount();
+        window.addEventListener('resize', updateVisibleCount);
+        return () => window.removeEventListener('resize', updateVisibleCount);
+    }, []);
+
+    const maxIndex = companies.length - visibleCount;
+
+    const nextSlide = () => {
+        setCurrentIndex((prev) => (prev >= maxIndex ? 0 : prev + 1));
+    };
+
+    const prevSlide = () => {
+        setCurrentIndex((prev) => (prev <= 0 ? maxIndex : prev - 1));
+    };
+
     return (
         <section className="py-16 bg-[#2c3e50] relative overflow-hidden">
             {/* Background overlay pattern */}
@@ -80,42 +107,66 @@ export default function HomeCompanies() {
 
                     {/* Navigation Arrows */}
                     <div className="flex gap-2">
-                        <button className="w-10 h-10 rounded-full border-2 border-white/30 flex items-center justify-center text-white hover:bg-white/10 transition-colors">
+                        <button
+                            onClick={prevSlide}
+                            className="w-10 h-10 rounded-full border-2 border-white/30 flex items-center justify-center text-white hover:bg-white/10 hover:border-white transition-all active:scale-95"
+                        >
                             <ChevronLeft className="w-5 h-5" />
                         </button>
-                        <button className="w-10 h-10 rounded-full border-2 border-white/30 flex items-center justify-center text-white hover:bg-white/10 transition-colors">
+                        <button
+                            onClick={nextSlide}
+                            className="w-10 h-10 rounded-full border-2 border-white/30 flex items-center justify-center text-white hover:bg-white/10 hover:border-white transition-all active:scale-95"
+                        >
                             <ChevronRight className="w-5 h-5" />
                         </button>
                     </div>
                 </div>
 
-                {/* Companies Grid */}
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-                    {companies.map((company, index) => (
-                        <div
-                            key={index}
-                            className="bg-white rounded-lg p-6 text-center hover:shadow-xl transition-shadow"
-                        >
-                            {/* Logo */}
-                            <div className="flex justify-center mb-4">
-                                <div
-                                    className={`w-16 h-16 rounded-full ${company.logoBg} flex items-center justify-center text-2xl font-bold`}
-                                >
-                                    {company.logo}
+                {/* Carousel Container */}
+                <div className="relative overflow-hidden">
+                    <div
+                        className="flex transition-transform duration-500 ease-out gap-6"
+                        style={{ transform: `translateX(-${currentIndex * (100 / visibleCount)}%)` }}
+                    >
+                        {companies.map((company, index) => (
+                            <div
+                                key={index}
+                                className={`flex-shrink-0 bg-white rounded-lg p-6 text-center hover:shadow-xl transition-all duration-300 border border-transparent hover:border-[#00b4d8]/30`}
+                                style={{ width: `calc(${(100 / visibleCount)}% - ${(6 * (visibleCount - 1)) / visibleCount}px)` }}
+                            >
+                                {/* Logo */}
+                                <div className="flex justify-center mb-4">
+                                    <div
+                                        className={`w-16 h-16 rounded-full ${company.logoBg} flex items-center justify-center text-2xl font-bold shadow-sm`}
+                                    >
+                                        {company.logo}
+                                    </div>
                                 </div>
+
+                                {/* Company Info */}
+                                <h3 className="text-base font-semibold text-gray-900 mb-1 truncate">
+                                    {company.name}
+                                </h3>
+                                <p className="text-xs text-gray-500 mb-4">{company.location}</p>
+
+                                {/* Openings Button */}
+                                <button className="w-full bg-[#2c3e50] text-white text-[10px] px-4 py-2 rounded font-bold hover:bg-[#34495e] transition-colors uppercase tracking-wider">
+                                    {company.openings} OPENING{company.openings > 1 ? "S" : ""}
+                                </button>
                             </div>
+                        ))}
+                    </div>
+                </div>
 
-                            {/* Company Info */}
-                            <h3 className="text-base font-semibold text-gray-900 mb-1">
-                                {company.name}
-                            </h3>
-                            <p className="text-xs text-gray-500 mb-4">{company.location}</p>
-
-                            {/* Openings Button */}
-                            <button className="bg-[#2c3e50] text-white text-xs px-4 py-2 rounded font-medium hover:bg-[#34495e] transition-colors uppercase">
-                                {company.openings} OPENING{company.openings > 1 ? "S" : ""}
-                            </button>
-                        </div>
+                {/* Dots indicator */}
+                <div className="flex justify-center gap-2 mt-8">
+                    {Array.from({ length: maxIndex + 1 }).map((_, i) => (
+                        <button
+                            key={i}
+                            onClick={() => setCurrentIndex(i)}
+                            className={`w-2 h-2 rounded-full transition-all ${currentIndex === i ? "bg-[#00b4d8] w-4" : "bg-white/30 hover:bg-white/50"
+                                }`}
+                        />
                     ))}
                 </div>
             </div>

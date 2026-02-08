@@ -1,106 +1,151 @@
+import { useState } from "react";
 import { MapPin, Briefcase, DollarSign, Calendar, Heart } from "lucide-react";
-import { useParams } from "react-router-dom";
+import { useParams, Link } from "react-router-dom";
 import PageWrapper from "../layouts/PageWrapper";
 import Loader from "../ui/Loader";
 import usePageLoader from "../../hooks/usePageLoader";
+import { jobs } from "../../data/jobs";
+import { employers } from "../../data/employers";
+import ApplyJobModal from "../ui/ApplyJobModal";
 
 export default function JobDetailPage() {
   const { id } = useParams();
   const isLoading = usePageLoader(1000);
-  
+  const [isApplyModalOpen, setIsApplyModalOpen] = useState(false);
+  const [isSaved, setIsSaved] = useState(false);
+
+  const job = jobs.find(j => j.id === id);
+  const employer = job ? employers.find(e => e.id === job.employerId) : null;
+
+  // Get similar jobs (exclude current job)
+  const similarJobs = jobs.filter(j => j.id !== id).slice(0, 3);
+
   if (isLoading) {
     return <Loader />;
   }
-  
+
+  if (!job) {
+    return (
+      <PageWrapper>
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 text-center">
+          <h1 className="text-2xl font-bold text-gray-900">Job Not Found</h1>
+          <p className="text-gray-600 mt-2">The job you are looking for does not exist.</p>
+          <Link to="/jobs" className="text-[#00b4d8] hover:underline mt-4 inline-block">Browse All Jobs</Link>
+        </div>
+      </PageWrapper>
+    )
+  }
+
   return (
     <PageWrapper>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div className="mb-4 p-4 bg-blue-50 rounded-lg">
-          <p className="text-blue-800">Job ID: {id}</p>
-        </div>
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           {/* Main Content */}
           <div className="lg:col-span-2">
             {/* Job Header */}
-            <div className="bg-white rounded-lg shadow p-6 mb-6">
+            <div className="bg-white rounded-lg shadow p-6 mb-6 border border-gray-100">
               <div className="flex items-start gap-4 mb-6">
-                <div className="w-16 h-16 bg-gray-200 rounded-lg flex items-center justify-center">
-                  <span className="text-sm font-semibold">LOGO</span>
+                <div className={`w-16 h-16 rounded-lg flex items-center justify-center ${job.logoBg} flex-shrink-0`}>
+                  <span className="text-2xl font-bold">{job.logo}</span>
                 </div>
                 <div className="flex-1">
                   <h1 className="text-2xl font-bold text-gray-900 mb-2">
-                    Senior Health and Food Specialist
+                    {job.title}
                   </h1>
-                  <p className="text-blue-600 text-lg mb-3">Pay Walt</p>
+                  <p className="text-[#00b4d8] text-lg mb-3 font-medium">
+                    <Link to={`/employers/${job.employerId}`} className="hover:underline">
+                      {job.company}
+                    </Link>
+                  </p>
                   <div className="flex flex-wrap gap-3 text-sm text-gray-600">
                     <span className="flex items-center gap-1">
-                      <MapPin className="w-4 h-4" /> New York, USA
+                      <MapPin className="w-4 h-4 text-[#ff6b6b]" /> {job.location}
                     </span>
                     <span className="flex items-center gap-1">
-                      <Briefcase className="w-4 h-4" /> Full Time
+                      <Briefcase className="w-4 h-4 text-[#ff6b6b]" /> {job.type}
                     </span>
                     <span className="flex items-center gap-1">
-                      <DollarSign className="w-4 h-4" /> $80k - $120k
+                      <DollarSign className="w-4 h-4 text-[#ff6b6b]" /> {job.salary}
                     </span>
-                    <span className="flex items-center gap-1">
-                      <Calendar className="w-4 h-4" /> Posted 2 days ago
-                    </span>
+                    {job.postedDate && (
+                      <span className="flex items-center gap-1">
+                        <Calendar className="w-4 h-4 text-[#ff6b6b]" /> Posted {job.postedDate}
+                      </span>
+                    )}
                   </div>
                 </div>
               </div>
 
               <div className="flex flex-wrap gap-2 mb-6">
-                <span className="px-3 py-1 bg-blue-100 text-blue-700 text-sm rounded-full">
-                  Media
-                </span>
-                <span className="px-3 py-1 bg-green-100 text-green-700 text-sm rounded-full">
-                  Medical
-                </span>
-                <span className="px-3 py-1 bg-purple-100 text-purple-700 text-sm rounded-full">
-                  Restaurants
-                </span>
+                {job.tags.map((tag, idx) => (
+                  <span key={idx} className="px-3 py-1 bg-gray-100 text-gray-600 text-sm rounded-full capitalize">
+                    {tag}
+                  </span>
+                ))}
               </div>
 
               <div className="flex gap-3">
-                <button className="px-6 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors">
+                <button
+                  onClick={() => setIsApplyModalOpen(true)}
+                  className="px-8 py-3 bg-[#ff6b6b] text-white rounded-lg hover:bg-[#ff5252] transition-all font-bold uppercase tracking-wider shadow-sm active:scale-95"
+                >
                   Apply Now
                 </button>
-                <button className="px-6 py-2 border border-gray-300 text-gray-700 rounded-md hover:bg-gray-50 transition-colors flex items-center gap-2">
-                  <Heart className="w-4 h-4" /> Save Job
+                <button
+                  onClick={() => setIsSaved(!isSaved)}
+                  className={`px-6 py-2 border rounded-lg transition-all flex items-center gap-2 font-bold uppercase tracking-wider text-xs active:scale-95 ${isSaved
+                      ? "bg-red-50 border-[#ff6b6b] text-[#ff6b6b]"
+                      : "bg-white border-gray-200 text-gray-700 hover:bg-gray-50"
+                    }`}
+                >
+                  <Heart className={`w-4 h-4 transition-colors ${isSaved ? "fill-current" : ""}`} />
+                  {isSaved ? "Saved" : "Save Job"}
                 </button>
               </div>
             </div>
 
+            {/* Apply Modal */}
+            <ApplyJobModal
+              isOpen={isApplyModalOpen}
+              onClose={() => setIsApplyModalOpen(false)}
+              jobTitle={job.title}
+              companyName={job.company}
+            />
+
             {/* Job Description */}
-            <div className="bg-white rounded-lg shadow p-6 mb-6">
-              <h2 className="text-xl font-semibold mb-4">Job Description</h2>
-              <div className="prose max-w-none text-gray-700">
-                <p className="mb-4">
-                  We are seeking an experienced Senior Health and Food
-                  Specialist to join our dynamic team. This role requires a
-                  passionate individual who can drive innovation in health and
-                  food safety standards.
+            <div className="bg-white rounded-lg shadow p-6 mb-6 border border-gray-100">
+              <h2 className="text-xl font-bold text-gray-900 mb-4">Job Description</h2>
+              <div className="prose max-w-none text-gray-600 leading-relaxed">
+                <p className="mb-6">
+                  {job.description || "No description provided."}
                 </p>
-                <h3 className="text-lg font-semibold mb-2">
-                  Responsibilities:
-                </h3>
-                <ul className="list-disc pl-6 mb-4">
-                  <li>Develop and implement health and safety protocols</li>
-                  <li>Conduct regular food safety audits</li>
-                  <li>Train staff on health and safety procedures</li>
-                  <li>Collaborate with regulatory agencies</li>
-                  <li>Monitor industry trends and best practices</li>
-                </ul>
-                <h3 className="text-lg font-semibold mb-2">Requirements:</h3>
-                <ul className="list-disc pl-6 mb-4">
-                  <li>Bachelor's degree in Food Science or related field</li>
-                  <li>5+ years of experience in health and food safety</li>
-                  <li>Certification in food safety (HACCP preferred)</li>
-                  <li>Strong analytical and problem-solving skills</li>
-                  <li>Excellent communication abilities</li>
-                </ul>
-                <h3 className="text-lg font-semibold mb-2">What We Offer:</h3>
-                <ul className="list-disc pl-6">
+
+                {job.responsibilities && job.responsibilities.length > 0 && (
+                  <>
+                    <h3 className="text-lg font-bold text-gray-900 mb-3">
+                      Responsibilities:
+                    </h3>
+                    <ul className="list-disc pl-5 mb-6 space-y-2">
+                      {job.responsibilities.map((item, idx) => (
+                        <li key={idx}>{item}</li>
+                      ))}
+                    </ul>
+                  </>
+                )}
+
+                {job.requirements && job.requirements.length > 0 && (
+                  <>
+                    <h3 className="text-lg font-bold text-gray-900 mb-3">Requirements:</h3>
+                    <ul className="list-disc pl-5 mb-6 space-y-2">
+                      {job.requirements.map((item, idx) => (
+                        <li key={idx}>{item}</li>
+                      ))}
+                    </ul>
+                  </>
+                )}
+
+                <h3 className="text-lg font-bold text-gray-900 mb-3">What We Offer:</h3>
+                <ul className="list-disc pl-5 space-y-2">
                   <li>Competitive salary and benefits package</li>
                   <li>Health, dental, and vision insurance</li>
                   <li>401(k) retirement plan</li>
@@ -111,95 +156,82 @@ export default function JobDetailPage() {
             </div>
 
             {/* Company Info */}
-            <div className="bg-white rounded-lg shadow p-6">
-              <h2 className="text-xl font-semibold mb-4">About Pay Walt</h2>
-              <p className="text-gray-700 mb-4">
-                Pay Walt is a leading company in the health and food industry,
-                dedicated to providing innovative solutions that improve food
-                safety and health standards. We pride ourselves on our
-                commitment to excellence and our supportive work environment.
-              </p>
-              <div className="grid grid-cols-2 gap-4 text-sm">
-                <div>
-                  <span className="font-semibold">Company Size:</span> 100-500
-                  employees
-                </div>
-                <div>
-                  <span className="font-semibold">Founded:</span> 2010
-                </div>
-                <div>
-                  <span className="font-semibold">Industry:</span> Health & Food
-                  Services
-                </div>
-                <div>
-                  <span className="font-semibold">Location:</span> New York, USA
+            {employer && (
+              <div className="bg-white rounded-lg shadow p-6 border border-gray-100">
+                <h2 className="text-xl font-bold text-gray-900 mb-4">About {employer.name}</h2>
+                <p className="text-gray-600 mb-4 leading-relaxed">
+                  {employer.fullDescription || employer.description}
+                </p>
+                <div className="grid grid-cols-2 gap-4 text-sm text-gray-600">
+                  <div>
+                    <span className="font-bold text-gray-900 block">Open Positions:</span> {employer.openings}
+                  </div>
+                  <div>
+                    <span className="font-bold text-gray-900 block">Industry:</span> Health & Food Services
+                  </div>
+                  <div>
+                    <span className="font-bold text-gray-900 block">Location:</span> {employer.location}
+                  </div>
+                  <div>
+                    <Link to={`/employers/${employer.id}`} className="text-[#00b4d8] hover:underline font-medium">View Company Profile</Link>
+                  </div>
                 </div>
               </div>
-            </div>
+            )}
           </div>
 
           {/* Sidebar */}
           <div className="lg:col-span-1">
             {/* Job Summary */}
-            <div className="bg-white rounded-lg shadow p-6 mb-6">
-              <h3 className="text-lg font-semibold mb-4">Job Summary</h3>
-              <div className="space-y-3 text-sm">
-                <div className="flex justify-between">
-                  <span className="text-gray-600">Job Type:</span>
-                  <span className="font-medium">Full Time</span>
+            <div className="bg-white rounded-lg shadow p-6 mb-6 border border-gray-100">
+              <h3 className="text-lg font-bold text-gray-900 mb-4">Job Summary</h3>
+              <div className="space-y-4 text-sm">
+                <div className="flex justify-between items-center border-b border-gray-50 pb-3">
+                  <span className="text-gray-500">Job Type:</span>
+                  <span className="font-medium text-gray-900">{job.type}</span>
                 </div>
-                <div className="flex justify-between">
-                  <span className="text-gray-600">Location:</span>
-                  <span className="font-medium">New York</span>
+                <div className="flex justify-between items-center border-b border-gray-50 pb-3">
+                  <span className="text-gray-500">Location:</span>
+                  <span className="font-medium text-gray-900 text-right w-1/2 line-clamp-1">{job.location}</span>
                 </div>
-                <div className="flex justify-between">
-                  <span className="text-gray-600">Salary:</span>
-                  <span className="font-medium">$80k - $120k</span>
+                <div className="flex justify-between items-center border-b border-gray-50 pb-3">
+                  <span className="text-gray-500">Salary:</span>
+                  <span className="font-medium text-gray-900">{job.salary}</span>
                 </div>
-                <div className="flex justify-between">
-                  <span className="text-gray-600">Experience:</span>
-                  <span className="font-medium">5+ years</span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-gray-600">Education:</span>
-                  <span className="font-medium">Bachelor's</span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-gray-600">Posted:</span>
-                  <span className="font-medium">2 days ago</span>
+                {job.experience && (
+                  <div className="flex justify-between items-center border-b border-gray-50 pb-3">
+                    <span className="text-gray-500">Experience:</span>
+                    <span className="font-medium text-gray-900">{job.experience}</span>
+                  </div>
+                )}
+                {job.education && (
+                  <div className="flex justify-between items-center border-b border-gray-50 pb-3">
+                    <span className="text-gray-500">Education:</span>
+                    <span className="font-medium text-gray-900">{job.education}</span>
+                  </div>
+                )}
+                <div className="flex justify-between items-center">
+                  <span className="text-gray-500">Posted:</span>
+                  <span className="font-medium text-gray-900">{job.postedDate || "Recently"}</span>
                 </div>
               </div>
             </div>
 
             {/* Similar Jobs */}
-            <div className="bg-white rounded-lg shadow p-6">
-              <h3 className="text-lg font-semibold mb-4">Similar Jobs</h3>
+            <div className="bg-white rounded-lg shadow p-6 border border-gray-100">
+              <h3 className="text-lg font-bold text-gray-900 mb-4">Similar Jobs</h3>
               <div className="space-y-4">
-                <div className="border-b pb-3">
-                  <h4 className="font-medium text-gray-900 mb-1">
-                    iOS Developer
-                  </h4>
-                  <p className="text-blue-600 text-sm mb-1">Apus Inc.</p>
-                  <p className="text-gray-600 text-sm">
-                    New York • $90k - $130k
-                  </p>
-                </div>
-                <div className="border-b pb-3">
-                  <h4 className="font-medium text-gray-900 mb-1">
-                    Front-End Web Developer
-                  </h4>
-                  <p className="text-blue-600 text-sm mb-1">Envato Inc.</p>
-                  <p className="text-gray-600 text-sm">India • $70k - $100k</p>
-                </div>
-                <div>
-                  <h4 className="font-medium text-gray-900 mb-1">
-                    Medical Logo Designer
-                  </h4>
-                  <p className="text-blue-600 text-sm mb-1">FShop Inc.</p>
-                  <p className="text-gray-600 text-sm">
-                    Australia • $60k - $80k
-                  </p>
-                </div>
+                {similarJobs.map(similar => (
+                  <div key={similar.id} className="border-b border-gray-50 pb-4 last:border-0 last:pb-0">
+                    <h4 className="font-bold text-gray-900 mb-1 hover:text-[#00b4d8] transition-colors cursor-pointer block">
+                      <Link to={`/jobs/${similar.id}`}>{similar.title}</Link>
+                    </h4>
+                    <p className="text-[#00b4d8] text-sm mb-1">{similar.company}</p>
+                    <p className="text-gray-500 text-xs">
+                      {similar.location} • {similar.salary}
+                    </p>
+                  </div>
+                ))}
               </div>
             </div>
           </div>

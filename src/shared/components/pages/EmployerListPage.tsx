@@ -1,5 +1,5 @@
 import PageWrapper from "../layouts/PageWrapper";
-import { ChevronRight } from "lucide-react";
+import PageHeader from "../ui/PageHeader";
 import { Link } from "react-router-dom";
 import { employers } from "../../data/employers";
 import Loader from "../ui/Loader";
@@ -7,11 +7,11 @@ import usePageLoader from "../../hooks/usePageLoader";
 
 export default function EmployerListPage() {
     const isLoading = usePageLoader(1000);
-    
+
     if (isLoading) {
         return <Loader />;
     }
-    
+
     // Group companies by first letter
     const companyGroups = employers.reduce((groups, company) => {
         const letter = company.name.charAt(0).toUpperCase();
@@ -57,28 +57,7 @@ export default function EmployerListPage() {
 
     return (
         <PageWrapper disableTopPadding={true}>
-            {/* Hero Section */}
-            <section className="relative bg-[#0f172a] pb-24 pt-32 overflow-hidden">
-                <div className="absolute inset-0 bg-black/50 z-10"></div>
-                <div
-                    className="absolute inset-0 bg-cover bg-center z-0 opacity-30"
-                    style={{
-                        backgroundImage:
-                            "url('https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?ixlib=rb-4.0.3&auto=format&fit=crop&w=2070&q=80')",
-                    }}
-                ></div>
-
-                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-20">
-                    <h1 className="text-5xl font-bold text-white mb-6">List Company</h1>
-                    <div className="flex items-center gap-2 text-gray-300 text-sm">
-                        <span className="hover:text-white cursor-pointer transition-colors">
-                            Home
-                        </span>
-                        <ChevronRight className="w-4 h-4" />
-                        <span className="text-[#00b4d8]">List Company</span>
-                    </div>
-                </div>
-            </section>
+            <PageHeader title="List Company" breadcrumb="List Company" />
 
             {/* Main Content */}
             <section className="py-20 bg-gray-50">
