@@ -10,6 +10,9 @@ export interface Job {
     logo: string;
     logoBg: string;
     tags: string[];
+    description: string;
+    requirements: string[];
+    postedDate: string;
 }
 
 export const jobs: Job[] = [
@@ -25,6 +28,9 @@ export const jobs: Job[] = [
         logo: "P",
         logoBg: "bg-green-100 text-green-600",
         tags: ["Media", "Medical", "Restaurants"],
+        description: "Looking for an experienced health and food specialist to join our dynamic team.",
+        requirements: ["5+ years experience", "Bachelor's degree in related field", "Strong communication skills"],
+        postedDate: "2024-01-15"
     },
     {
         id: "2",
@@ -38,6 +44,9 @@ export const jobs: Job[] = [
         logo: "A",
         logoBg: "bg-green-100 text-green-600",
         tags: ["developer", "it company", "jobs"],
+        description: "Join our team as an iOS Developer and work on cutting-edge mobile applications.",
+        requirements: ["Experience with iOS development", "Git proficiency", "API integration experience"],
+        postedDate: "2024-01-20"
     },
     {
         id: "3",
@@ -51,6 +60,9 @@ export const jobs: Job[] = [
         logo: "E",
         logoBg: "bg-orange-100 text-orange-600",
         tags: ["developer", "it company", "jobs"],
+        description: "Healthcare support specialist needed for our growing medical practice.",
+        requirements: ["Medical knowledge", "Patient care experience", "Communication skills"],
+        postedDate: "2024-01-24"
     },
     {
         id: "4",
@@ -64,6 +76,9 @@ export const jobs: Job[] = [
         logo: "F",
         logoBg: "bg-purple-100 text-purple-600",
         tags: ["design", "Medical", "Restaurants"],
+        description: "Creative marketing specialist needed for our growing social media presence.",
+        requirements: ["Social media expertise", "Content creation skills", "Analytics knowledge"],
+        postedDate: "2024-01-18"
     },
     {
         id: "5",
@@ -77,6 +92,9 @@ export const jobs: Job[] = [
         logo: "L",
         logoBg: "bg-blue-100 text-blue-600",
         tags: ["design", "developer", "it company"],
+        description: "Legal counsel position for our corporate legal team.",
+        requirements: ["Law degree", "Corporate experience", "Attention to detail"],
+        postedDate: "2024-01-27"
     },
     {
         id: "6",
@@ -89,7 +107,10 @@ export const jobs: Job[] = [
         salary: "$50k - $1,000",
         logo: "C",
         logoBg: "bg-red-100 text-red-600",
-        tags: ["call center", "design", "developer"],
+        tags: ["Engineering", "Software", "Development"],
+        description: "Software engineer position available for our expanding tech team.",
+        requirements: ["Programming experience", "Problem-solving skills", "Team collaboration"],
+        postedDate: "2024-01-21"
     },
     {
         id: "7",
@@ -102,7 +123,10 @@ export const jobs: Job[] = [
         salary: "$50k - $1,200",
         logo: "C",
         logoBg: "bg-purple-100 text-purple-600",
-        tags: ["design", "developer", "it company"],
+        tags: ["Technology", "Remote", "Full Stack"],
+        description: "Looking for a talented full-stack developer to join our remote team.",
+        requirements: ["3+ years experience", "Node.js and React", "Strong problem-solving skills"],
+        postedDate: "2024-01-22"
     },
     {
         id: "8",
@@ -110,12 +134,15 @@ export const jobs: Job[] = [
         title: "UX/UI Designer (1 - 2 Yrs Exp.)",
         company: "Webstrot Inc.",
         location: "906-152 Flatbush St, Brooklyn NY 11003",
-        logo: "W",
-        logoBg: "bg-green-100 text-green-600",
         type: "TEMPORARY",
         typeBg: "bg-teal-500",
         salary: "$30k - $35k/A",
-        tags: ["design", "developer", "it company"],
+        logo: "W",
+        logoBg: "bg-green-100 text-green-600",
+        tags: ["Design", "UI/UX", "Creative"],
+        description: "We're looking for a creative designer to help shape our user experience.",
+        requirements: ["Portfolio of design work", "Figma proficiency", "Understanding of UX principles"],
+        postedDate: "2024-01-25"
     },
     {
         id: "9",
@@ -129,6 +156,9 @@ export const jobs: Job[] = [
         logo: "E",
         logoBg: "bg-orange-100 text-orange-600",
         tags: ["design", "developer", "it company"],
+        description: "Join our team as a JavaScript developer and work on exciting web projects.",
+        requirements: ["JavaScript experience", "Web development knowledge", "Problem-solving skills"],
+        postedDate: "2024-01-25"
     },
     {
         id: "10",
@@ -142,6 +172,9 @@ export const jobs: Job[] = [
         logo: "F",
         logoBg: "bg-purple-100 text-purple-600",
         tags: ["call center", "design", "developer"],
+        description: "Protection consultant needed for our growing online presence.",
+        requirements: ["Customer service experience", "Technical knowledge", "Communication skills"],
+        postedDate: "2024-01-26"
     },
     // Adding more jobs for Akshay INC (1) since it's the first one usually clicked
     {
@@ -156,6 +189,9 @@ export const jobs: Job[] = [
         logo: "A",
         logoBg: "bg-blue-100 text-blue-600",
         tags: ["developer", "wordpress", "php"],
+        description: "Join our team as a WordPress developer and work on exciting web projects.",
+        requirements: ["WordPress experience", "PHP knowledge", "Problem-solving skills"],
+        postedDate: "2024-01-20"
     },
     {
         id: "12",
@@ -168,7 +204,10 @@ export const jobs: Job[] = [
         salary: "$30k - $40k",
         logo: "A",
         logoBg: "bg-blue-100 text-blue-600",
-        tags: ["developer", "plugin", "react"],
+        tags: ["Sales", "Business", "Communication"],
+        description: "Sales professional needed to drive our business growth and client relationships.",
+        requirements: ["Sales experience", "Excellent communication", "Customer service skills"],
+        postedDate: "2024-01-23"
     },
     {
         id: "13",
@@ -182,5 +221,8 @@ export const jobs: Job[] = [
         logo: "A",
         logoBg: "bg-blue-100 text-blue-600",
         tags: ["support", "technical"],
+        description: "Technical support engineer for our growing customer base.",
+        requirements: ["Technical knowledge", "Customer service experience", "Problem-solving skills"],
+        postedDate: "2024-01-30",
     }
 ];

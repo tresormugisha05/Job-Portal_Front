@@ -1,5 +1,9 @@
+import { useState } from 'react';
 import { Link, useLocation } from "react-router-dom";
-import { Briefcase, User, X, Menu, LogIn } from "lucide-react";
+import { Briefcase, Menu, X, Users, LogOut } from "lucide-react";
+import { useAuth } from "../../contexts/AuthContext";
+import AuthModal from "../ui/AuthModal";
+import MobileMenu from "./MobileMenu";
 
 interface HeaderProps {
   isMobileMenuOpen: boolean;
@@ -11,20 +15,24 @@ export default function Header({
   setIsMobileMenuOpen,
 }: HeaderProps) {
   const { pathname } = useLocation();
+  const { isAuthenticated, user, logout } = useAuth();
+  const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
+  const [authMode, setAuthMode] = useState<'login' | 'register'>('login');
+
+  const openAuthModal = (mode: 'login' | 'register') => {
+    setAuthMode(mode);
+    setIsAuthModalOpen(true);
+  };
+
+  const closeAuthModal = () => {
+    setIsAuthModalOpen(false);
+  };
 
   const getLinkClass = (path: string) => {
     const baseClass =
       "flex items-center gap-1 hover:text-[#00b4d8] transition-colors";
     const activeClass =
       "text-[#00b4d8] relative after:content-[''] after:absolute after:-bottom-2 after:left-0 after:w-full after:h-0.5 after:bg-[#00b4d8]";
-
-    return pathname === path ? `${baseClass} ${activeClass}` : baseClass;
-  };
-
-  const getMobileLinkClass = (path: string) => {
-    const baseClass =
-      "flex items-center justify-between hover:text-[#00b4d8] transition-colors";
-    const activeClass = "text-[#00b4d8]";
 
     return pathname === path ? `${baseClass} ${activeClass}` : baseClass;
   };
@@ -64,18 +72,36 @@ export default function Header({
 
         {/* Auth Buttons */}
         <div className="hidden md:flex gap-4 items-center">
-          <Link
-            to="/signup"
-            className="border border-white/30 px-6 py-2 rounded hover:bg-white/10 transition-colors flex items-center gap-2 text-sm font-semibold"
-          >
-            <User className="w-4 h-4" /> SIGN UP
-          </Link>
-          <Link
-            to="/signin"
-            className="bg-[#ff6b6b] px-6 py-2 rounded hover:bg-[#ff5252] transition-colors flex items-center gap-2 text-sm font-semibold"
-          >
-            <LogIn className="w-4 h-4" /> LOGIN
-          </Link>
+          {isAuthenticated ? (
+            <>
+              <div className="flex items-center gap-3">
+                <span className="text-sm">
+                  Welcome, {user?.firstName || user?.email}
+                </span>
+                <button
+                  onClick={() => logout()}
+                  className="border border-white/30 px-4 py-2 rounded hover:bg-white/10 transition-colors text-sm font-semibold"
+                >
+                  Logout
+                </button>
+              </div>
+            </>
+          ) : (
+            <>
+              <button
+                onClick={() => openAuthModal('register')}
+                className="border border-white/30 px-6 py-2 rounded hover:bg-white/10 transition-colors flex items-center gap-2 text-sm font-semibold"
+              >
+                <Users className="w-4 h-4" /> SIGN UP
+              </button>
+              <button
+                onClick={() => openAuthModal('login')}
+                className="bg-[#ff6b6b] px-6 py-2 rounded hover:bg-[#ff5252] transition-colors flex items-center gap-2 text-sm font-semibold"
+              >
+                <LogOut className="w-4 h-4" /> LOGIN
+              </button>
+            </>
+          )}
         </div>
 
         {/* Mobile Menu Toggle */}
@@ -93,47 +119,15 @@ export default function Header({
 
       {/* Mobile Menu */}
       {isMobileMenuOpen && (
-        <div className="lg:hidden bg-[#0b2c3d] border-t border-gray-600">
-          <nav className="flex flex-col p-4 space-y-3 text-sm">
-            <Link to="/" className={getMobileLinkClass("/")}>
-              Home
-            </Link>
-            <Link to="/jobs" className={getMobileLinkClass("/jobs")}>
-              Jobs
-            </Link>
-            <Link
-              to="/candidates"
-              className={getMobileLinkClass("/candidates")}
-            >
-              Candidates
-            </Link>
-            <Link to="/employers" className={getMobileLinkClass("/employers")}>
-              Employers
-            </Link>
-            <Link to="/blog" className={getMobileLinkClass("/blog")}>
-              Blog
-            </Link>
-            <Link to="/contact" className={getMobileLinkClass("/contact")}>
-              Contact Us
-            </Link>
-
-            <div className="pt-4 flex flex-col gap-3">
-              <Link
-                to="/signup"
-                className="border border-white/30 px-4 py-2 rounded text-center hover:bg-white/10 transition-colors flex items-center justify-center gap-2"
-              >
-                <User className="w-4 h-4" /> SIGN UP
-              </Link>
-              <Link
-                to="/signin"
-                className="bg-[#ff6b6b] px-4 py-2 rounded text-center hover:bg-[#ff5252] transition-colors flex items-center justify-center gap-2"
-              >
-                <LogIn className="w-4 h-4" /> LOGIN
-              </Link>
-            </div>
-          </nav>
-        </div>
+        <MobileMenu isOpen={isMobileMenuOpen} onClose={() => setIsMobileMenuOpen(false)} />
       )}
+
+      {/* Auth Modal */}
+      <AuthModal 
+        isOpen={isAuthModalOpen}
+        onClose={closeAuthModal}
+        initialMode={authMode}
+      />
     </header>
   );
 }

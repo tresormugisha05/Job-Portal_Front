@@ -1,13 +1,43 @@
-import { MapPin, Briefcase, DollarSign, Heart } from "lucide-react";
+import { useState } from "react";
 import PageWrapper from "../layouts/PageWrapper";
 import Loader from "../ui/Loader";
-import usePageLoader from "../../hooks/usePageLoader";
+import { useJobs } from "../../hooks/useJobs";
+import JobCard from "../ui/JobCard";
 
 export default function JobsListPage() {
-  const isLoading = usePageLoader(1000);
+  const [filters] = useState({
+    search: '',
+    location: '',
+    type: '',
+    page: 1,
+    limit: 10
+  });
   
-  if (isLoading) {
-    return <Loader />;
+  const { jobs, loading, error } = useJobs(filters);
+
+  if (loading) {
+    return (
+      <PageWrapper>
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+          <div className="flex justify-center items-center h-64">
+            <Loader />
+          </div>
+        </div>
+      </PageWrapper>
+    );
+  }
+
+  if (error) {
+    return (
+      <PageWrapper>
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+          <div className="text-center">
+            <h2 className="text-2xl font-semibold text-red-600 mb-2">Error Loading Jobs</h2>
+            <p className="text-gray-600">{error}</p>
+          </div>
+        </div>
+      </PageWrapper>
+    );
   }
   
   return (
@@ -116,62 +146,15 @@ export default function JobsListPage() {
 
             {/* Job Cards */}
             <div className="space-y-4">
-              {[1, 2, 3, 4, 5].map((job) => (
-                <div
-                  key={job}
-                  className="bg-white rounded-lg shadow p-6 hover:shadow-lg transition-shadow"
-                >
-                  <div className="flex flex-col sm:flex-row justify-between">
-                    <div className="flex-1">
-                      <div className="flex items-start gap-4">
-                        <div className="w-12 h-12 bg-gray-200 rounded-lg flex items-center justify-center">
-                          <span className="text-xs font-semibold">LOGO</span>
-                        </div>
-                        <div className="flex-1">
-                          <h3 className="text-lg font-semibold text-gray-900 mb-1">
-                            Senior Health and Food Specialist
-                          </h3>
-                          <p className="text-blue-600 mb-2">Pay Walt</p>
-                          <div className="flex flex-wrap gap-2 text-sm text-gray-600 mb-3">
-                            <span className="flex items-center gap-1">
-                              <MapPin className="w-4 h-4" /> New York
-                            </span>
-                            <span className="flex items-center gap-1">
-                              <Briefcase className="w-4 h-4" /> Full Time
-                            </span>
-                            <span className="flex items-center gap-1">
-                              <DollarSign className="w-4 h-4" /> $80k - $120k
-                            </span>
-                          </div>
-                          <div className="flex flex-wrap gap-2 mb-3">
-                            <span className="px-2 py-1 bg-blue-100 text-blue-700 text-xs rounded">
-                              Media
-                            </span>
-                            <span className="px-2 py-1 bg-green-100 text-green-700 text-xs rounded">
-                              Medical
-                            </span>
-                            <span className="px-2 py-1 bg-purple-100 text-purple-700 text-xs rounded">
-                              Restaurants
-                            </span>
-                          </div>
-                          <p className="text-gray-600 text-sm line-clamp-2">
-                            Looking for an experienced health and food
-                            specialist to join our growing team...
-                          </p>
-                        </div>
-                      </div>
-                    </div>
-                    <div className="flex flex-col items-end gap-2 mt-4 sm:mt-0">
-                      <button className="px-4 py-2 border border-gray-300 text-gray-700 rounded-md hover:bg-gray-50 transition-colors flex items-center gap-2">
-                        <Heart className="w-9 h-4" /> Save
-                      </button>
-                      <button className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors">
-                        Apply Now
-                      </button>
-                    </div>
-                  </div>
+              {jobs.length > 0 ? (
+                jobs.map((job) => (
+                  <JobCard key={job.id} job={job} />
+                ))
+              ) : (
+                <div className="text-center py-12">
+                  <p className="text-gray-600">No jobs found matching your criteria.</p>
                 </div>
-              ))}
+              )}
             </div>
 
             {/* Pagination */}

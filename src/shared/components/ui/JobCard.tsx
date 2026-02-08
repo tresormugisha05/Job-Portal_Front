@@ -1,6 +1,6 @@
 import { MapPin, Heart, Tag, DollarSign } from "lucide-react";
 import { Link } from "react-router-dom";
-import type { Job } from "../../data/jobs";
+import type { Job } from "../../services/api/jobs";
 
 interface JobCardProps {
     job: Job;
@@ -13,9 +13,9 @@ export default function JobCard({ job }: JobCardProps) {
                 <div className="flex items-start gap-4">
                     {/* Logo */}
                     <div
-                        className={`w-16 h-16 rounded ${job.logoBg} flex items-center justify-center text-2xl font-bold shrink-0`}
+                        className={`w-16 h-16 rounded ${job.logoBg || 'bg-gray-200'} flex items-center justify-center text-2xl font-bold shrink-0`}
                     >
-                        {job.logo}
+                        {job.logo || 'LOGO'}
                     </div>
 
                     {/* Main Content */}
@@ -50,7 +50,7 @@ export default function JobCard({ job }: JobCardProps) {
                         {/* Bottom Actions */}
                         <div className="flex items-center justify-end gap-3">
                             <span
-                                className={`${job.typeBg} text-white text-xs px-4 py-1.5 font-medium uppercase tracking-wider rounded`}
+                                className={`bg-blue-100 text-blue-700 text-xs px-4 py-1.5 font-medium uppercase tracking-wider rounded`}
                             >
                                 {job.type}
                             </span>
@@ -63,20 +63,22 @@ export default function JobCard({ job }: JobCardProps) {
             </div>
 
             {/* Tags Bar - Shows on hover */}
-            <div className="h-0 group-hover:h-auto overflow-hidden transition-all">
-                <div className="bg-[#00b4d8] px-6 py-3 flex items-center gap-2">
-                    <Tag className="w-4 h-4 text-white" />
-                    <div className="flex flex-wrap gap-1 text-sm text-white">
-                        <span className="font-medium">Tagged as:</span>
-                        {job.tags.map((tag, i) => (
-                            <span key={i}>
-                                {tag}
-                                {i < job.tags.length - 1 ? "," : ""}
-                            </span>
-                        ))}
+            {job.tags && job.tags.length > 0 && (
+                <div className="h-0 group-hover:h-auto overflow-hidden transition-all">
+                    <div className="bg-[#00b4d8] px-6 py-3 flex items-center gap-2">
+                        <Tag className="w-4 h-4 text-white" />
+                        <div className="flex flex-wrap gap-1 text-sm text-white">
+                            <span className="font-medium">Tagged as:</span>
+                            {job.tags.map((tag, i) => (
+                                <span key={i}>
+                                    {tag}
+                                    {i < job.tags!.length - 1 ? "," : ""}
+                                </span>
+                            ))}
+                        </div>
                     </div>
                 </div>
-            </div>
+            )}
         </div>
     );
 }

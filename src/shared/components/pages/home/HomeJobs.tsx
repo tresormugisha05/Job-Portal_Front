@@ -1,7 +1,33 @@
-import { jobs } from "../../../data/jobs";
 import JobCard from "../../ui/JobCard";
+import { useJobs } from "../../../hooks/useJobs";
+import Loader from "../../ui/Loader";
 
 export default function HomeJobs() {
+  const { jobs, loading, error } = useJobs({ limit: 6 });
+
+  if (loading) {
+    return (
+      <section className="py-16 bg-gray-50">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex justify-center items-center h-64">
+            <Loader />
+          </div>
+        </div>
+      </section>
+    );
+  }
+
+  if (error) {
+    return (
+      <section className="py-16 bg-gray-50">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center">
+            <p className="text-red-600">Failed to load jobs. Please try again later.</p>
+          </div>
+        </div>
+      </section>
+    );
+  }
   return (
     <section className="py-16 bg-gray-50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
