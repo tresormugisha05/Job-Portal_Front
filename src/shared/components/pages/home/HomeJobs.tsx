@@ -1,50 +1,36 @@
-import { useState, useMemo } from "react";
-import { jobs } from "../../../data/jobs";
 import JobCard from "../../ui/JobCard";
+import { useJobs } from "../../../hooks/useJobs";
+import Loader from "../../ui/Loader";
 
 // Define filter types
 type FilterType = "RECENT JOBS" | "FEATURED" | "FULL TIME" | "PART TIME";
 
 export default function HomeJobs() {
-  const [activeFilter, setActiveFilter] = useState<FilterType>("RECENT JOBS");
+  const { jobs, loading, error } = useJobs({ limit: 6 });
 
-  // Filter jobs based on active tab
-  const filteredJobs = useMemo(() => {
-    let filtered = [...jobs];
+  if (loading) {
+    return (
+      <section className="py-16 bg-gray-50">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex justify-center items-center h-64">
+            <Loader />
+          </div>
+        </div>
+      </section>
+    );
+  }
 
-    switch (activeFilter) {
-      case "FEATURED":
-        filtered = filtered.filter((job) => job.featured);
-        break;
-      case "FULL TIME":
-        filtered = filtered.filter((job) => job.type === "FULL TIME");
-        break;
-      case "PART TIME":
-        filtered = filtered.filter((job) => job.type === "PART TIME");
-        break;
-      case "RECENT JOBS":
-      default:
-        // Sort by date descending if date exists, otherwise fallback to original order
-        filtered = filtered.sort((a, b) => {
-          if (a.date && b.date) {
-            return new Date(b.date).getTime() - new Date(a.date).getTime();
-          }
-          return 0;
-        });
-        break;
-    }
-
-    // Limit to 6 jobs for the home page view
-    return filtered.slice(0, 6);
-  }, [activeFilter]);
-
-  const tabs: FilterType[] = [
-    "FEATURED",
-    "RECENT JOBS",
-    "FULL TIME",
-    "PART TIME",
-  ];
-
+  if (error) {
+    return (
+      <section className="py-16 bg-gray-50">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center">
+            <p className="text-red-600">Failed to load jobs. Please try again later.</p>
+          </div>
+        </div>
+      </section>
+    );
+  }
   return (
     <section className="py-16 bg-gray-50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">

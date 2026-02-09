@@ -1,108 +1,43 @@
-import { useState, useMemo, useEffect } from "react";
-import { useSearchParams } from "react-router-dom";
+import { useState } from "react";
 import PageWrapper from "../layouts/PageWrapper";
 import Loader from "../ui/Loader";
-import usePageLoader from "../../hooks/usePageLoader";
-import { jobs } from "../../data/jobs";
+import { useJobs } from "../../hooks/useJobs";
 import JobCard from "../ui/JobCard";
-import PageHeader from "../ui/PageHeader";
-
-// Extract unique values for filters
-const uniqueLocations = [...new Set(jobs.map((job) => job.location.split(',').pop()?.trim() || job.location))].sort();
-const uniqueJobTypes = [...new Set(jobs.map((job) => job.type))].sort();
-const uniqueCategories = ["Developer", "Technology", "Medical", "Accounting", "Design", "Marketing"]; // Simplified for now, or derive from tags
-
-const ITEMS_PER_PAGE = 5;
 
 export default function JobsListPage() {
-  const isLoading = usePageLoader(1000);
-  const [searchParams] = useSearchParams();
+  const [filters] = useState({
+    search: '',
+    location: '',
+    type: '',
+    page: 1,
+    limit: 10
+  });
+  
+  const { jobs, loading, error } = useJobs(filters);
 
-  // Filter States initialized from searchParams
-  const [searchQuery, setSearchQuery] = useState(searchParams.get("search") || "");
-  const [selectedLocation, setSelectedLocation] = useState(searchParams.get("location") || "");
-  const [selectedJobTypes, setSelectedJobTypes] = useState<string[]>([]);
-
-  const initialCategory = searchParams.get("category");
-  const [selectedCategories, setSelectedCategories] = useState<string[]>(
-    initialCategory ? [initialCategory] : []
-  );
-
-  // Pagination State
-  const [currentPage, setCurrentPage] = useState(1);
-
-  // Sync state back to URL (optional but helpful for bookmarking)
-  useEffect(() => {
-    const newParams = new URLSearchParams();
-    if (searchQuery) newParams.set("search", searchQuery);
-    if (selectedLocation) newParams.set("location", selectedLocation);
-    if (selectedCategories.length > 0) newParams.set("category", selectedCategories[0]);
-
-    // update URL without triggering a full re-render loop if possible
-    // or just leave URL as is if you don't want deep synchronization
-  }, [searchQuery, selectedLocation, selectedCategories]);
-
-
-  // Filter Logic
-  const filteredJobs = useMemo(() => {
-    return jobs.filter((job) => {
-      // Search (Title or Company)
-      const matchesSearch =
-        job.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        job.company.toLowerCase().includes(searchQuery.toLowerCase());
-
-      // Location
-      const matchesLocation =
-        selectedLocation === "" ||
-        selectedLocation === "All Locations" ||
-        job.location.includes(selectedLocation);
-
-      // Job Type
-      const matchesType =
-        selectedJobTypes.length === 0 || selectedJobTypes.includes(job.type);
-
-      // Categories (Tags) - Check if job tags overlap with selected categories
-      // Note: Logic assumes categories serve as broad tags
-      const matchesCategory =
-        selectedCategories.length === 0 ||
-        job.tags.some((tag) =>
-          selectedCategories.some((cat) => tag.toLowerCase().includes(cat.toLowerCase()))
-        );
-
-      return matchesSearch && matchesLocation && matchesType && matchesCategory;
-    });
-  }, [searchQuery, selectedLocation, selectedJobTypes, selectedCategories]);
-
-  // Pagination Logic
-  const totalPages = Math.ceil(filteredJobs.length / ITEMS_PER_PAGE);
-  const paginatedJobs = filteredJobs.slice(
-    (currentPage - 1) * ITEMS_PER_PAGE,
-    currentPage * ITEMS_PER_PAGE
-  );
-
-  const handleJobTypeChange = (type: string) => {
-    setSelectedJobTypes((prev) =>
-      prev.includes(type) ? prev.filter((t) => t !== type) : [...prev, type]
+  if (loading) {
+    return (
+      <PageWrapper>
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+          <div className="flex justify-center items-center h-64">
+            <Loader />
+          </div>
+        </div>
+      </PageWrapper>
     );
-    setCurrentPage(1); // Reset to page 1 on filter change
-  };
+  }
 
-  const handleCategoryChange = (category: string) => {
-    setSelectedCategories((prev) =>
-      prev.includes(category)
-        ? prev.filter((c) => c !== category)
-        : [...prev, category]
+  if (error) {
+    return (
+      <PageWrapper>
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+          <div className="text-center">
+            <h2 className="text-2xl font-semibold text-red-600 mb-2">Error Loading Jobs</h2>
+            <p className="text-gray-600">{error}</p>
+          </div>
+        </div>
+      </PageWrapper>
     );
-    setCurrentPage(1);
-  };
-
-  const handlePageChange = (page: number) => {
-    window.scrollTo({ top: 0, behavior: "smooth" });
-    setCurrentPage(page);
-  };
-
-  if (isLoading) {
-    return <Loader />;
   }
 
   return (
@@ -229,24 +164,13 @@ export default function JobsListPage() {
 
             {/* Job Cards */}
             <div className="space-y-4">
-              {paginatedJobs.length > 0 ? (
-                paginatedJobs.map((job) => (
+              {jobs.length > 0 ? (
+                jobs.map((job) => (
                   <JobCard key={job.id} job={job} />
                 ))
               ) : (
-                <div className="bg-white rounded-lg shadow p-8 text-center text-gray-500">
-                  <p className="text-lg">No jobs found matching your criteria.</p>
-                  <button
-                    onClick={() => {
-                      setSearchQuery("");
-                      setSelectedLocation("");
-                      setSelectedCategories([]);
-                      setSelectedJobTypes([]);
-                    }}
-                    className="mt-4 text-[#00b4d8] hover:underline"
-                  >
-                    Clear all filters
-                  </button>
+                <div className="text-center py-12">
+                  <p className="text-gray-600">No jobs found matching your criteria.</p>
                 </div>
               )}
             </div>
