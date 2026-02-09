@@ -15,6 +15,6 @@ export default function DashboardRedirect() {
             return <Navigate to="/dashboard/manage-jobs" replace />;
         case "CANDIDATE":
         default:
-            return <Navigate to="/dashboard/applied-jobs" replace />;
+            return <Navigate to="/dashboard/profile" replace />;
     }
 }

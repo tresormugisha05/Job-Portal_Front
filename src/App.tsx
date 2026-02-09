@@ -22,6 +22,10 @@ import EmployerDashboard from "./shared/components/pages/dashboard/EmployerDashb
 import AdminDashboard from "./shared/components/pages/dashboard/AdminDashboard";
 import PostJob from "./shared/components/pages/dashboard/PostJob";
 
+// Candidate Pages
+import AppliedJobsPage from "./components/candidate/AppliedJobsPage";
+import SavedJobsPage from "./components/candidate/SavedJobsPage";
+
 export default function App() {
   return (
     <AuthProvider>
@@ -44,9 +48,10 @@ export default function App() {
 
           {/* Dashboards */}
           <Route path="/dashboard" element={<DashboardRedirect />} />
-          <Route path="/dashboard/applied-jobs" element={<CandidateDashboard />} />
-          <Route path="/dashboard/saved-jobs" element={<CandidateDashboard />} />
+          <Route path="/dashboard/applied-jobs" element={<AppliedJobsPage />} />
+          <Route path="/dashboard/saved-jobs" element={<SavedJobsPage />} />
           <Route path="/dashboard/profile" element={<CandidateDashboard />} />
+          <Route path="/dashboard/user-profile" element={<CandidateDashboard />} />
 
           <Route path="/dashboard/manage-jobs" element={<EmployerDashboard />} />
           <Route path="/dashboard/post-job" element={<PostJob />} />

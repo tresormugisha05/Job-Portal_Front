@@ -27,7 +27,7 @@ const sidebarItems: SidebarItem[] = [
     // Candidate
     { label: "Applied Jobs", path: "/dashboard/applied-jobs", icon: <FileText className="w-5 h-5" />, roles: ["CANDIDATE"] },
     { label: "Saved Jobs", path: "/dashboard/saved-jobs", icon: <Heart className="w-5 h-5" />, roles: ["CANDIDATE"] },
-    { label: "My Profile", path: "/dashboard/profile", icon: <User className="w-5 h-5" />, roles: ["CANDIDATE"] },
+    { label: "My Profile", path: "/dashboard/user-profile", icon: <User className="w-5 h-5" />, roles: ["CANDIDATE"] },
 
     // Employer
     { label: "Job Post", path: "/dashboard/post-job", icon: <PlusCircle className="w-5 h-5" />, roles: ["EMPLOYER"] },
@@ -60,7 +60,8 @@ export default function DashboardSidebar() {
 
             <nav className="flex-1 px-4 space-y-1">
                 {filteredItems.map((item) => {
-                    const isActive = location.pathname === item.path;
+                    const isActive = location.pathname === item.path || 
+                        (item.path === "/dashboard" && location.pathname === "/dashboard/profile");
                     return (
                         <Link
                             key={item.label}
