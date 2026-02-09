@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { MapPin, Heart, Tag, DollarSign, Briefcase } from "lucide-react";
 import { Link } from "react-router-dom";
-import type { Job } from "../../services/api/jobs";
+import type { Job } from "../../data/jobs";
 
 interface JobCardProps {
     job: Job;
@@ -16,9 +16,9 @@ export default function JobCard({ job }: JobCardProps) {
                 <div className="flex items-start gap-5">
                     {/* Logo */}
                     <div
-                        className={`w-16 h-16 rounded ${job.logoBg || 'bg-gray-200'} flex items-center justify-center text-2xl font-bold shrink-0`}
+                        className={`w-16 h-16 rounded-xl ${job.logoBg} flex items-center justify-center text-2xl font-bold shrink-0 border border-gray-100 shadow-sm transition-transform group-hover:scale-105 duration-300`}
                     >
-                        {job.logo || 'LOGO'}
+                        {job.logo}
                     </div>
 
                     {/* Main Content */}
@@ -61,7 +61,7 @@ export default function JobCard({ job }: JobCardProps) {
                         {/* Bottom Actions */}
                         <div className="flex items-center justify-between mt-auto">
                             <span
-                                className={`bg-blue-100 text-blue-700 text-xs px-4 py-1.5 font-medium uppercase tracking-wider rounded`}
+                                className={`${job.typeBg} text-white text-[10px] px-3 py-1 font-bold uppercase tracking-wider rounded-full shadow-sm`}
                             >
                                 {job.type}
                             </span>
@@ -76,23 +76,21 @@ export default function JobCard({ job }: JobCardProps) {
                 </div>
             </div>
 
-            {/* Tags Bar - Shows on hover */}
-            {job.tags && job.tags.length > 0 && (
-                <div className="h-0 group-hover:h-auto overflow-hidden transition-all">
-                    <div className="bg-[#00b4d8] px-6 py-3 flex items-center gap-2">
-                        <Tag className="w-4 h-4 text-white" />
-                        <div className="flex flex-wrap gap-1 text-sm text-white">
-                            <span className="font-medium">Tagged as:</span>
-                            {job.tags.map((tag, i) => (
-                                <span key={i}>
-                                    {tag}
-                                    {i < job.tags!.length - 1 ? "," : ""}
-                                </span>
-                            ))}
-                        </div>
-                    </div>
+            {/* Tags Bar - Reveal on Hover */}
+            <div className="bg-gray-50 px-6 py-3 border-t border-gray-100 flex items-center gap-3 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
+                <Tag className="w-4 h-4 text-[#00b4d8]" />
+                <div className="flex flex-wrap gap-2 text-xs text-gray-600">
+                    <span className="font-medium text-gray-900">Tags:</span>
+                    {job.tags.slice(0, 3).map((tag, i) => (
+                        <span key={i} className="bg-white border border-gray-200 px-2 py-0.5 rounded text-gray-500">
+                            {tag}
+                        </span>
+                    ))}
+                    {job.tags.length > 3 && (
+                        <span className="text-gray-400">+{job.tags.length - 3}</span>
+                    )}
                 </div>
-            )}
+            </div>
         </div>
     );
 }

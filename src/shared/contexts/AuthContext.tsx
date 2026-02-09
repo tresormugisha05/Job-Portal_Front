@@ -1,92 +1,92 @@
-import React, { createContext, useContext, useState, useEffect } from 'react';
-import type { ReactNode } from 'react';
-import { authService, type User } from '../services/api/auth';
+import React, { createContext, useContext, useState, useEffect } from "react";
 
-interface AuthState {
-  user: User | null;
-  token: string | null;
-  isLoading: boolean;
-  isAuthenticated: boolean;
+export type UserRole = "CANDIDATE" | "EMPLOYER" | "ADMIN" | "GUEST";
+
+interface User {
+    id: string;
+    name: string;
+    email: string;
+    role: UserRole;
+    avatar?: string;
 }
 
-interface AuthContextType extends AuthState {
-  login: (email: string, password: string) => Promise<void>;
-  register: (data: any) => Promise<void>;
-  logout: () => void;
+interface AuthContextType {
+    user: User | null;
+    role: UserRole;
+    isAuthenticated: boolean;
+    login: (email: string, password: string) => Promise<void>;
+    register: (userData: { name: string; email: string; role: "CANDIDATE" | "EMPLOYER" }) => Promise<void>;
+    logout: () => void;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-export const useAuth = () => {
-  const context = useContext(AuthContext);
-  if (!context) {
-    throw new Error('useAuth must be used within AuthProvider');
-  }
-  return context;
-};
+export function AuthProvider({ children }: { children: React.ReactNode }) {
+    const [user, setUser] = useState<User | null>(null);
 
-interface AuthProviderProps {
-  children: ReactNode;
-}
+    // Simulate persistent session
+    useEffect(() => {
+        const savedUser = localStorage.getItem("job_portal_user");
+        if (savedUser) {
+            setUser(JSON.parse(savedUser));
+        }
+    }, []);
 
-export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
-  const [user, setUser] = useState<User | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
+    const login = async (email: string, _password: string) => {
+        // Simulate API delay
+        await new Promise(resolve => setTimeout(resolve, 1000));
 
-  useEffect(() => {
-    const initAuth = () => {
-      const token = localStorage.getItem('token');
-      const storedUser = authService.getStoredUser();
-      
-      if (token && storedUser) {
-        setUser(storedUser);
-      }
-      
-      setIsLoading(false);
+        let mockUser: User;
+
+        // Simple mock logic: admin email gets admin role, otherwise based on a "database" simulation
+        // In a real app, this would be a backend call
+        if (email.includes("admin")) {
+            mockUser = { id: "a1", name: "System Admin", email, role: "ADMIN", avatar: "SA" };
+        } else if (email.includes("employer")) {
+            mockUser = { id: "e1", name: "Tech Corp", email, role: "EMPLOYER", avatar: "TC" };
+        } else {
+            mockUser = { id: "c1", name: "John Doe", email, role: "CANDIDATE", avatar: "JD" };
+        }
+
+        setUser(mockUser);
+        localStorage.setItem("job_portal_user", JSON.stringify(mockUser));
     };
 
-    initAuth();
-  }, []);
+    const register = async (userData: { name: string; email: string; role: "CANDIDATE" | "EMPLOYER" }) => {
+        // Simulate API delay
+        await new Promise(resolve => setTimeout(resolve, 1500));
 
-  const login = async (email: string, password: string) => {
-    setIsLoading(true);
-    try {
-      const response = await authService.login({ email, password });
-      setUser(response.user);
-    } catch (error) {
-      throw error;
-    } finally {
-      setIsLoading(false);
+        const newUser: User = {
+            id: Math.random().toString(36).substr(2, 9),
+            ...userData,
+            avatar: userData.name.split(" ").map(n => n[0]).join("").toUpperCase()
+        };
+
+        setUser(newUser);
+        localStorage.setItem("job_portal_user", JSON.stringify(newUser));
+    };
+
+    const logout = () => {
+        setUser(null);
+        localStorage.removeItem("job_portal_user");
+    };
+
+    const value = {
+        user,
+        role: user?.role || "GUEST",
+        isAuthenticated: !!user,
+        login,
+        register,
+        logout
+    };
+
+    return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
+}
+
+export function useAuth() {
+    const context = useContext(AuthContext);
+    if (context === undefined) {
+        throw new Error("useAuth must be used within an AuthProvider");
     }
-  };
-
-  const register = async (data: any) => {
-    setIsLoading(true);
-    try {
-      const response = await authService.register(data);
-      setUser(response.user);
-    } catch (error) {
-      throw error;
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  const logout = () => {
-    authService.logout();
-    setUser(null);
-    window.location.href = '/';
-  };
-
-  const value: AuthContextType = {
-    user,
-    token: localStorage.getItem('token'),
-    isLoading,
-    isAuthenticated: !!user,
-    login,
-    register,
-    logout,
-  };
-
-  return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
-};
+    return context;
+}
