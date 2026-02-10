@@ -1,44 +1,73 @@
-import { MapPin, Briefcase, GraduationCap, Mail, Phone, Calendar, Download, ArrowLeft } from "lucide-react";
-import { Link } from "react-router-dom";
+import { MapPin, Briefcase, GraduationCap, Mail, Phone, Calendar, Download, ArrowLeft, User } from "lucide-react";
+import { Link, useParams } from "react-router-dom";
 import PageWrapper from "../layouts/PageWrapper";
-import { useState } from "react";
+import { useState, useMemo } from "react";
+import { useAuth } from "../../contexts/AuthContext";
+import { candidates } from "../../data/candidates";
 
 export default function CandidateDetailPage() {
+  const { id } = useParams();
+  const { user } = useAuth();
   const [message, setMessage] = useState("");
-  
-  const candidate = {
-    name: "Jhon Doe",
-    title: "Project Manager",
-    email: "jhon.doe@example.com",
-    phone: "+1 234 567 8900",
-    location: "New York, USA",
-    experience: "5+ years",
-    education: "Bachelor's Degree in Computer Science",
-    joinedDate: "January 2020",
-    bio: "Experienced Project Manager with 5+ years in software development projects. Proven track record of delivering complex projects on time and within budget. Strong leadership and communication skills with expertise in Agile methodologies.",
-    skills: ["Leadership", "Agile", "Scrum", "PMP", "Risk Management", "Stakeholder Management"],
-    workExperience: [
-      {
-        title: "Senior Project Manager",
-        company: "Tech Corp",
-        period: "2021 - Present",
-        description: "Leading multiple software development projects with teams of 10+ members."
-      },
-      {
-        title: "Project Manager",
-        company: "Digital Solutions Inc",
-        period: "2019 - 2021",
-        description: "Managed web and mobile application projects using Agile methodologies."
-      }
-    ],
-    educationHistory: [
-      {
-        degree: "Bachelor's in Computer Science",
-        institution: "University of Technology",
-        year: "2015 - 2019"
-      }
-    ]
-  };
+
+  const candidate = useMemo(() => {
+    // If we're looking at our own profile in the detail view
+    if (user && (id === user.id || !id)) {
+      return {
+        name: user.name,
+        professionalTitle: user.professionalTitle || "No Title Set",
+        email: user.email,
+        phone: user.phone || "No Phone Set",
+        location: user.location || "No Location Set",
+        experience: user.experience || "No Experience Set",
+        education: user.education || "No Education Set",
+        joinedDate: "February 2026",
+        summary: user.summary || "No summary provided.",
+        skills: user.skills || [],
+        initials: user.initials || user.name.split(" ").map(n => n[0]).join("").toUpperCase(),
+        workExperience: [
+          {
+            title: user.professionalTitle || "Professional",
+            company: "Current Company",
+            period: "2024 - Present",
+            description: user.summary || ""
+          }
+        ],
+        educationHistory: [
+          {
+            degree: user.education || "Degree",
+            institution: "University",
+            year: "2020 - 2024"
+          }
+        ]
+      };
+    }
+
+    // Otherwise find in mock data
+    const mockCandidate = candidates.find(c => c.id.toString() === id) || candidates[0];
+    return {
+      ...mockCandidate,
+      professionalTitle: mockCandidate.professionalTitle, // Consistent naming
+      summary: mockCandidate.summary,
+      phone: "+1 234 567 8900",
+      joinedDate: "January 2020",
+      workExperience: [
+        {
+          title: mockCandidate.professionalTitle,
+          company: "Tech Corp",
+          period: "2021 - Present",
+          description: mockCandidate.summary
+        }
+      ],
+      educationHistory: [
+        {
+          degree: mockCandidate.education,
+          institution: "University of Technology",
+          year: "2015 - 2019"
+        }
+      ]
+    };
+  }, [id, user]);
 
   const handleSendMessage = () => {
     const subject = encodeURIComponent(`Job Opportunity - Message from Employer`);
@@ -62,33 +91,33 @@ export default function CandidateDetailPage() {
                   <span className="text-3xl font-semibold">JD</span>
                 </div>
                 <h2 className="text-2xl font-bold text-gray-900">{candidate.name}</h2>
-                <p className="text-blue-600 text-lg">{candidate.title}</p>
+                <p className="text-[#00b4d8] font-bold text-lg">{candidate.professionalTitle}</p>
               </div>
 
-              <div className="space-y-3 mb-6">
-                <div className="flex items-center gap-2 text-gray-600">
-                  <MapPin className="w-4 h-4" />
+              <div className="space-y-3 mb-8">
+                <div className="flex items-center gap-3 text-gray-600">
+                  <MapPin className="w-4 h-4 text-[#00b4d8]" />
                   <span className="text-sm">{candidate.location}</span>
                 </div>
-                <div className="flex items-center gap-2 text-gray-600">
-                  <Mail className="w-4 h-4" />
+                <div className="flex items-center gap-3 text-gray-600">
+                  <Mail className="w-4 h-4 text-[#00b4d8]" />
                   <span className="text-sm">{candidate.email}</span>
                 </div>
-                <div className="flex items-center gap-2 text-gray-600">
-                  <Phone className="w-4 h-4" />
+                <div className="flex items-center gap-3 text-gray-600">
+                  <Phone className="w-4 h-4 text-[#00b4d8]" />
                   <span className="text-sm">{candidate.phone}</span>
                 </div>
-                <div className="flex items-center gap-2 text-gray-600">
-                  <Briefcase className="w-4 h-4" />
+                <div className="flex items-center gap-3 text-gray-600">
+                  <Briefcase className="w-4 h-4 text-[#00b4d8]" />
                   <span className="text-sm">{candidate.experience}</span>
                 </div>
-                <div className="flex items-center gap-2 text-gray-600">
-                  <Calendar className="w-4 h-4" />
+                <div className="flex items-center gap-3 text-gray-600">
+                  <Calendar className="w-4 h-4 text-[#00b4d8]" />
                   <span className="text-sm">Joined {candidate.joinedDate}</span>
                 </div>
               </div>
 
-              <button className="w-full bg-gray-100 text-gray-700 py-2 rounded-md hover:bg-gray-200 transition-colors flex items-center justify-center gap-2 mb-3">
+              <button className="w-full bg-[#00b4d8] text-white py-3 rounded-xl font-bold hover:shadow-lg hover:shadow-[#00b4d8]/20 transition-all flex items-center justify-center gap-2">
                 <Download className="w-4 h-4" /> Download Resume
               </button>
             </div>
@@ -97,17 +126,19 @@ export default function CandidateDetailPage() {
           {/* Right Column - Details */}
           <div className="lg:col-span-2 space-y-6">
             {/* About */}
-            <div className="bg-white rounded-lg shadow p-6">
-              <h3 className="text-xl font-bold text-gray-900 mb-4">About</h3>
-              <p className="text-gray-600 leading-relaxed">{candidate.bio}</p>
+            <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-8">
+              <h3 className="text-xl font-bold text-gray-900 mb-6 flex items-center gap-2">
+                <User className="w-5 h-5 text-[#00b4d8]" /> About Me
+              </h3>
+              <p className="text-gray-600 leading-relaxed italic">{candidate.summary}</p>
             </div>
 
             {/* Skills */}
-            <div className="bg-white rounded-lg shadow p-6">
-              <h3 className="text-xl font-bold text-gray-900 mb-4">Skills</h3>
+            <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-8">
+              <h3 className="text-xl font-bold text-gray-900 mb-6">Skills & Expertise</h3>
               <div className="flex flex-wrap gap-2">
                 {candidate.skills.map((skill) => (
-                  <span key={skill} className="px-3 py-2 bg-blue-100 text-blue-700 rounded-md">
+                  <span key={skill} className="px-4 py-2 bg-blue-50 text-[#0077b6] rounded-lg font-medium text-sm border border-blue-100">
                     {skill}
                   </span>
                 ))}
@@ -130,16 +161,20 @@ export default function CandidateDetailPage() {
             </div>
 
             {/* Education */}
-            <div className="bg-white rounded-lg shadow p-6">
-              <h3 className="text-xl font-bold text-gray-900 mb-4">Education</h3>
+            <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-8">
+              <h3 className="text-xl font-bold text-gray-900 mb-6 flex items-center gap-2">
+                <GraduationCap className="w-5 h-5 text-[#00b4d8]" /> Education
+              </h3>
               <div className="space-y-4">
                 {candidate.educationHistory.map((edu, index) => (
-                  <div key={index} className="flex items-start gap-3">
-                    <GraduationCap className="w-5 h-5 text-blue-600 mt-1" />
+                  <div key={index} className="flex items-start gap-4 p-4 rounded-lg bg-gray-50 border border-gray-100">
+                    <div className="w-10 h-10 rounded-lg bg-white border border-gray-100 flex items-center justify-center shadow-sm">
+                      <GraduationCap className="w-5 h-5 text-[#00b4d8]" />
+                    </div>
                     <div>
-                      <h4 className="font-semibold text-gray-900">{edu.degree}</h4>
-                      <p className="text-gray-600">{edu.institution}</p>
-                      <p className="text-sm text-gray-500">{edu.year}</p>
+                      <h4 className="font-bold text-gray-900">{edu.degree}</h4>
+                      <p className="text-[#00b4d8] font-medium">{edu.institution}</p>
+                      <p className="text-xs text-gray-400 mt-1">{edu.year}</p>
                     </div>
                   </div>
                 ))}

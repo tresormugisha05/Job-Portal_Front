@@ -21,6 +21,7 @@ import CandidateDashboard from "./shared/components/pages/dashboard/CandidateDas
 import EmployerDashboard from "./shared/components/pages/dashboard/EmployerDashboard";
 import AdminDashboard from "./shared/components/pages/dashboard/AdminDashboard";
 import PostJob from "./shared/components/pages/dashboard/PostJob";
+import CandidateProfile from "./shared/components/pages/dashboard/CandidateProfile";
 
 export default function App() {
   return (
@@ -46,7 +47,7 @@ export default function App() {
           <Route path="/dashboard" element={<DashboardRedirect />} />
           <Route path="/dashboard/applied-jobs" element={<CandidateDashboard />} />
           <Route path="/dashboard/saved-jobs" element={<CandidateDashboard />} />
-          <Route path="/dashboard/profile" element={<CandidateDashboard />} />
+          <Route path="/dashboard/profile" element={<CandidateProfile />} />
 
           <Route path="/dashboard/manage-jobs" element={<EmployerDashboard />} />
           <Route path="/dashboard/post-job" element={<PostJob />} />

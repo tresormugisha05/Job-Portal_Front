@@ -14,10 +14,10 @@ export default function EmployerDashboard() {
     ];
 
     const recentApplicants: Applicant[] = [
-        { id: 1, name: "Jhon Doe", role: "Project Manager", jobTitle: "Senior Health and Food", appliedDate: "24 Oct, 2024" },
-        { id: 2, name: "Sarah Smith", role: "UI Designer", jobTitle: "Product Designer", appliedDate: "25 Oct, 2024" },
-        { id: 3, name: "Mike Johnson", role: "Frontend Dev", jobTitle: "React Developer", appliedDate: "26 Oct, 2024" },
-        { id: 4, name: "Emma Wilson", role: "UX Researcher", jobTitle: "Product Designer", appliedDate: "27 Oct, 2024" },
+        { id: 1, name: "Jhon Doe", professionalTitle: "Project Manager", jobTitle: "Senior Health and Food", appliedDate: "24 Oct, 2024" },
+        { id: 2, name: "Sarah Smith", professionalTitle: "UI Designer", jobTitle: "Product Designer", appliedDate: "25 Oct, 2024" },
+        { id: 3, name: "Mike Johnson", professionalTitle: "Frontend Dev", jobTitle: "React Developer", appliedDate: "26 Oct, 2024" },
+        { id: 4, name: "Emma Wilson", professionalTitle: "UX Researcher", jobTitle: "Product Designer", appliedDate: "27 Oct, 2024" },
     ];
 
     return (

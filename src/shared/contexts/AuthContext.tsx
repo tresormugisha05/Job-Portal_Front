@@ -2,12 +2,38 @@ import React, { createContext, useContext, useState, useEffect } from "react";
 
 export type UserRole = "CANDIDATE" | "EMPLOYER" | "ADMIN" | "GUEST";
 
+export interface WorkExperience {
+    id: string;
+    title: string;
+    company: string;
+    period: string;
+    description: string;
+}
+
+export interface EducationHistory {
+    id: string;
+    degree: string;
+    institution: string;
+    year: string;
+}
+
 interface User {
     id: string;
     name: string;
     email: string;
-    role: UserRole;
     avatar?: string;
+    role: UserRole; // This is the system role
+    professionalTitle?: string; // Standardized title field
+    location?: string;
+    experience?: string;
+    education?: string;
+    skills?: string[];
+    summary?: string;
+    phone?: string;
+    resume?: string;
+    initials?: string;
+    workExperience?: WorkExperience[];
+    educationHistory?: EducationHistory[];
 }
 
 interface AuthContextType {
@@ -16,6 +42,7 @@ interface AuthContextType {
     isAuthenticated: boolean;
     login: (email: string, password: string) => Promise<void>;
     register: (userData: { name: string; email: string; role: "CANDIDATE" | "EMPLOYER" }) => Promise<void>;
+    updateProfile: (updates: Partial<User>) => Promise<void>;
     logout: () => void;
 }
 
@@ -66,6 +93,17 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         localStorage.setItem("job_portal_user", JSON.stringify(newUser));
     };
 
+    const updateProfile = async (updates: Partial<User>) => {
+        // Simulate API delay
+        await new Promise(resolve => setTimeout(resolve, 1000));
+
+        if (user) {
+            const updatedUser = { ...user, ...updates };
+            setUser(updatedUser);
+            localStorage.setItem("job_portal_user", JSON.stringify(updatedUser));
+        }
+    };
+
     const logout = () => {
         setUser(null);
         localStorage.removeItem("job_portal_user");
@@ -77,6 +115,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         isAuthenticated: !!user,
         login,
         register,
+        updateProfile,
         logout
     };
 

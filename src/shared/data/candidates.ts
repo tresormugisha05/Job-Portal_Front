@@ -1,7 +1,7 @@
 export interface Candidate {
     id: number;
     name: string;
-    role: string;
+    professionalTitle: string;
     location: string;
     experience: string;
     experienceLevel: "Entry Level" | "Mid Level" | "Senior Level";
@@ -16,7 +16,7 @@ export const candidates: Candidate[] = [
     {
         id: 1,
         name: "Jhon Doe",
-        role: "Project Manager",
+        professionalTitle: "Project Manager",
         location: "New York",
         experience: "5+ years",
         experienceLevel: "Senior Level",
@@ -29,7 +29,7 @@ export const candidates: Candidate[] = [
     {
         id: 2,
         name: "Sarah Smith",
-        role: "Frontend Developer",
+        professionalTitle: "Frontend Developer",
         location: "San Francisco",
         experience: "3 years",
         experienceLevel: "Mid Level",
@@ -42,7 +42,7 @@ export const candidates: Candidate[] = [
     {
         id: 3,
         name: "Michael Brown",
-        role: "Backend Engineer",
+        professionalTitle: "Backend Engineer",
         location: "Austin",
         experience: "7 years",
         experienceLevel: "Senior Level",
@@ -55,7 +55,7 @@ export const candidates: Candidate[] = [
     {
         id: 4,
         name: "Emily Davis",
-        role: "UI/UX Designer",
+        professionalTitle: "UI/UX Designer",
         location: "New York",
         experience: "2 years",
         experienceLevel: "Entry Level",
@@ -68,7 +68,7 @@ export const candidates: Candidate[] = [
     {
         id: 5,
         name: "David Wilson",
-        role: "DevOps Engineer",
+        professionalTitle: "DevOps Engineer",
         location: "Remote",
         experience: "4 years",
         experienceLevel: "Mid Level",
@@ -81,7 +81,7 @@ export const candidates: Candidate[] = [
     {
         id: 6,
         name: "Lisa Anderson",
-        role: "Data Scientist",
+        professionalTitle: "Data Scientist",
         location: "Boston",
         experience: "6 years",
         experienceLevel: "Senior Level",
@@ -94,7 +94,7 @@ export const candidates: Candidate[] = [
     {
         id: 7,
         name: "James Taylor",
-        role: "Full Stack Developer",
+        professionalTitle: "Full Stack Developer",
         location: "London",
         experience: "5 years",
         experienceLevel: "Senior Level",
@@ -107,7 +107,7 @@ export const candidates: Candidate[] = [
     {
         id: 8,
         name: "Jessica Martinez",
-        role: "Marketing Specialist",
+        professionalTitle: "Marketing Specialist",
         location: "Chicago",
         experience: "3 years",
         experienceLevel: "Mid Level",
@@ -120,7 +120,7 @@ export const candidates: Candidate[] = [
     {
         id: 9,
         name: "Robert Thomas",
-        role: "QA Engineer",
+        professionalTitle: "QA Engineer",
         location: "Austin",
         experience: "2 years",
         experienceLevel: "Entry Level",
@@ -133,7 +133,7 @@ export const candidates: Candidate[] = [
     {
         id: 10,
         name: "Jennifer Garcia",
-        role: "Product Owner",
+        professionalTitle: "Product Owner",
         location: "Seattle",
         experience: "8 years",
         experienceLevel: "Senior Level",
@@ -146,7 +146,7 @@ export const candidates: Candidate[] = [
     {
         id: 11,
         name: "William Rodriguez",
-        role: "Mobile Developer",
+        professionalTitle: "Mobile Developer",
         location: "Los Angeles",
         experience: "4 years",
         experienceLevel: "Mid Level",
@@ -159,7 +159,7 @@ export const candidates: Candidate[] = [
     {
         id: 12,
         name: "Elizabeth Lee",
-        role: "HR Manager",
+        professionalTitle: "HR Manager",
         location: "New York",
         experience: "10+ years",
         experienceLevel: "Senior Level",
