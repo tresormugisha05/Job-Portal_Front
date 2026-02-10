@@ -66,42 +66,21 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
   }, []);
 
-  const login = async (email: string, _password: string) => {
-    // Simulate API delay
-    await new Promise((resolve) => setTimeout(resolve, 1000));
+  const login = async (email: string, password: string) => {
+    try {
+      const response = await api.post("/api/candidates/login", {
+        email,
+        password,
+      });
+      const { token, user: userDataFromApi } = response.data;
 
-    let mockUser: User;
+      localStorage.setItem("token", token);
+      localStorage.setItem("job_portal_user", JSON.stringify(userDataFromApi));
 
-    // Simple mock logic: admin email gets admin role, otherwise based on a "database" simulation
-    // In a real app, this would be a backend call
-    if (email.includes("admin")) {
-      mockUser = {
-        id: "a1",
-        name: "System Admin",
-        email,
-        role: "ADMIN",
-        avatar: "SA",
-      };
-    } else if (email.includes("employer")) {
-      mockUser = {
-        id: "e1",
-        name: "Tech Corp",
-        email,
-        role: "EMPLOYER",
-        avatar: "TC",
-      };
-    } else {
-      mockUser = {
-        id: "c1",
-        name: "John Doe",
-        email,
-        role: "CANDIDATE",
-        avatar: "JD",
-      };
+      setUser(userDataFromApi);
+    } catch (error: any) {
+      throw new Error(error.response?.data?.message || "Login failed");
     }
-
-    setUser(mockUser);
-    localStorage.setItem("job_portal_user", JSON.stringify(mockUser));
   };
 
   const register = async (userData: {
