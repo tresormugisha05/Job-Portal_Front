@@ -1,131 +1,162 @@
 import React, { createContext, useContext, useState, useEffect } from "react";
+import api from "../services/Service";
 
 export type UserRole = "CANDIDATE" | "EMPLOYER" | "ADMIN" | "GUEST";
 
 export interface WorkExperience {
-    id: string;
-    title: string;
-    company: string;
-    period: string;
-    description: string;
+  id: string;
+  title: string;
+  company: string;
+  period: string;
+  description: string;
 }
 
 export interface EducationHistory {
-    id: string;
-    degree: string;
-    institution: string;
-    year: string;
+  id: string;
+  degree: string;
+  institution: string;
+  year: string;
 }
 
 interface User {
-    id: string;
-    name: string;
-    email: string;
-    avatar?: string;
-    role: UserRole; // This is the system role
-    professionalTitle?: string; // Standardized title field
-    location?: string;
-    experience?: string;
-    education?: string;
-    skills?: string[];
-    summary?: string;
-    phone?: string;
-    resume?: string;
-    initials?: string;
-    workExperience?: WorkExperience[];
-    educationHistory?: EducationHistory[];
+  id: string;
+  name: string;
+  email: string;
+  avatar?: string;
+  role: UserRole; // This is the system role
+  professionalTitle?: string; // Standardized title field
+  location?: string;
+  experience?: string;
+  education?: string;
+  skills?: string[];
+  summary?: string;
+  phone?: string;
+  resume?: string;
+  initials?: string;
+  workExperience?: WorkExperience[];
+  educationHistory?: EducationHistory[];
 }
 
 interface AuthContextType {
-    user: User | null;
-    role: UserRole;
-    isAuthenticated: boolean;
-    login: (email: string, password: string) => Promise<void>;
-    register: (userData: { name: string; email: string; role: "CANDIDATE" | "EMPLOYER" }) => Promise<void>;
-    updateProfile: (updates: Partial<User>) => Promise<void>;
-    logout: () => void;
+  user: User | null;
+  role: UserRole;
+  isAuthenticated: boolean;
+  login: (email: string, password: string) => Promise<void>;
+  register: (userData: {
+    name: string;
+    email: string;
+    phone: string;
+    password: string;
+    role: "CANDIDATE" | "EMPLOYER";
+  }) => Promise<void>;
+  updateProfile: (updates: Partial<User>) => Promise<void>;
+  logout: () => void;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
-    const [user, setUser] = useState<User | null>(null);
+  const [user, setUser] = useState<User | null>(null);
 
-    // Simulate persistent session
-    useEffect(() => {
-        const savedUser = localStorage.getItem("job_portal_user");
-        if (savedUser) {
-            setUser(JSON.parse(savedUser));
-        }
-    }, []);
+  // Simulate persistent session
+  useEffect(() => {
+    const savedUser = localStorage.getItem("job_portal_user");
+    if (savedUser) {
+      setUser(JSON.parse(savedUser));
+    }
+  }, []);
 
-    const login = async (email: string, _password: string) => {
-        // Simulate API delay
-        await new Promise(resolve => setTimeout(resolve, 1000));
+  const login = async (email: string, _password: string) => {
+    // Simulate API delay
+    await new Promise((resolve) => setTimeout(resolve, 1000));
 
-        let mockUser: User;
+    let mockUser: User;
 
-        // Simple mock logic: admin email gets admin role, otherwise based on a "database" simulation
-        // In a real app, this would be a backend call
-        if (email.includes("admin")) {
-            mockUser = { id: "a1", name: "System Admin", email, role: "ADMIN", avatar: "SA" };
-        } else if (email.includes("employer")) {
-            mockUser = { id: "e1", name: "Tech Corp", email, role: "EMPLOYER", avatar: "TC" };
-        } else {
-            mockUser = { id: "c1", name: "John Doe", email, role: "CANDIDATE", avatar: "JD" };
-        }
+    // Simple mock logic: admin email gets admin role, otherwise based on a "database" simulation
+    // In a real app, this would be a backend call
+    if (email.includes("admin")) {
+      mockUser = {
+        id: "a1",
+        name: "System Admin",
+        email,
+        role: "ADMIN",
+        avatar: "SA",
+      };
+    } else if (email.includes("employer")) {
+      mockUser = {
+        id: "e1",
+        name: "Tech Corp",
+        email,
+        role: "EMPLOYER",
+        avatar: "TC",
+      };
+    } else {
+      mockUser = {
+        id: "c1",
+        name: "John Doe",
+        email,
+        role: "CANDIDATE",
+        avatar: "JD",
+      };
+    }
 
-        setUser(mockUser);
-        localStorage.setItem("job_portal_user", JSON.stringify(mockUser));
-    };
+    setUser(mockUser);
+    localStorage.setItem("job_portal_user", JSON.stringify(mockUser));
+  };
 
-    const register = async (userData: { name: string; email: string; role: "CANDIDATE" | "EMPLOYER" }) => {
-        // Simulate API delay
-        await new Promise(resolve => setTimeout(resolve, 1500));
+  const register = async (userData: {
+    name: string;
+    email: string;
+    phone: string;
+    password: string;
+    role: "CANDIDATE" | "EMPLOYER";
+  }) => {
+    try {
+      const response = await api.post("/api/candidates/register", userData);
+      const { token, user: userDataFromApi } = response.data;
 
-        const newUser: User = {
-            id: Math.random().toString(36).substr(2, 9),
-            ...userData,
-            avatar: userData.name.split(" ").map(n => n[0]).join("").toUpperCase()
-        };
+      localStorage.setItem("token", token);
+      localStorage.setItem("job_portal_user", JSON.stringify(userDataFromApi));
 
-        setUser(newUser);
-        localStorage.setItem("job_portal_user", JSON.stringify(newUser));
-    };
+      setUser(userDataFromApi);
+    } catch (error: any) {
+      throw new Error(error.response?.data?.message || "Registration failed");
+    }
+  };
 
-    const updateProfile = async (updates: Partial<User>) => {
-        // Simulate API delay
-        await new Promise(resolve => setTimeout(resolve, 1000));
+  const updateProfile = async (updates: Partial<User>) => {
+    // Simulate API delay
+    await new Promise((resolve) => setTimeout(resolve, 1000));
 
-        if (user) {
-            const updatedUser = { ...user, ...updates };
-            setUser(updatedUser);
-            localStorage.setItem("job_portal_user", JSON.stringify(updatedUser));
-        }
-    };
+    if (user) {
+      const updatedUser = { ...user, ...updates };
+      setUser(updatedUser);
+      localStorage.setItem("job_portal_user", JSON.stringify(updatedUser));
+    }
+  };
 
-    const logout = () => {
-        setUser(null);
-        localStorage.removeItem("job_portal_user");
-    };
+  const logout = () => {
+    setUser(null);
+    localStorage.removeItem("job_portal_user");
+  };
 
-    const value = {
-        user,
-        role: user?.role || "GUEST",
-        isAuthenticated: !!user,
-        login,
-        register,
-        updateProfile,
-        logout
-    };
+  const value = {
+    user,
+    role: user?.role || "GUEST",
+    isAuthenticated: !!user,
+    login,
+    register,
+    updateProfile,
+    logout,
+  };
 
-    return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
+  return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 }
 
 export function useAuth() {
-    const context = useContext(AuthContext);
-    if (context === undefined) {
-        throw new Error("useAuth must be used within an AuthProvider");
-    }
-    return context;
+  const context = useContext(AuthContext);
+  if (context === undefined) {
+    throw new Error("useAuth must be used within an AuthProvider");
+  }
+  return context;
 }
