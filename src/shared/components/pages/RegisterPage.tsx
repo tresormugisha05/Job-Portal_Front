@@ -12,28 +12,62 @@ export default function RegisterPage() {
     const [isLoading, setIsLoading] = useState(false);
     const [role, setRole] = useState<RegRole>("CANDIDATE");
     const [formData, setFormData] = useState({
-        name: "",
+        firstName: "",
+        lastName: "",
         email: "",
         password: "",
-        confirmPassword: ""
+        confirmPassword: "",
+        age: "",
+        phoneNumber: ""
     });
     const [error, setError] = useState("");
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
+        setError("");
+
+        // Validation
+        if (!formData.firstName.trim() || !formData.lastName.trim()) {
+            setError("First name and last name are required");
+            return;
+        }
+
+        if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
+            setError("Please enter a valid email address");
+            return;
+        }
+
+        if (formData.password.length < 6) {
+            setError("Password must be at least 6 characters long");
+            return;
+        }
+
         if (formData.password !== formData.confirmPassword) {
             setError("Passwords do not match");
             return;
         }
 
+        if (formData.age && (isNaN(Number(formData.age)) || Number(formData.age) < 18 || Number(formData.age) > 100)) {
+            setError("Age must be between 18 and 100");
+            return;
+        }
+
+        if (formData.phoneNumber && !/^[+]?[0-9\s-]{10,}$/.test(formData.phoneNumber)) {
+            setError("Please enter a valid phone number");
+            return;
+        }
+
         setIsLoading(true);
-        setError("");
 
         try {
             await register({
-                name: formData.name,
+                firstName: formData.firstName,
+                lastName: formData.lastName,
                 email: formData.email,
-                role: role
+                password: formData.password,
+                age: formData.age,
+                phoneNumber: formData.phoneNumber,
+                role: role.toLowerCase()
             });
             navigate("/dashboard");
         } catch (err) {
@@ -104,22 +138,42 @@ export default function RegisterPage() {
                                 </div>
                             )}
 
-                            <div className="space-y-2 text-left">
-                                <label className="text-xs font-black text-gray-400 uppercase tracking-widest ml-1">
-                                    {role === "CANDIDATE" ? "Full Name" : "Company Name"}
-                                </label>
-                                <div className="relative group">
-                                    <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                                        <User className="h-5 w-5 text-gray-400 group-focus-within:text-[#00b4d8] transition-colors" />
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 text-left">
+                                <div className="space-y-2">
+                                    <label className="text-xs font-black text-gray-400 uppercase tracking-widest ml-1">
+                                        First Name
+                                    </label>
+                                    <div className="relative group">
+                                        <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                                            <User className="h-5 w-5 text-gray-400 group-focus-within:text-[#00b4d8] transition-colors" />
+                                        </div>
+                                        <input
+                                            required
+                                            type="text"
+                                            value={formData.firstName}
+                                            onChange={(e) => setFormData({ ...formData, firstName: e.target.value })}
+                                            className="block w-full pl-12 pr-4 py-4 bg-gray-50 border-2 border-transparent focus:border-[#00b4d8] focus:bg-white rounded-2xl transition-all outline-none font-medium"
+                                            placeholder="patrick"
+                                        />
                                     </div>
-                                    <input
-                                        required
-                                        type="text"
-                                        value={formData.name}
-                                        onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                                        className="block w-full pl-12 pr-4 py-4 bg-gray-50 border-2 border-transparent focus:border-[#00b4d8] focus:bg-white rounded-2xl transition-all outline-none font-medium"
-                                        placeholder={role === "CANDIDATE" ? "John Doe" : "Tech Solutions Inc."}
-                                    />
+                                </div>
+                                <div className="space-y-2">
+                                    <label className="text-xs font-black text-gray-400 uppercase tracking-widest ml-1">
+                                        Last Name
+                                    </label>
+                                    <div className="relative group">
+                                        <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                                            <User className="h-5 w-5 text-gray-400 group-focus-within:text-[#00b4d8] transition-colors" />
+                                        </div>
+                                        <input
+                                            required
+                                            type="text"
+                                            value={formData.lastName}
+                                            onChange={(e) => setFormData({ ...formData, lastName: e.target.value })}
+                                            className="block w-full pl-12 pr-4 py-4 bg-gray-50 border-2 border-transparent focus:border-[#00b4d8] focus:bg-white rounded-2xl transition-all outline-none font-medium"
+                                            placeholder="huguette"
+                                        />
+                                    </div>
                                 </div>
                             </div>
 
@@ -137,7 +191,30 @@ export default function RegisterPage() {
                                         value={formData.email}
                                         onChange={(e) => setFormData({ ...formData, email: e.target.value })}
                                         className="block w-full pl-12 pr-4 py-4 bg-gray-50 border-2 border-transparent focus:border-[#00b4d8] focus:bg-white rounded-2xl transition-all outline-none font-medium"
-                                        placeholder="name@example.com"
+                                        placeholder="patrickHuguette@example.com"
+                                    />
+                                </div>
+                            </div>
+
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 text-left">
+                                <div className="space-y-2">
+                                    <label className="text-xs font-black text-gray-400 uppercase tracking-widest ml-1">Age (Optional)</label>
+                                    <input
+                                        type="text"
+                                        value={formData.age}
+                                        onChange={(e) => setFormData({ ...formData, age: e.target.value })}
+                                        className="block w-full px-4 py-4 bg-gray-50 border-2 border-transparent focus:border-[#00b4d8] focus:bg-white rounded-2xl transition-all outline-none font-medium"
+                                        placeholder="25"
+                                    />
+                                </div>
+                                <div className="space-y-2">
+                                    <label className="text-xs font-black text-gray-400 uppercase tracking-widest ml-1">Phone (Optional)</label>
+                                    <input
+                                        type="tel"
+                                        value={formData.phoneNumber}
+                                        onChange={(e) => setFormData({ ...formData, phoneNumber: e.target.value })}
+                                        className="block w-full px-4 py-4 bg-gray-50 border-2 border-transparent focus:border-[#00b4d8] focus:bg-white rounded-2xl transition-all outline-none font-medium"
+                                        placeholder="+250 123 456 789"
                                     />
                                 </div>
                             </div>

@@ -15,7 +15,7 @@ interface AuthContextType {
     role: UserRole;
     isAuthenticated: boolean;
     login: (email: string, password: string) => Promise<void>;
-    register: (userData: { name: string; email: string; role: "CANDIDATE" | "EMPLOYER" }) => Promise<void>;
+    register: (userData: { firstName: string; lastName: string; email: string; password: string; age: string; phoneNumber: string; role: string }) => Promise<void>;
     logout: () => void;
 }
 
@@ -52,14 +52,16 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         localStorage.setItem("job_portal_user", JSON.stringify(mockUser));
     };
 
-    const register = async (userData: { name: string; email: string; role: "CANDIDATE" | "EMPLOYER" }) => {
+    const register = async (userData: { firstName: string; lastName: string; email: string; password: string; age: string; phoneNumber: string; role: string }) => {
         // Simulate API delay
         await new Promise(resolve => setTimeout(resolve, 1500));
 
         const newUser: User = {
             id: Math.random().toString(36).substr(2, 9),
-            ...userData,
-            avatar: userData.name.split(" ").map(n => n[0]).join("").toUpperCase()
+            name: `${userData.firstName} ${userData.lastName}`,
+            email: userData.email,
+            role: userData.role.toUpperCase() as UserRole,
+            avatar: `${userData.firstName[0]}${userData.lastName[0]}`.toUpperCase()
         };
 
         setUser(newUser);
