@@ -12,12 +12,10 @@ export default function RegisterPage() {
     const [isLoading, setIsLoading] = useState(false);
     const [role, setRole] = useState<RegRole>("CANDIDATE");
     const [formData, setFormData] = useState({
-        firstName: "",
-        lastName: "",
+        Name: "",
         email: "",
         password: "",
         confirmPassword: "",
-        age: "",
         phoneNumber: ""
     });
     const [error, setError] = useState("");
@@ -27,8 +25,8 @@ export default function RegisterPage() {
         setError("");
 
         // Validation
-        if (!formData.firstName.trim() || !formData.lastName.trim()) {
-            setError("First name and last name are required");
+        if (!formData.Name.trim()) {
+            setError("name is required");
             return;
         }
 
@@ -47,11 +45,6 @@ export default function RegisterPage() {
             return;
         }
 
-        if (formData.age && (isNaN(Number(formData.age)) || Number(formData.age) < 18 || Number(formData.age) > 100)) {
-            setError("Age must be between 18 and 100");
-            return;
-        }
-
         if (formData.phoneNumber && !/^[+]?[0-9\s-]{10,}$/.test(formData.phoneNumber)) {
             setError("Please enter a valid phone number");
             return;
@@ -61,15 +54,13 @@ export default function RegisterPage() {
 
         try {
             await register({
-                firstName: formData.firstName,
-                lastName: formData.lastName,
+                Name: formData.Name,
                 email: formData.email,
                 password: formData.password,
-                age: formData.age,
                 phoneNumber: formData.phoneNumber,
                 role: role.toLowerCase()
             });
-            navigate("/dashboard");
+            navigate("/home");
         } catch (err) {
             setError("Registration failed. Please try again.");
         } finally {
@@ -150,8 +141,8 @@ export default function RegisterPage() {
                                         <input
                                             required
                                             type="text"
-                                            value={formData.firstName}
-                                            onChange={(e) => setFormData({ ...formData, firstName: e.target.value })}
+                                            value={formData.Name}
+                                            onChange={(e) => setFormData({ ...formData,Name: e.target.value })}
                                             className="block w-full pl-12 pr-4 py-4 bg-gray-50 border-2 border-transparent focus:border-[#00b4d8] focus:bg-white rounded-2xl transition-all outline-none font-medium"
                                             placeholder="patrick"
                                         />

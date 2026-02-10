@@ -42,6 +42,7 @@ export default function LoginPage() {
                         </p>
                     </div>
 
+                    {/* Form Card */}
                     <div className="bg-white p-10 rounded-[2.5rem] shadow-2xl shadow-blue-100/50 border border-gray-100">
                         <form className="space-y-6" onSubmit={handleSubmit}>
                             {error && (
@@ -49,6 +50,7 @@ export default function LoginPage() {
                                     {error}
                                 </div>
                             )}
+
                             <div className="space-y-2">
                                 <label className="text-xs font-black text-gray-400 uppercase tracking-widest ml-1">
                                     Email Address
