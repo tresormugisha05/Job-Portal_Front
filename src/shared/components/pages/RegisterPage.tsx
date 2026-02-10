@@ -3,7 +3,6 @@ import { useNavigate, Link } from "react-router-dom";
 import { useAuth } from "../../contexts/AuthContext";
 import { User, Briefcase, Mail, Lock, UserPlus, Loader2, ArrowRight, CheckCircle2 } from "lucide-react";
 import PageWrapper from "../layouts/PageWrapper";
-
 type RegRole = "CANDIDATE" | "EMPLOYER";
 
 export default function RegisterPage() {
