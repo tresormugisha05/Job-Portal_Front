@@ -1,93 +1,59 @@
-import api from "./ApiSetter";
-export interface userAuth {
-  _id?: string;
-  FirstName: string;
-  LastName:string;
-  Age:string
+import api from "./ApiSetter"
+export interface UserModel {
+  name: string;
   email: string;
-  phone?: string;
-  profile?: string;
+  phone: string;
   password: string;
-  UserType: "applicant" | "employer" | "admin"
-  resetPasswordToken?: String;
-  resetPasswordExpires?: Date;
-  createdAt: Date;
+  avatar?: string;
+  role: UserRole;
+  professionalTitle?: string;
+  location?: string;
+  experience?: string;
+  education?: string;
+  skills?: string[];
+  summary?: string;
+  workExperience?: WorkExperience[];
+  educationHistory?: EducationHistory[];
+  resume?: string;
+  initials?: string;
 }
-export const userService = {
-  // GET all users
-  getUsers: async (params?: {
-    search?: string;
-    role?: string;
-  }): Promise<userAuth> => {
-    const response = await api.get("/api/auth", { params });
-    return response.data;
-  },
-
-  // GET single user
-  getUser: async (id: string): Promise<userAuth> => {
-    const response = await api.get(`/api/auth/${id}`);
-    return response.data;
-  },
-
-  // GET profile
-  getProfile: async (): Promise<userAuth> => {
-    const response = await api.get("/api/auth/profile");
-    return response.data;
-  },
-
-  // POST create user
-  createUser: async (userData: {
-    FirstName: string;
-    LastName: string;
-    Age: string;
-    phone: string;
-    profile?: string;
-    password: string;
-    email: string;
-    UserType?: "applicant" | "employer" | "admin";
-  }) => {
-    const response = await api.post("/api/auth/register", userData);
-    return response.data;
-  },
-
-  LoginUser: async (userData: {
-    email: string;
-    password: string;
-  }): Promise<{ token: string; user: userAuth }> => {
-    const response = await api.post("/api/auth/login", userData);
-    return response.data;
-  },
-
-  updateProfile: async (userData: FormData): Promise<userAuth> => {
-    const response = await api.put("/api/auth/profile", userData, {
-      headers: { "Content-Type": "multipart/form-data" },
-    });
-    return response.data;
-  },
-
-  changePassword: async (passwords: {
-    currentPassword: string;
-    newPassword: string;
-  }) => {
-    const response = await api.post("/api/auth/change-password", passwords);
-    return response.data;
-  },
-
-  deleteAccount: async (): Promise<{ message: string }> => {
-    const response = await api.delete("/api/auth/account");
-    return response.data;
-  },
-
-  updateUser: async (
-    id: string,
-    userData: Partial<{ name: string; email: string; role: string }>,
-  ): Promise<userAuth> => {
-    const response = await api.put(`/api/auth/${id}`, userData);
-    return response.data;
-  },
-
-  deleteUser: async (id: string): Promise<{ message: string }> => {
-    const response = await api.delete(`/api/auth/${id}`);
-    return response.data;
-  },
-};
+export interface WorkExperience {
+  title: string;
+  company: string;
+  period: string;
+  description: string;
+}
+export type UserRole = "CANDIDATE" | "EMPLOYER" | "ADMIN";
+export interface EducationHistory {
+  degree: string;
+  institution: string;
+  year: string;
+}
+export const CandidateService ={
+    getUser: async(id:string):Promise<UserModel> =>{
+        const response = await api.get(`candidates/${id}`)
+        return response.data
+    },
+    updateUser: async(id:string,data:UserModel):Promise<UserModel> =>{
+        const response = await api.put(`candidates/${id}`,data)
+        return response.data
+    },
+    getProfile: async ():Promise<UserModel>=>{
+        const response = await api.get(`candidates/profile`)
+        return response.data
+    },
+    createUser: async():Promise<UserModel>=>{
+        const response = await api.post(`candidates`)
+        return response.data
+    },
+    deleteUser: async(id:string):Promise<void>=>{
+        await api.delete(`candidates/${id}`)
+    },
+    ChangePassword: async(currentPassword:string,newPassword:string):Promise<void>=>{
+        await api.post(`candidates/change-password`,{currentPassword,newPassword})
+    },
+    LoginUser: async (UserData:{Email:string,Password:string}):Promise<{token:string; User:UserModel}>=>{
+        const response = await api.post(`candidates/login`, UserData)
+        return response.data
+    }
+}
