@@ -48,7 +48,7 @@ export default function RegisterPage() {
         role: role,
       });
       navigate("/dashboard");
-    } catch (err: any) {
+    } catch (err: Error) {
       setError(err.message || "Registration failed. Please try again.");
     } finally {
       setIsLoading(false);

@@ -6,26 +6,28 @@ import {
     Loader2, Image as ImageIcon, X, Upload, Plus, Trash2,
     DollarSign, MapPin, GraduationCap, Award, Tag
 } from "lucide-react";
+import jobService from "../../../services/Job.Service"; // Import jobService
 
 export default function PostJob() {
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [isSuccess, setIsSuccess] = useState(false);
-    const [banner, setBanner] = useState<File | null>(null);
     const [bannerPreview, setBannerPreview] = useState<string | null>(null);
     const fileInputRef = useRef<HTMLInputElement>(null);
 
     const [formData, setFormData] = useState({
         title: "",
-        company: "Pay Walt",
+        company: "Pay Walt", // Placeholder, ideally fetched from auth context
         location: "",
-        type: "FULL TIME",
+        type: "Full-time", // Changed to match backend enum
         salary: "",
         experience: "",
         education: "",
         description: "",
-        tags: ["Media", "Medical"],
-        responsibilities: [""],
-        requirements: [""]
+        tags: [] as string[], // Initialize as empty array
+        responsibilities: [""] as string[],
+        requirements: [""] as string[],
+        category: "Technology", // Added category, default value
+        deadline: "" // Added deadline
     });
 
     const [newTag, setNewTag] = useState("");
@@ -33,7 +35,6 @@ export default function PostJob() {
     const handleBannerChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files?.[0];
         if (file) {
-            setBanner(file);
             const reader = new FileReader();
             reader.onloadend = () => {
                 setBannerPreview(reader.result as string);
@@ -68,8 +69,8 @@ export default function PostJob() {
     };
 
     const addTag = () => {
-        if (newTag && !formData.tags.includes(newTag)) {
-            setFormData({ ...formData, tags: [...formData.tags, newTag] });
+        if (newTag.trim() !== "" && !formData.tags.includes(newTag.trim())) {
+            setFormData({ ...formData, tags: [...formData.tags, newTag.trim()] });
             setNewTag("");
         }
     };
@@ -78,14 +79,39 @@ export default function PostJob() {
         setFormData({ ...formData, tags: formData.tags.filter(tag => tag !== tagToRemove) });
     };
 
-    const handleSubmit = (e: React.FormEvent) => {
+    const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         setIsSubmitting(true);
-        console.log("Submitting job:", { ...formData, hasBanner: !!banner });
-        setTimeout(() => {
-            setIsSubmitting(false);
+        // Assuming employerId is available from an auth context or hardcoded for now
+        const employerId = "65e6488d0111bb1f2b60b7e2"; // Replace with actual employer ID
+
+        const payload = {
+            ...formData,
+            image: bannerPreview || undefined, // Use banner preview as image, or undefined if not present
+            employerId,
+            // Ensure responsibilities and requirements are sent as arrays of strings, filtering out empty strings
+            responsibilities: formData.responsibilities.filter(Boolean),
+            requirements: formData.requirements.filter(Boolean),
+            // deadline is currently a string, backend expects Date. We'll need to transform this.
+            // For now, let's assume it's sent as a string and handled by backend or convert it here.
+            // Converting to ISO string for backend
+            deadline: new Date(formData.deadline).toISOString(),
+            // Ensure category is part of payload
+            category: formData.category,
+        };
+        
+        console.log("Submitting job payload:", payload);
+
+        try {
+            await jobService.addJob(payload);
             setIsSuccess(true);
-        }, 2000);
+        } catch (error) {
+            console.error("Failed to post job:", error);
+            alert("Failed to post job. Please try again.");
+            setIsSuccess(false);
+        } finally {
+            setIsSubmitting(false);
+        }
     };
 
     if (isSuccess) {
@@ -268,12 +294,44 @@ export default function PostJob() {
                                         onChange={(e) => setFormData({ ...formData, type: e.target.value })}
                                         className="w-full px-4 py-3 bg-white border border-gray-100 rounded-xl focus:border-[#00b4d8] outline-none appearance-none font-semibold text-left"
                                     >
-                                        <option>FULL TIME</option>
-                                        <option>PART TIME</option>
-                                        <option>FREELANCE</option>
-                                        <option>CONTRACT</option>
-                                        <option>INTERNSHIP</option>
+                                        <option value="Full-time">Full-time</option>
+                                        <option value="Part-time">Part-time</option>
+                                        <option value="Contract">Contract</option>
+                                        <option value="Internship">Internship</option>
+                                        <option value="Remote">Remote</option>
                                     </select>
+                                </div>
+
+                                <div className="space-y-2">
+                                    <label className="text-xs font-bold text-gray-500 uppercase tracking-widest flex items-center gap-2">
+                                        <Building2 className="w-3 h-3" /> Job Category
+                                    </label>
+                                    <select
+                                        value={formData.category}
+                                        onChange={(e) => setFormData({ ...formData, category: e.target.value })}
+                                        className="w-full px-4 py-3 bg-white border border-gray-100 rounded-xl focus:border-[#00b4d8] outline-none appearance-none font-semibold text-left"
+                                    >
+                                        <option value="Technology">Technology</option>
+                                        <option value="Healthcare">Healthcare</option>
+                                        <option value="Finance">Finance</option>
+                                        <option value="Education">Education</option>
+                                        <option value="Marketing">Marketing</option>
+                                        <option value="Sales">Sales</option>
+                                        <option value="Engineering">Engineering</option>
+                                        <option value="Other">Other</option>
+                                    </select>
+                                </div>
+
+                                <div className="space-y-2">
+                                    <label className="text-xs font-bold text-gray-500 uppercase tracking-widest flex items-center gap-2">
+                                        <Send className="w-3 h-3" /> Application Deadline
+                                    </label>
+                                    <input
+                                        type="date"
+                                        value={formData.deadline}
+                                        onChange={(e) => setFormData({ ...formData, deadline: e.target.value })}
+                                        className="w-full px-4 py-3 bg-white border border-gray-100 rounded-xl focus:border-[#00b4d8] outline-none transition-all font-semibold text-left"
+                                    />
                                 </div>
 
                                 <div className="space-y-2">

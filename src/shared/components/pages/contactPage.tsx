@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import PageWrapper from "../layouts/PageWrapper";
 import Loader from "../ui/Loader";
 import usePageLoader from "../../hooks/usePageLoader";
@@ -103,11 +103,7 @@ const ContactPage: React.FC = () => {
     message?: string;
   }>({ status: "idle" });
 
-  const [isAnimated, setIsAnimated] = useState(false);
-
-  useEffect(() => {
-    setIsAnimated(true);
-  }, []);
+  const isAnimated = true;
 
   if (isLoading) {
     return <Loader />;
@@ -156,6 +152,7 @@ const ContactPage: React.FC = () => {
       setFormData({ name: "", email: "", phone: "", subject: "", message: "" });
       setFormErrors({});
     } catch (err) {
+      console.error(err);
       setSubmitStatus({
         status: "error",
         message: "Failed to send message. Try again.",
@@ -377,7 +374,7 @@ const ContactPage: React.FC = () => {
                     type="tel"
                     name="phone"
                     value={formData.phone}
-                    onChange={handleChange as any}
+                    onChange={handleChange}
                     placeholder="Phone Number (optional)"
                     className="w-full py-4 px-5 pl-14 border-2 border-slate-200 rounded-xl font-sans text-base transition-all focus:outline-none focus:border-teal-600 focus:ring-4 focus:ring-teal-600/10"
                   />

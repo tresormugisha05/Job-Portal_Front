@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, useEffect } from "react";
+import React, { createContext, useContext, useState } from "react";
 import api from "../services/Service";
 
 export type UserRole = "CANDIDATE" | "EMPLOYER" | "ADMIN" | "GUEST";
@@ -56,17 +56,12 @@ interface AuthContextType {
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
-  const [user, setUser] = useState<User | null>(null);
-
-  // Simulate persistent session
-  useEffect(() => {
+  const [user, setUser] = useState<User | null>(() => {
     const savedUser = localStorage.getItem("job_portal_user");
-    if (savedUser) {
-      setUser(JSON.parse(savedUser));
-    }
-  }, []);
+    return savedUser ? JSON.parse(savedUser) : null;
+  });
 
-  const login = async (email: string, _password: string) => {
+  const login = async (email: string) => {
     // Simulate API delay
     await new Promise((resolve) => setTimeout(resolve, 1000));
 
@@ -119,7 +114,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       localStorage.setItem("job_portal_user", JSON.stringify(userDataFromApi));
 
       setUser(userDataFromApi);
-    } catch (error: any) {
+    } catch (error: Error) {
       throw new Error(error.response?.data?.message || "Registration failed");
     }
   };

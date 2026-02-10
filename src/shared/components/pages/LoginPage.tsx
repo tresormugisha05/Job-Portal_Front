@@ -20,7 +20,8 @@ export default function LoginPage() {
         try {
             await login(email, password);
             navigate("/dashboard");
-        } catch (err) {
+        } catch (err: Error) {
+            console.error(err);
             setError("Invalid credentials. Use 'admin@jobportal.com' or 'employer@tech.com' for demo.");
         } finally {
             setIsLoading(false);
