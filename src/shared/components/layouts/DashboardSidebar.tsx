@@ -9,7 +9,8 @@ import {
     Settings,
     LogOut,
     PlusCircle,
-    BarChart3
+    BarChart3,
+    FolderTree
 } from "lucide-react";
 import { useAuth, type UserRole } from "../../contexts/AuthContext";
 
@@ -38,6 +39,8 @@ const sidebarItems: SidebarItem[] = [
     { label: "Statistics", path: "/dashboard/admin/stats", icon: <BarChart3 className="w-5 h-5" />, roles: ["ADMIN"] },
     { label: "Manage Jobs", path: "/dashboard/admin/jobs", icon: <Briefcase className="w-5 h-5" />, roles: ["ADMIN"] },
     { label: "Manage Users", path: "/dashboard/admin/users", icon: <Users className="w-5 h-5" />, roles: ["ADMIN"] },
+    { label: "Applications", path: "/dashboard/admin/applications", icon: <FileText className="w-5 h-5" />, roles: ["ADMIN"] },
+    { label: "Categories", path: "/dashboard/admin/categories", icon: <FolderTree className="w-5 h-5" />, roles: ["ADMIN"] },
 
     // Shared
     { label: "Settings", path: "/dashboard/settings", icon: <Settings className="w-5 h-5" />, roles: ["CANDIDATE", "EMPLOYER", "ADMIN"] },
