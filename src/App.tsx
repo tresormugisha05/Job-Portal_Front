@@ -22,10 +22,8 @@ import EmployerDashboard from "./shared/components/pages/dashboard/EmployerDashb
 import AdminDashboard from "./shared/components/pages/dashboard/AdminDashboard";
 import PostJob from "./shared/components/pages/dashboard/PostJob";
 import CandidateProfile from "./shared/components/pages/dashboard/CandidateProfile";
+// import { Apple } from "lucide-react";
 
-// Candidate Pages
-// import AppliedJobsPage from "./components/candidate/AppliedJobsPage";
-// import SavedJobsPage from "./components/candidate/SavedJobsPage";
 
 export default function App() {
   return (
@@ -50,7 +48,7 @@ export default function App() {
           {/* Dashboards */}
           <Route path="/dashboard" element={<DashboardRedirect />} />
           <Route path="/dashboard/applied-jobs" element={<CandidateDashboard />} />
-          <Route path="/dashboard/saved-jobs" element={<CandidateDashboard />} />
+          <Route path="/dashboard/saved-jobs" element={<CandidateDashboard/>} />
           <Route path="/dashboard/profile" element={<CandidateProfile />} />
 
           <Route path="/dashboard/manage-jobs" element={<EmployerDashboard />} />

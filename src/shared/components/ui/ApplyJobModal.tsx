@@ -8,38 +8,137 @@ interface ApplyJobModalProps {
     onClose: () => void;
     jobTitle: string;
     companyName: string;
+    jobId?: string;
 }
 
 export default function ApplyJobModal({
     isOpen,
     onClose,
     jobTitle,
-    companyName
+    companyName,
+    jobId
 }: ApplyJobModalProps) {
-    const { role, isAuthenticated } = useAuth();
     const [formData, setFormData] = useState({
         name: "",
         email: "",
         message: "",
+        resumeFile: null as File | null,
     });
 
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [isSuccess, setIsSuccess] = useState(false);
+    const [error, setError] = useState("");
+    const [fileInputRef, setFileInputRef] = useState<HTMLInputElement | null>(null);
 
     if (!isOpen) return null;
 
-    const isCandidate = role === "CANDIDATE";
+    const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0];
+        if (file) {
+            // Validate file type
+            const allowedTypes = ['.pdf', '.doc', '.docx'];
+            const fileExtension = '.' + file.name.split('.').pop()?.toLowerCase();
+            
+            if (!allowedTypes.includes(fileExtension)) {
+                setError('Please upload a PDF, DOC, or DOCX file');
+                return;
+            }
+            
+            // Validate file size (5MB max)
+            if (file.size > 5 * 1024 * 1024) {
+                setError('File size must be less than 5MB');
+                return;
+            }
+            
+            setFormData(prev => ({
+                ...prev,
+                resumeFile: file
+            }));
+            setError(''); // Clear error on successful upload
+        }
+    };
 
-    const handleSubmit = (e: React.FormEvent) => {
+    const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-        if (!isCandidate) return;
+
+        // Validate form
+        if (!formData.name.trim()) {
+            setError('Please enter your full name');
+            return;
+        }
+        if (!formData.email.trim()) {
+            setError('Please enter your email address');
+            return;
+        }
+        if (!formData.resumeFile) {
+            setError('Please upload your resume');
+            return;
+        }
 
         setIsSubmitting(true);
-        // Simulate API call
-        setTimeout(() => {
+        setError('');
+
+        // Validate jobId
+        if (!jobId) {
+            setError('Job ID is missing');
             setIsSubmitting(false);
+            return;
+        }
+
+        const token = localStorage.getItem('token'); // Optional token
+        if (!token) {
+            console.log('No token found, proceeding without authentication');
+        }
+
+        try {
+            // Create FormData for API submission
+            const formDataToSend = new FormData();
+            formDataToSend.append('name', formData.name);
+            formDataToSend.append('email', formData.email);
+            formDataToSend.append('message', formData.message);
+            formDataToSend.append('resume', formData.resumeFile);
+            formDataToSend.append('jobTitle', jobTitle);
+            formDataToSend.append('companyName', companyName);
+            
+            formDataToSend.append('jobId', jobId);
+            formDataToSend.append('userId', 'temp-user-id'); // Temporary user ID
+            formDataToSend.append('employerId', 'temp-employer-id'); // Temporary employer ID
+
+            // Real API call to backend
+            const response = await fetch(`http://localhost:5000/api/applications/${jobId}`, {
+                method: 'POST',
+                body: formDataToSend,
+            });
+
+            if (!response.ok) {
+                const errorText = await response.text();
+                console.error('Backend response:', errorText);
+                
+                // Try to parse as JSON, fallback to text
+                try {
+                    const errorData = JSON.parse(errorText);
+                    throw new Error(errorData.message || 'Application failed');
+                } catch {
+                    // Handle HTML error responses
+                    if (errorText.includes('Must supply api_key')) {
+                        throw new Error('Server configuration error. Please contact support.');
+                    } else if (errorText.includes('DOCTYPE html')) {
+                        throw new Error('Server error. Please try again later.');
+                    } else {
+                        throw new Error(errorText || 'Application failed');
+                    }
+                }
+            }
+
+            const responseData = await response.json();
+            console.log('Application submitted successfully:', responseData);
+
             setIsSuccess(true);
-        }, 1500);
+        } catch (err) {
+            setError(err instanceof Error ? err.message : 'Failed to submit application. Please try again.');
+        } finally {
+            setIsSubmitting(false);
+        }
     };
 
     if (isSuccess) {
@@ -87,35 +186,18 @@ export default function ApplyJobModal({
                     </button>
                 </div>
 
-                <div className="p-8 text-center">
-                    <p className="text-gray-500 mb-8">
+                <div className="p-8">
+                    <p className="text-gray-500 mb-8 text-center">
                         Apply for the <span className="text-[#00b4d8] font-bold">{jobTitle}</span> position at <span className="text-[#00b4d8] font-bold">{companyName}</span>.
                     </p>
 
-                    {!isCandidate ? (
-                        <div className="bg-orange-50 border border-orange-100 p-8 rounded-xl text-center">
-                            <div className="w-16 h-16 bg-white rounded-full flex items-center justify-center mx-auto mb-4 shadow-sm">
-                                <AlertCircle className="w-8 h-8 text-orange-500" />
-                            </div>
-                            <h3 className="text-lg font-bold text-gray-900 mb-2">Login Required</h3>
-                            <p className="text-gray-600 mb-6">
-                                You must be logged in as a <span className="font-bold">Candidate</span> to apply for this job.
-                            </p>
-                            <Link
-                                to="/login"
-                                className="inline-flex items-center gap-2 bg-[#ff6b6b] hover:bg-[#ff5252] text-white px-8 py-3 rounded-lg font-bold uppercase tracking-wider transition-all shadow-md active:scale-95"
-                            >
-                                <LogIn className="w-5 h-5" /> Go to Login
-                            </Link>
-                            {!isAuthenticated && (
-                                <p className="mt-4 text-xs text-gray-400 italic">No account? Select the Candidate role on the login page.</p>
+                    <form onSubmit={handleSubmit} className="space-y-6 text-left">
+                            {/* Error Display */}
+                            {error && (
+                                <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg">
+                                    {error}
+                                </div>
                             )}
-                            {isAuthenticated && (
-                                <p className="mt-4 text-xs text-red-400 font-medium">Your current role ({role}) does not have permission to apply.</p>
-                            )}
-                        </div>
-                    ) : (
-                        <form onSubmit={handleSubmit} className="space-y-6 text-left">
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                                 <div className="space-y-2">
                                     <label className="text-xs font-bold text-gray-700 uppercase tracking-wider">Full Name</label>
@@ -143,10 +225,31 @@ export default function ApplyJobModal({
 
                             <div className="space-y-2">
                                 <label className="text-xs font-bold text-gray-700 uppercase tracking-wider">Upload Resume</label>
-                                <div className="border-2 border-dashed border-gray-200 rounded-xl p-8 text-center hover:border-[#00b4d8] hover:bg-blue-50/30 transition-all cursor-pointer group">
+                                {/* Hidden File Input */}
+                                <input
+                                    ref={(el) => setFileInputRef(el)}
+                                    type="file"
+                                    accept=".pdf,.doc,.docx"
+                                    onChange={handleFileUpload}
+                                    className="hidden"
+                                />
+                                {/* Clickable Upload Area */}
+                                <div 
+                                    onClick={() => fileInputRef?.click()}
+                                    className="border-2 border-dashed border-gray-200 rounded-xl p-8 text-center hover:border-[#00b4d8] hover:bg-blue-50/30 transition-all cursor-pointer group"
+                                >
                                     <Upload className="w-10 h-10 text-gray-400 mx-auto mb-3 group-hover:text-[#00b4d8] transition-colors" />
-                                    <p className="text-sm font-medium text-gray-600 mb-1">Click to upload or drag and drop</p>
-                                    <p className="text-xs text-gray-400">PDF, DOC, DOCX (Max 5MB)</p>
+                                    {formData.resumeFile ? (
+                                        <div className="space-y-1">
+                                            <p className="text-sm font-medium text-green-600">{formData.resumeFile.name}</p>
+                                            <p className="text-xs text-gray-400">{(formData.resumeFile.size / 1024 / 1024).toFixed(2)} MB</p>
+                                        </div>
+                                    ) : (
+                                        <div className="space-y-1">
+                                            <p className="text-sm font-medium text-gray-600 mb-1">Click to upload or drag and drop</p>
+                                            <p className="text-xs text-gray-400">PDF, DOC, DOCX (Max 5MB)</p>
+                                        </div>
+                                    )}
                                 </div>
                             </div>
 
@@ -184,7 +287,6 @@ export default function ApplyJobModal({
                                 </button>
                             </div>
                         </form>
-                    )}
                 </div>
             </div>
         </div>
