@@ -89,7 +89,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const login = async (email: string, password: string) => {
     try {
-      const response = await api.post("/api/auth/login", { email, password });
+      const response = await api.post("/api/auth/login", {
+        email,
+        password,
+      });
       const { token, user: userDataFromApi } = response.data;
 
       if (userDataFromApi && !userDataFromApi.id && userDataFromApi._id) {
