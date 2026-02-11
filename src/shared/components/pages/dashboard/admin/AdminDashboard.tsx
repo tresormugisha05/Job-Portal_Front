@@ -16,6 +16,7 @@ import {
 import StatCard from "../components/StatCard";
 import DashboardSection from "../components/DashboardSection";
 
+//dashboard for admin users with stats on total users, active jobs, resumes, and revenue. Also includes sections for system status, pending employer approvals, critical alerts, and quick management links for admin tasks like managing emails, logs, SEO, cache, security, and backups. Uses a clean and modern design with a focus on usability and quick access to important information.
 export default function AdminDashboard() {
   const stats = [
     {

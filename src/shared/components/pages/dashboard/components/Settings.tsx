@@ -3,6 +3,7 @@ import DashboardLayout from "../../../layouts/DashboardLayout";
 import { User, Lock, Bell, Shield, ChevronRight, Save } from "lucide-react";
 import { useAuth } from "../../../../contexts/AuthContext";
 
+//settings page for all dashboards with tabs for account settings, password change, notifications, and privacy settings. Uses shared components and styles for consistency across dashboards.
 export default function Settings() {
   const { user } = useAuth();
   const [activeTab, setActiveTab] = useState("account");
