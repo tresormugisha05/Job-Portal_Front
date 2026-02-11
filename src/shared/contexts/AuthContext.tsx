@@ -58,50 +58,47 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
 
-  // Simulate persistent session
+  // Check for persistent session
   useEffect(() => {
     const savedUser = localStorage.getItem("job_portal_user");
     if (savedUser) {
-      setUser(JSON.parse(savedUser));
+      try {
+        const parsedUser = JSON.parse(savedUser);
+        // Ensure id exists (handle potential _id from backend)
+        if (parsedUser && !parsedUser.id && parsedUser._id) {
+          parsedUser.id = parsedUser._id;
+        }
+
+        if (parsedUser && parsedUser.id) {
+          setUser(parsedUser);
+        } else {
+          // Invalid user data, clear it
+          localStorage.removeItem("job_portal_user");
+          localStorage.removeItem("token");
+        }
+      } catch (e) {
+        localStorage.removeItem("job_portal_user");
+        localStorage.removeItem("token");
+      }
     }
   }, []);
 
-  const login = async (email: string, _password: string) => {
-    // Simulate API delay
-    await new Promise((resolve) => setTimeout(resolve, 1000));
+  const login = async (email: string, password: string) => {
+    try {
+      const response = await api.post("/api/auth/login", { email, password });
+      const { token, user: userDataFromApi } = response.data;
 
-    let mockUser: User;
+      if (userDataFromApi && !userDataFromApi.id && userDataFromApi._id) {
+        userDataFromApi.id = userDataFromApi._id;
+      }
 
-    // Simple mock logic: admin email gets admin role, otherwise based on a "database" simulation
-    // In a real app, this would be a backend call
-    if (email.includes("admin")) {
-      mockUser = {
-        id: "a1",
-        name: "System Admin",
-        email,
-        role: "ADMIN",
-        avatar: "SA",
-      };
-    } else if (email.includes("employer")) {
-      mockUser = {
-        id: "e1",
-        name: "Tech Corp",
-        email,
-        role: "EMPLOYER",
-        avatar: "TC",
-      };
-    } else {
-      mockUser = {
-        id: "c1",
-        name: "John Doe",
-        email,
-        role: "CANDIDATE",
-        avatar: "JD",
-      };
+      localStorage.setItem("token", token);
+      localStorage.setItem("job_portal_user", JSON.stringify(userDataFromApi));
+
+      setUser(userDataFromApi);
+    } catch (error: any) {
+      throw new Error(error.response?.data?.message || "Login failed");
     }
-
-    setUser(mockUser);
-    localStorage.setItem("job_portal_user", JSON.stringify(mockUser));
   };
 
   const register = async (userData: {
@@ -112,8 +109,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     role: "CANDIDATE" | "EMPLOYER";
   }) => {
     try {
-      const response = await api.post("/api/candidates/register", userData);
+      const response = await api.post("/api/auth/register", userData);
       const { token, user: userDataFromApi } = response.data;
+
+      if (userDataFromApi && !userDataFromApi.id && userDataFromApi._id) {
+        userDataFromApi.id = userDataFromApi._id;
+      }
 
       localStorage.setItem("token", token);
       localStorage.setItem("job_portal_user", JSON.stringify(userDataFromApi));
@@ -125,13 +126,16 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   };
 
   const updateProfile = async (updates: Partial<User>) => {
-    // Simulate API delay
-    await new Promise((resolve) => setTimeout(resolve, 1000));
+    if (!user) return;
 
-    if (user) {
-      const updatedUser = { ...user, ...updates };
+    try {
+      const response = await api.put(`/api/auth/${user.id}`, updates);
+      const updatedUser = response.data.data;
+
       setUser(updatedUser);
       localStorage.setItem("job_portal_user", JSON.stringify(updatedUser));
+    } catch (error: any) {
+      throw new Error(error.response?.data?.message || "Profile update failed");
     }
   };
 
