@@ -1,6 +1,6 @@
 ﻿import { useState, useRef } from "react";
-import DashboardLayout from "../../layouts/DashboardLayout";
-import DashboardSection from "./components/DashboardSection";
+import DashboardLayout from "../../../layouts/DashboardLayout";
+import DashboardSection from "../components/DashboardSection";
 import {
     Briefcase, Building2, Send, CheckCircle2,
     Loader2, Image as ImageIcon, X, Upload, Plus, Trash2,

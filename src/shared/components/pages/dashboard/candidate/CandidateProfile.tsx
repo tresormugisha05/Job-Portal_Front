@@ -54,14 +54,14 @@ export default function CandidateProfile() {
     user?.workExperience && user.workExperience.length > 0
       ? user.workExperience
       : [
-          {
-            id: "1",
-            title: "",
-            company: "",
-            period: "",
-            description: "",
-          },
-        ],
+        {
+          id: "1",
+          title: "",
+          company: "",
+          period: "",
+          description: "",
+        },
+      ],
   );
 
   // Education History - Initialize from user data or with one default entry
@@ -69,13 +69,13 @@ export default function CandidateProfile() {
     user?.educationHistory && user.educationHistory.length > 0
       ? user.educationHistory
       : [
-          {
-            id: "1",
-            degree: "",
-            institution: "",
-            year: "",
-          },
-        ],
+        {
+          id: "1",
+          degree: "",
+          institution: "",
+          year: "",
+        },
+      ],
   );
 
   // Fetch full profile on mount
