@@ -1,6 +1,7 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import DashboardLayout from "../../layouts/DashboardLayout";
 import { useAuth } from "../../../contexts/AuthContext";
+import api from "../../../services/Service";
 import type { WorkExperience, EducationHistory } from "../../../contexts/AuthContext";
 import {
     User, Mail, Phone, Briefcase, FileText, Camera, Save, CheckCircle,
@@ -53,6 +54,44 @@ export default function CandidateProfile() {
                 }
             ]
     );
+
+    // Fetch full profile on mount
+    useEffect(() => {
+        if (user?.id) {
+            const fetchProfile = async () => {
+                try {
+                    const response = await api.get(`/api/auth/${user.id}`);
+                    const fullUser = response.data.data;
+
+                    if (fullUser) {
+                        setFormData({
+                            name: fullUser.name || "",
+                            email: fullUser.email || "",
+                            phone: fullUser.phone || "",
+                            professionalTitle: fullUser.professionalTitle || "",
+                            summary: fullUser.summary || "",
+                            location: fullUser.location || "",
+                            experience: fullUser.experience || "",
+                            education: fullUser.education || "",
+                            skills: fullUser.skills?.join(", ") || "",
+                            resume: fullUser.resume || ""
+                        });
+
+                        if (fullUser.workExperience && fullUser.workExperience.length > 0) {
+                            setWorkExperience(fullUser.workExperience);
+                        }
+
+                        if (fullUser.educationHistory && fullUser.educationHistory.length > 0) {
+                            setEducationHistory(fullUser.educationHistory);
+                        }
+                    }
+                } catch (error) {
+                    console.error("Error fetching profile:", error);
+                }
+            };
+            fetchProfile();
+        }
+    }, [user?.id]);
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
         const { name, value } = e.target;
