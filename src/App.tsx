@@ -17,6 +17,7 @@ import RegisterPage from "./shared/components/pages/RegisterPage";
 
 // Dashboards
 import DashboardRedirect from "./shared/components/pages/dashboard/DashboardRedirect";
+<<<<<<< HEAD
 import CandidateDashboard from "./shared/components/pages/dashboard/CandidateDashboard";
 import EmployerDashboard from "./shared/components/pages/dashboard/EmployerDashboard";
 import AdminDashboard from "./shared/components/pages/dashboard/AdminDashboard";
@@ -24,6 +25,31 @@ import PostJob from "./shared/components/pages/dashboard/PostJob";
 import CandidateProfile from "./shared/components/pages/dashboard/CandidateProfile";
 // import { Apple } from "lucide-react";
 
+=======
+import CandidateDashboard from "./shared/components/pages/dashboard/candidate/CandidateDashboard";
+import EmployerDashboard from "./shared/components/pages/dashboard/employer/EmployerDashboard";
+import AdminDashboard from "./shared/components/pages/dashboard/admin/AdminDashboard";
+import PostJob from "./shared/components/pages/dashboard/employer/PostJob";
+import CandidateProfile from "./shared/components/pages/dashboard/candidate/CandidateProfile";
+
+// Candidate Dashboard Pages
+import AppliedJobs from "./shared/components/pages/dashboard/candidate/AppliedJobs";
+import SavedJobs from "./shared/components/pages/dashboard/candidate/SavedJobs";
+
+// Employer Dashboard Pages
+import ManageJobs from "./shared/components/pages/dashboard/employer/ManageJobs";
+import Applicants from "./shared/components/pages/dashboard/employer/Applicants";
+
+// Admin Dashboard Pages
+import AdminStats from "./shared/components/pages/dashboard/admin/AdminStats";
+import AdminJobs from "./shared/components/pages/dashboard/admin/AdminJobs";
+import AdminUsers from "./shared/components/pages/dashboard/admin/AdminUsers";
+import AdminApplications from "./shared/components/pages/dashboard/admin/AdminApplications";
+import AdminCategories from "./shared/components/pages/dashboard/admin/AdminCategories";
+
+// Shared Dashboard Pages
+import Settings from "./shared/components/pages/dashboard/components/Settings";
+>>>>>>> c03526dd92bc18056d049f58c39b3f33d5d3f5b1
 
 export default function App() {
   return (
@@ -47,19 +73,33 @@ export default function App() {
 
           {/* Dashboards */}
           <Route path="/dashboard" element={<DashboardRedirect />} />
+<<<<<<< HEAD
           <Route path="/dashboard/applied-jobs" element={<CandidateDashboard />} />
           <Route path="/dashboard/saved-jobs" element={<CandidateDashboard/>} />
+=======
+
+          {/* Candidate Dashboard */}
+          <Route path="/dashboard/candidate" element={<CandidateDashboard />} />
+          <Route path="/dashboard/applied-jobs" element={<AppliedJobs />} />
+          <Route path="/dashboard/saved-jobs" element={<SavedJobs />} />
+>>>>>>> c03526dd92bc18056d049f58c39b3f33d5d3f5b1
           <Route path="/dashboard/profile" element={<CandidateProfile />} />
 
-          <Route path="/dashboard/manage-jobs" element={<EmployerDashboard />} />
+          {/* Employer Dashboard */}
+          <Route path="/dashboard/employer" element={<EmployerDashboard />} />
+          <Route path="/dashboard/manage-jobs" element={<ManageJobs />} />
           <Route path="/dashboard/post-job" element={<PostJob />} />
-          <Route path="/dashboard/applicants" element={<EmployerDashboard />} />
+          <Route path="/dashboard/applicants" element={<Applicants />} />
 
-          <Route path="/dashboard/admin/stats" element={<AdminDashboard />} />
-          <Route path="/dashboard/admin/jobs" element={<AdminDashboard />} />
-          <Route path="/dashboard/admin/users" element={<AdminDashboard />} />
+          {/* Admin Dashboard */}
+          <Route path="/dashboard/admin" element={<AdminDashboard />} />
+          <Route path="/dashboard/admin/stats" element={<AdminStats />} />
+          <Route path="/dashboard/admin/jobs" element={<AdminJobs />} />
+          <Route path="/dashboard/admin/users" element={<AdminUsers />} />
+          <Route path="/dashboard/admin/applications" element={<AdminApplications />} />
+          <Route path="/dashboard/admin/categories" element={<AdminCategories />} />
 
-          <Route path="/dashboard/settings" element={<CandidateDashboard />} /> {/* Shared settings placeholder */}
+          <Route path="/dashboard/settings" element={<Settings />} />
         </Routes>
       </BrowserRouter>
     </AuthProvider>

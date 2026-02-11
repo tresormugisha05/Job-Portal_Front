@@ -1,29 +1,33 @@
 ﻿import { useState, useRef } from "react";
-import DashboardLayout from "../../layouts/DashboardLayout";
-import DashboardSection from "./components/DashboardSection";
+import DashboardLayout from "../../../layouts/DashboardLayout";
+import DashboardSection from "../components/DashboardSection";
 import {
     Briefcase, Building2, Send, CheckCircle2,
     Loader2, Image as ImageIcon, X, Upload, Plus, Trash2,
     DollarSign, MapPin, GraduationCap, Award, Tag
 } from "lucide-react";
+import api from "../../../../services/Service";
+import { useAuth } from "../../../../contexts/AuthContext";
 
 export default function PostJob() {
+    const { user } = useAuth();
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [isSuccess, setIsSuccess] = useState(false);
-    const [banner, setBanner] = useState<File | null>(null);
+    const [error, setError] = useState<string | null>(null);
+    const [, setBanner] = useState<File | null>(null);
     const [bannerPreview, setBannerPreview] = useState<string | null>(null);
     const fileInputRef = useRef<HTMLInputElement>(null);
 
     const [formData, setFormData] = useState({
         title: "",
-        company: "Pay Walt",
+        company: "",
         location: "",
         type: "FULL TIME",
         salary: "",
         experience: "",
         education: "",
         description: "",
-        tags: ["Media", "Medical"],
+        tags: [] as string[],
         responsibilities: [""],
         requirements: [""]
     });
@@ -78,14 +82,41 @@ export default function PostJob() {
         setFormData({ ...formData, tags: formData.tags.filter(tag => tag !== tagToRemove) });
     };
 
-    const handleSubmit = (e: React.FormEvent) => {
+    const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         setIsSubmitting(true);
-        console.log("Submitting job:", { ...formData, hasBanner: !!banner });
-        setTimeout(() => {
-            setIsSubmitting(false);
+        setError(null);
+
+        try {
+            const jobData = {
+                title: formData.title,
+                company: formData.company || user?.name || "Company",
+                location: formData.location,
+                jobType: "Full-time",
+                type: formData.type,
+                typeBg: "bg-blue-100 text-blue-600",
+                logo: "https://via.placeholder.com/100",
+                logoBg: "bg-gray-100",
+                salary: formData.salary,
+                experience: formData.experience,
+                education: formData.education,
+                description: formData.description,
+                responsibilities: formData.responsibilities.filter(r => r.trim()),
+                requirements: formData.requirements.filter(r => r.trim()),
+                tags: formData.tags,
+                category: formData.tags[0] || "Technology",
+                deadline: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString(),
+                employerId: user?.id
+            };
+
+            await api.post("/api/jobs", jobData);
             setIsSuccess(true);
-        }, 2000);
+        } catch (err: unknown) {
+            console.error("Error posting job:", err);
+            setError("Failed to post job. Please try again.");
+        } finally {
+            setIsSubmitting(false);
+        }
     };
 
     if (isSuccess) {
@@ -99,12 +130,35 @@ export default function PostJob() {
                     <p className="text-gray-500 max-w-md mb-8">
                         Your listing for <span className="font-bold text-[#00b4d8]">{formData.title}</span> has been published.
                     </p>
-                    <button
-                        onClick={() => setIsSuccess(false)}
-                        className="bg-[#00b4d8] hover:bg-[#009bc2] text-white px-8 py-3 rounded-lg font-bold uppercase tracking-wider transition-all shadow-md active:scale-95"
-                    >
-                        Post Another Job
-                    </button>
+                    <div className="flex gap-4">
+                        <button
+                            onClick={() => {
+                                setIsSuccess(false);
+                                setFormData({
+                                    title: "",
+                                    company: "",
+                                    location: "",
+                                    type: "FULL TIME",
+                                    salary: "",
+                                    experience: "",
+                                    education: "",
+                                    description: "",
+                                    tags: [],
+                                    responsibilities: [""],
+                                    requirements: [""]
+                                });
+                            }}
+                            className="bg-[#00b4d8] hover:bg-[#009bc2] text-white px-8 py-3 rounded-lg font-bold uppercase tracking-wider transition-all shadow-md active:scale-95"
+                        >
+                            Post Another Job
+                        </button>
+                        <a
+                            href="/dashboard/manage-jobs"
+                            className="bg-gray-100 hover:bg-gray-200 text-gray-700 px-8 py-3 rounded-lg font-bold uppercase tracking-wider transition-all shadow-md active:scale-95"
+                        >
+                            View My Jobs
+                        </a>
+                    </div>
                 </div>
             </DashboardLayout>
         );
@@ -118,10 +172,15 @@ export default function PostJob() {
             </div>
 
             <form onSubmit={handleSubmit} className="max-w-5xl space-y-8 pb-20 text-left">
+                {error && (
+                    <div className="bg-red-50 border border-red-200 text-red-700 px-6 py-4 rounded-xl">
+                        {error}
+                    </div>
+                )}
                 <DashboardSection title="Job Banner / Flyer">
                     <p className="text-xs text-gray-400 uppercase font-bold tracking-widest mb-4">Promotional visual for the job page</p>
                     {bannerPreview ? (
-                        <div className="relative rounded-2xl overflow-hidden border-2 border-[#00b4d8] group aspect-[24/10] bg-gray-100 shadow-lg">
+                        <div className="relative rounded-2xl overflow-hidden border-2 border-[#00b4d8] group aspect-24/10 bg-gray-100 shadow-lg">
                             <img src={bannerPreview} alt="Banner Preview" className="w-full h-full object-cover" />
                             <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-4 backdrop-blur-sm">
                                 <button type="button" onClick={() => fileInputRef.current?.click()} className="bg-white/20 hover:bg-white/40 text-white p-4 rounded-full transition-all shadow-xl">
