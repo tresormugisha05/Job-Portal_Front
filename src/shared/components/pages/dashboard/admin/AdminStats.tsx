@@ -1,23 +1,24 @@
 import DashboardLayout from "../../../layouts/DashboardLayout";
-import { Users, Briefcase, TrendingUp, BarChart3, PieChart, Activity, ArrowUpRight } from "lucide-react";
+import { Users, User, Briefcase, BarChart3, PieChart, ArrowUpRight, Building2, FileText } from "lucide-react";
 import StatCard from "../components/StatCard";
 
 export default function AdminStats() {
     const stats = [
         { label: "Total Users", value: "4,285", icon: <Users className="w-6 h-6" />, color: "bg-blue-600" },
-        { label: "Total Jobs", value: "852", icon: <Briefcase className="w-6 h-6" />, color: "bg-[#00b4d8]" },
-        { label: "Active Subs", value: "142", icon: <Activity className="w-6 h-6" />, color: "bg-purple-600" },
-        { label: "Total Revenue", value: "$42.5k", icon: <TrendingUp className="w-6 h-6" />, color: "bg-green-600" },
+        { label: "Employers", value: "852", icon: <Building2 className="w-6 h-6" />, color: "bg-purple-600" },
+        { label: "Applicants", value: "3,433", icon: <User className="w-6 h-6" />, color: "bg-indigo-600" },
+        { label: "Total Jobs", value: "1,240", icon: <Briefcase className="w-6 h-6" />, color: "bg-[#00b4d8]" },
+        { label: "Applications", value: "12.5k", icon: <FileText className="w-6 h-6" />, color: "bg-green-600" },
     ];
 
     return (
         <DashboardLayout>
             <div className="mb-8">
-                <h1 className="text-2xl font-bold text-gray-900 mb-2">Platform Statistics</h1>
-                <p className="text-gray-500 text-sm">Real-time overview of platform activity and growth.</p>
+                <h1 className="text-2xl font-bold text-gray-900 mb-1">Platform Statistics</h1>
+                <p className="text-gray-500 text-sm font-medium">Real-time overview of platform activity and growth.</p>
             </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-10">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4 mb-10">
                 {stats.map((stat, i) => (
                     <StatCard key={i} {...stat} />
                 ))}
