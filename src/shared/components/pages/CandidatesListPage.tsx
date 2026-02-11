@@ -1,30 +1,57 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import PageWrapper from "../layouts/PageWrapper";
 import PageHeader from "../ui/PageHeader";
 import Loader from "../ui/Loader";
 import usePageLoader from "../../hooks/usePageLoader";
-import { candidates } from "../../data/candidates";
+import { CandidateService, type UserModel } from "../../services/Auth.Service";
 import CandidateCard from "../ui/CandidateCard";
 
 // Extract unique values for filters
-const uniqueLocations = [...new Set(candidates.map((c) => c.location))].sort();
-const uniqueSkills = [...new Set(candidates.flatMap((c) => c.skills))].sort();
-const uniqueEducation = [...new Set(candidates.map((c) => c.education))].sort();
-
 const ITEMS_PER_PAGE = 5;
 
 export default function CandidatesListPage() {
   const isLoading = usePageLoader(1000);
+  const [candidates, setCandidates] = useState<UserModel[]>([]);
 
   // Filter States
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedLocation, setSelectedLocation] = useState("");
-  const [selectedExperienceLevels, setSelectedExperienceLevels] = useState<string[]>([]);
+  const [selectedExperienceLevels, setSelectedExperienceLevels] = useState<
+    string[]
+  >([]);
   const [selectedSkills, setSelectedSkills] = useState<string[]>([]);
   const [selectedEducation, setSelectedEducation] = useState<string[]>([]);
 
   // Pagination State
   const [currentPage, setCurrentPage] = useState(1);
+
+  useEffect(() => {
+    const fetchCandidates = async () => {
+      try {
+        const data = await CandidateService.getAllUsers();
+        const filteredData = data.filter((user) => user.role === "CANDIDATE");
+        setCandidates(filteredData);
+      } catch (err) {
+        console.error("Failed to load candidates", err);
+      }
+    };
+    fetchCandidates();
+  }, []);
+
+  const uniqueLocations = useMemo(
+    () =>
+      [...new Set(candidates.map((c) => c.location).filter(Boolean))].sort(),
+    [candidates],
+  );
+  const uniqueSkills = useMemo(
+    () => [...new Set(candidates.flatMap((c) => c.skills))].sort(),
+    [candidates],
+  );
+  const uniqueEducation = useMemo(
+    () =>
+      [...new Set(candidates.map((c) => c.education).filter(Boolean))].sort(),
+    [candidates],
+  );
 
   // Filter Logic
   const filteredCandidates = useMemo(() => {
@@ -32,7 +59,10 @@ export default function CandidatesListPage() {
       // Search (Name or Role)
       const matchesSearch =
         candidate.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        candidate.professionalTitle.toLowerCase().includes(searchQuery.toLowerCase());
+        (candidate.professionalTitle &&
+          candidate.professionalTitle
+            .toLowerCase()
+            .includes(searchQuery.toLowerCase()));
 
       // Location
       const matchesLocation =
@@ -40,17 +70,30 @@ export default function CandidatesListPage() {
         selectedLocation === "All Locations" ||
         candidate.location === selectedLocation;
 
-      // Experience Level
+      // Experience Level - Map experience string to levels
+      const getExperienceLevel = (exp: string) => {
+        if (!exp) return "";
+        const expLower = exp.toLowerCase();
+        if (
+          expLower.includes("entry") ||
+          expLower.includes("junior") ||
+          expLower.includes("1-2")
+        )
+          return "Entry Level";
+        if (expLower.includes("mid") || expLower.includes("3-5"))
+          return "Mid Level";
+        if (
+          expLower.includes("senior") ||
+          expLower.includes("lead") ||
+          expLower.includes("5+")
+        )
+          return "Senior Level";
+        return "";
+      };
+      const candidateLevel = getExperienceLevel(candidate.experience || "");
       const matchesExperience =
         selectedExperienceLevels.length === 0 ||
-        selectedExperienceLevels.some((level) =>
-          // Simple string matching, could be refined
-          candidate.experienceLevel.includes(level) ||
-          (level === "Entry Level" && candidate.experienceLevel === "Entry Level") ||
-          (level === "Mid Level" && candidate.experienceLevel === "Mid Level") ||
-          (level === "Senior Level" && candidate.experienceLevel === "Senior Level")
-        );
-      // Note: In real app, might map ranges. Here we match exact level strings from data.
+        selectedExperienceLevels.includes(candidateLevel);
 
       // Skills - Check if candidate has ANY of the selected skills
       const matchesSkills =
@@ -60,25 +103,39 @@ export default function CandidatesListPage() {
       // Education
       const matchesEducation =
         selectedEducation.length === 0 ||
-        selectedEducation.includes(candidate.education);
+        selectedEducation.includes(candidate.education || "");
 
-      return matchesSearch && matchesLocation && matchesExperience && matchesSkills && matchesEducation;
+      return (
+        matchesSearch &&
+        matchesLocation &&
+        matchesExperience &&
+        matchesSkills &&
+        matchesEducation
+      );
     });
-  }, [searchQuery, selectedLocation, selectedExperienceLevels, selectedSkills, selectedEducation]);
+  }, [
+    searchQuery,
+    selectedLocation,
+    selectedExperienceLevels,
+    selectedSkills,
+    selectedEducation,
+  ]);
 
   // Pagination Logic
   const totalPages = Math.ceil(filteredCandidates.length / ITEMS_PER_PAGE);
   const paginatedCandidates = filteredCandidates.slice(
     (currentPage - 1) * ITEMS_PER_PAGE,
-    currentPage * ITEMS_PER_PAGE
+    currentPage * ITEMS_PER_PAGE,
   );
 
   const handleCheckboxChange = (
     value: string,
-    setState: React.Dispatch<React.SetStateAction<string[]>>
+    setState: React.Dispatch<React.SetStateAction<string[]>>,
   ) => {
     setState((prev) =>
-      prev.includes(value) ? prev.filter((item) => item !== value) : [...prev, value]
+      prev.includes(value)
+        ? prev.filter((item) => item !== value)
+        : [...prev, value],
     );
     setCurrentPage(1);
   };
@@ -105,12 +162,13 @@ export default function CandidatesListPage() {
     <PageWrapper disableTopPadding={true}>
       <PageHeader title="Browse Candidates" breadcrumb="Browse Candidates" />
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-
         <div className="flex flex-col lg:flex-row gap-8">
           {/* Filters Sidebar */}
           <div className="lg:w-1/4">
             <div className="bg-white rounded-lg shadow p-6 border border-gray-100">
-              <h3 className="font-bold text-lg text-gray-900 mb-4">Filter Candidates</h3>
+              <h3 className="font-bold text-lg text-gray-900 mb-4">
+                Filter Candidates
+              </h3>
 
               {/* Keywords */}
               <div className="mb-6">
@@ -144,7 +202,9 @@ export default function CandidatesListPage() {
                 >
                   <option value="">All Locations</option>
                   {uniqueLocations.map((loc, idx) => (
-                    <option key={idx} value={loc}>{loc}</option>
+                    <option key={idx} value={loc || ""}>
+                      {loc || "Unknown"}
+                    </option>
                   ))}
                 </select>
               </div>
@@ -156,11 +216,19 @@ export default function CandidatesListPage() {
                 </label>
                 <div className="space-y-2">
                   {["Entry Level", "Mid Level", "Senior Level"].map((level) => (
-                    <label key={level} className="flex items-center text-gray-600 hover:text-[#00b4d8] cursor-pointer transition-colors">
+                    <label
+                      key={level}
+                      className="flex items-center text-gray-600 hover:text-[#00b4d8] cursor-pointer transition-colors"
+                    >
                       <input
                         type="checkbox"
                         checked={selectedExperienceLevels.includes(level)}
-                        onChange={() => handleCheckboxChange(level, setSelectedExperienceLevels)}
+                        onChange={() =>
+                          handleCheckboxChange(
+                            level,
+                            setSelectedExperienceLevels,
+                          )
+                        }
                         className="mr-2 rounded border-gray-300 text-[#00b4d8] focus:ring-[#00b4d8]"
                       />
                       <span>{level}</span>
@@ -176,11 +244,16 @@ export default function CandidatesListPage() {
                 </label>
                 <div className="space-y-2 max-h-48 overflow-y-auto custom-scrollbar">
                   {uniqueSkills.map((skill) => (
-                    <label key={skill} className="flex items-center text-gray-600 hover:text-[#00b4d8] cursor-pointer transition-colors">
+                    <label
+                      key={skill}
+                      className="flex items-center text-gray-600 hover:text-[#00b4d8] cursor-pointer transition-colors"
+                    >
                       <input
                         type="checkbox"
                         checked={selectedSkills.includes(skill)}
-                        onChange={() => handleCheckboxChange(skill, setSelectedSkills)}
+                        onChange={() =>
+                          handleCheckboxChange(skill, setSelectedSkills)
+                        }
                         className="mr-2 rounded border-gray-300 text-[#00b4d8] focus:ring-[#00b4d8]"
                       />
                       <span>{skill}</span>
@@ -196,14 +269,19 @@ export default function CandidatesListPage() {
                 </label>
                 <div className="space-y-2">
                   {uniqueEducation.map((edu) => (
-                    <label key={edu} className="flex items-center text-gray-600 hover:text-[#00b4d8] cursor-pointer transition-colors">
+                    <label
+                      key={edu}
+                      className="flex items-center text-gray-600 hover:text-[#00b4d8] cursor-pointer transition-colors"
+                    >
                       <input
                         type="checkbox"
-                        checked={selectedEducation.includes(edu)}
-                        onChange={() => handleCheckboxChange(edu, setSelectedEducation)}
+                        checked={selectedEducation.includes(edu || "")}
+                        onChange={() =>
+                          handleCheckboxChange(edu || "", setSelectedEducation)
+                        }
                         className="mr-2 rounded border-gray-300 text-[#00b4d8] focus:ring-[#00b4d8]"
                       />
-                      <span>{edu}</span>
+                      <span>{edu || "Unknown"}</span>
                     </label>
                   ))}
                 </div>
@@ -223,11 +301,22 @@ export default function CandidatesListPage() {
             <div className="bg-white rounded-lg shadow mb-6 p-4 border border-gray-100">
               <div className="flex flex-col sm:flex-row justify-between items-center">
                 <p className="text-gray-600 mb-2 sm:mb-0">
-                  Showing <span className="font-semibold text-gray-900">
-                    {filteredCandidates.length > 0 ? (currentPage - 1) * ITEMS_PER_PAGE + 1 : 0}
+                  Showing{" "}
+                  <span className="font-semibold text-gray-900">
+                    {filteredCandidates.length > 0
+                      ? (currentPage - 1) * ITEMS_PER_PAGE + 1
+                      : 0}
                     -
-                    {Math.min(currentPage * ITEMS_PER_PAGE, filteredCandidates.length)}
-                  </span> of <span className="font-semibold text-gray-900">{filteredCandidates.length}</span> candidates
+                    {Math.min(
+                      currentPage * ITEMS_PER_PAGE,
+                      filteredCandidates.length,
+                    )}
+                  </span>{" "}
+                  of{" "}
+                  <span className="font-semibold text-gray-900">
+                    {filteredCandidates.length}
+                  </span>{" "}
+                  candidates
                 </p>
                 <select className="px-3 py-2 border border-gray-300 rounded focus:outline-none focus:border-[#00b4d8] transition-colors">
                   <option>Sort by: Latest</option>
@@ -241,11 +330,13 @@ export default function CandidatesListPage() {
             <div className="space-y-4">
               {paginatedCandidates.length > 0 ? (
                 paginatedCandidates.map((candidate) => (
-                  <CandidateCard key={candidate.id} candidate={candidate} />
+                  <CandidateCard key={candidate._id} candidate={candidate} />
                 ))
               ) : (
                 <div className="bg-white rounded-lg shadow p-8 text-center text-gray-500">
-                  <p className="text-lg">No candidates found matching your criteria.</p>
+                  <p className="text-lg">
+                    No candidates found matching your criteria.
+                  </p>
                   <button
                     onClick={clearAllFilters}
                     className="mt-4 text-[#00b4d8] hover:underline"
@@ -261,28 +352,35 @@ export default function CandidatesListPage() {
               <div className="mt-8 flex justify-center">
                 <nav className="flex items-center gap-2">
                   <button
-                    onClick={() => handlePageChange(Math.max(1, currentPage - 1))}
+                    onClick={() =>
+                      handlePageChange(Math.max(1, currentPage - 1))
+                    }
                     disabled={currentPage === 1}
                     className={`px-3 py-2 border border-gray-300 rounded hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed`}
                   >
                     Previous
                   </button>
 
-                  {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
-                    <button
-                      key={page}
-                      onClick={() => handlePageChange(page)}
-                      className={`px-3 py-2 rounded ${currentPage === page
-                        ? "bg-[#00b4d8] text-white border border-[#00b4d8]"
-                        : "border border-gray-300 hover:bg-gray-50"
+                  {Array.from({ length: totalPages }, (_, i) => i + 1).map(
+                    (page) => (
+                      <button
+                        key={page}
+                        onClick={() => handlePageChange(page)}
+                        className={`px-3 py-2 rounded ${
+                          currentPage === page
+                            ? "bg-[#00b4d8] text-white border border-[#00b4d8]"
+                            : "border border-gray-300 hover:bg-gray-50"
                         }`}
-                    >
-                      {page}
-                    </button>
-                  ))}
+                      >
+                        {page}
+                      </button>
+                    ),
+                  )}
 
                   <button
-                    onClick={() => handlePageChange(Math.min(totalPages, currentPage + 1))}
+                    onClick={() =>
+                      handlePageChange(Math.min(totalPages, currentPage + 1))
+                    }
                     disabled={currentPage === totalPages}
                     className={`px-3 py-2 border border-gray-300 rounded hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed`}
                   >

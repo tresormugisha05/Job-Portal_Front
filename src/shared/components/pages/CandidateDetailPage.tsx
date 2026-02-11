@@ -1,84 +1,141 @@
-import { MapPin, Briefcase, GraduationCap, Mail, Phone, Calendar, Download, ArrowLeft, User } from "lucide-react";
+import {
+  MapPin,
+  Briefcase,
+  GraduationCap,
+  Mail,
+  Phone,
+  Calendar,
+  Download,
+  ArrowLeft,
+  User,
+} from "lucide-react";
 import { Link, useParams } from "react-router-dom";
 import PageWrapper from "../layouts/PageWrapper";
-import { useState, useMemo } from "react";
+import { useState, useEffect } from "react";
 import { useAuth } from "../../contexts/AuthContext";
-import { candidates } from "../../data/candidates";
+import { CandidateService, type UserModel } from "../../services/Auth.Service";
+import Loader from "../ui/Loader";
 
 export default function CandidateDetailPage() {
   const { id } = useParams();
   const { user } = useAuth();
   const [message, setMessage] = useState("");
+  const [candidateData, setCandidateData] = useState<UserModel | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
-  const candidate = useMemo(() => {
-    // If we're looking at our own profile in the detail view
-    if (user && (id === user.id || !id)) {
-      return {
-        name: user.name,
-        professionalTitle: user.professionalTitle || "No Title Set",
-        email: user.email,
-        phone: user.phone || "No Phone Set",
-        location: user.location || "No Location Set",
-        experience: user.experience || "No Experience Set",
-        education: user.education || "No Education Set",
-        joinedDate: "February 2026",
-        summary: user.summary || "No summary provided.",
-        skills: user.skills || [],
-        initials: user.initials || user.name.split(" ").map(n => n[0]).join("").toUpperCase(),
-        workExperience: [
-          {
-            title: user.professionalTitle || "Professional",
-            company: "Current Company",
-            period: "2024 - Present",
-            description: user.summary || ""
-          }
-        ],
-        educationHistory: [
-          {
-            degree: user.education || "Degree",
-            institution: "University",
-            year: "2020 - 2024"
-          }
-        ]
-      };
-    }
+  useEffect(() => {
+    const fetchCandidate = async () => {
+      try {
+        setLoading(true);
+        setError(null);
 
-    // Otherwise find in mock data
-    const mockCandidate = candidates.find(c => c.id.toString() === id) || candidates[0];
-    return {
-      ...mockCandidate,
-      professionalTitle: mockCandidate.professionalTitle, // Consistent naming
-      summary: mockCandidate.summary,
-      phone: "+1 234 567 8900",
-      joinedDate: "January 2020",
-      workExperience: [
-        {
-          title: mockCandidate.professionalTitle,
-          company: "Tech Corp",
-          period: "2021 - Present",
-          description: mockCandidate.summary
+        if (!id) {
+          // Viewing own profile
+          if (user) {
+            // Map user to UserModel structure
+            const mappedUser: UserModel = {
+              _id: user.id,
+              name: user.name,
+              email: user.email,
+              phone: user.phone || "",
+              password: "", // Not needed for display
+              avatar: user.avatar,
+              role: user.role,
+              professionalTitle: user.professionalTitle,
+              location: user.location,
+              experience: user.experience,
+              education: user.education,
+              skills: user.skills || [],
+              summary: user.summary,
+              workExperience: user.workExperience || [],
+              educationHistory: user.educationHistory || [],
+              resume: user.resume,
+              initials: user.initials,
+              isActive: true,
+              createdAt: new Date(),
+              updatedAt: new Date(),
+            };
+            setCandidateData(mappedUser);
+          } else {
+            setError("User not authenticated");
+          }
+        } else {
+          // Fetch other candidate's data
+          const data = await CandidateService.getUser(id);
+          setCandidateData(data);
         }
-      ],
-      educationHistory: [
-        {
-          degree: mockCandidate.education,
-          institution: "University of Technology",
-          year: "2015 - 2019"
-        }
-      ]
+      } catch (err: any) {
+        setError(err.message || "Failed to load candidate data");
+      } finally {
+        setLoading(false);
+      }
     };
+
+    fetchCandidate();
   }, [id, user]);
 
+  if (loading) {
+    return (
+      <PageWrapper>
+        <div className="flex justify-center items-center min-h-[400px]">
+          <Loader />
+        </div>
+      </PageWrapper>
+    );
+  }
+
+  if (error) {
+    return (
+      <PageWrapper>
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+          <div className="text-center">
+            <p className="text-red-600 text-lg">{error}</p>
+            <Link
+              to="/candidates"
+              className="inline-flex items-center gap-2 text-blue-600 hover:text-blue-700 mt-4"
+            >
+              <ArrowLeft className="w-4 h-4" /> Back to Candidates
+            </Link>
+          </div>
+        </div>
+      </PageWrapper>
+    );
+  }
+
+  if (!candidateData) {
+    return (
+      <PageWrapper>
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+          <div className="text-center">
+            <p className="text-gray-600 text-lg">Candidate not found</p>
+            <Link
+              to="/candidates"
+              className="inline-flex items-center gap-2 text-blue-600 hover:text-blue-700 mt-4"
+            >
+              <ArrowLeft className="w-4 h-4" /> Back to Candidates
+            </Link>
+          </div>
+        </div>
+      </PageWrapper>
+    );
+  }
+
   const handleSendMessage = () => {
-    const subject = encodeURIComponent(`Job Opportunity - Message from Employer`);
+    const subject = encodeURIComponent(
+      `Job Opportunity - Message from Employer`,
+    );
     const body = encodeURIComponent(message);
-    window.location.href = `mailto:${candidate.email}?subject=${subject}&body=${body}`;
+    window.location.href = `mailto:${candidateData.email}?subject=${subject}&body=${body}`;
   };
 
   return (
     <PageWrapper>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <Link to="/candidates" className="flex items-center gap-2 text-blue-600 hover:text-blue-700 mb-6">
+        <Link
+          to="/candidates"
+          className="flex items-center gap-2 text-blue-600 hover:text-blue-700 mb-6"
+        >
           <ArrowLeft className="w-4 h-4" /> Back to Candidates
         </Link>
 
@@ -88,32 +145,56 @@ export default function CandidateDetailPage() {
             <div className="bg-white rounded-lg shadow p-6 sticky top-24">
               <div className="text-center mb-6">
                 <div className="w-32 h-32 bg-gray-200 rounded-full flex items-center justify-center mx-auto mb-4">
-                  <span className="text-3xl font-semibold">JD</span>
+                  <span className="text-3xl font-semibold">
+                    {candidateData.initials ||
+                      (candidateData.name
+                        ? candidateData.name
+                            .split(" ")
+                            .map((n) => n[0])
+                            .join("")
+                            .toUpperCase()
+                        : "U")}
+                  </span>
                 </div>
-                <h2 className="text-2xl font-bold text-gray-900">{candidate.name}</h2>
-                <p className="text-[#00b4d8] font-bold text-lg">{candidate.professionalTitle}</p>
+                <h2 className="text-2xl font-bold text-gray-900">
+                  {candidateData.name || "Unknown User"}
+                </h2>
+                <p className="text-[#00b4d8] font-bold text-lg">
+                  {candidateData.professionalTitle || "No Title Set"}
+                </p>
               </div>
 
               <div className="space-y-3 mb-8">
                 <div className="flex items-center gap-3 text-gray-600">
                   <MapPin className="w-4 h-4 text-[#00b4d8]" />
-                  <span className="text-sm">{candidate.location}</span>
+                  <span className="text-sm">
+                    {candidateData.location || "No Location Set"}
+                  </span>
                 </div>
                 <div className="flex items-center gap-3 text-gray-600">
                   <Mail className="w-4 h-4 text-[#00b4d8]" />
-                  <span className="text-sm">{candidate.email}</span>
+                  <span className="text-sm">{candidateData.email}</span>
                 </div>
                 <div className="flex items-center gap-3 text-gray-600">
                   <Phone className="w-4 h-4 text-[#00b4d8]" />
-                  <span className="text-sm">{candidate.phone}</span>
+                  <span className="text-sm">
+                    {candidateData.phone || "No Phone Set"}
+                  </span>
                 </div>
                 <div className="flex items-center gap-3 text-gray-600">
                   <Briefcase className="w-4 h-4 text-[#00b4d8]" />
-                  <span className="text-sm">{candidate.experience}</span>
+                  <span className="text-sm">
+                    {candidateData.experience || "No Experience Set"}
+                  </span>
                 </div>
                 <div className="flex items-center gap-3 text-gray-600">
                   <Calendar className="w-4 h-4 text-[#00b4d8]" />
-                  <span className="text-sm">Joined {candidate.joinedDate}</span>
+                  <span className="text-sm">
+                    Joined{" "}
+                    {candidateData.createdAt
+                      ? new Date(candidateData.createdAt).toLocaleDateString()
+                      : "Unknown"}
+                  </span>
                 </div>
               </div>
 
@@ -130,33 +211,53 @@ export default function CandidateDetailPage() {
               <h3 className="text-xl font-bold text-gray-900 mb-6 flex items-center gap-2">
                 <User className="w-5 h-5 text-[#00b4d8]" /> About Me
               </h3>
-              <p className="text-gray-600 leading-relaxed italic">{candidate.summary}</p>
+              <p className="text-gray-600 leading-relaxed italic">
+                {candidateData.summary || "No summary provided."}
+              </p>
             </div>
 
             {/* Skills */}
             <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-8">
-              <h3 className="text-xl font-bold text-gray-900 mb-6">Skills & Expertise</h3>
+              <h3 className="text-xl font-bold text-gray-900 mb-6">
+                Skills & Expertise
+              </h3>
               <div className="flex flex-wrap gap-2">
-                {candidate.skills.map((skill) => (
-                  <span key={skill} className="px-4 py-2 bg-blue-50 text-[#0077b6] rounded-lg font-medium text-sm border border-blue-100">
-                    {skill}
-                  </span>
-                ))}
+                {candidateData.skills &&
+                  candidateData.skills.map((skill: string) => (
+                    <span
+                      key={skill}
+                      className="px-4 py-2 bg-blue-50 text-[#0077b6] rounded-lg font-medium text-sm border border-blue-100"
+                    >
+                      {skill}
+                    </span>
+                  ))}
               </div>
             </div>
 
             {/* Work Experience */}
             <div className="bg-white rounded-lg shadow p-6">
-              <h3 className="text-xl font-bold text-gray-900 mb-4">Work Experience</h3>
+              <h3 className="text-xl font-bold text-gray-900 mb-4">
+                Work Experience
+              </h3>
               <div className="space-y-4">
-                {candidate.workExperience.map((work, index) => (
-                  <div key={index} className="border-l-2 border-blue-600 pl-4">
-                    <h4 className="font-semibold text-gray-900">{work.title}</h4>
-                    <p className="text-blue-600">{work.company}</p>
-                    <p className="text-sm text-gray-500 mb-2">{work.period}</p>
-                    <p className="text-gray-600">{work.description}</p>
-                  </div>
-                ))}
+                {candidateData.workExperience &&
+                  candidateData.workExperience.map(
+                    (work: any, index: number) => (
+                      <div
+                        key={work.id || index}
+                        className="border-l-2 border-blue-600 pl-4"
+                      >
+                        <h4 className="font-semibold text-gray-900">
+                          {work.title}
+                        </h4>
+                        <p className="text-blue-600">{work.company}</p>
+                        <p className="text-sm text-gray-500 mb-2">
+                          {work.period}
+                        </p>
+                        <p className="text-gray-600">{work.description}</p>
+                      </div>
+                    ),
+                  )}
               </div>
             </div>
 
@@ -166,24 +267,38 @@ export default function CandidateDetailPage() {
                 <GraduationCap className="w-5 h-5 text-[#00b4d8]" /> Education
               </h3>
               <div className="space-y-4">
-                {candidate.educationHistory.map((edu, index) => (
-                  <div key={index} className="flex items-start gap-4 p-4 rounded-lg bg-gray-50 border border-gray-100">
-                    <div className="w-10 h-10 rounded-lg bg-white border border-gray-100 flex items-center justify-center shadow-sm">
-                      <GraduationCap className="w-5 h-5 text-[#00b4d8]" />
-                    </div>
-                    <div>
-                      <h4 className="font-bold text-gray-900">{edu.degree}</h4>
-                      <p className="text-[#00b4d8] font-medium">{edu.institution}</p>
-                      <p className="text-xs text-gray-400 mt-1">{edu.year}</p>
-                    </div>
-                  </div>
-                ))}
+                {candidateData.educationHistory &&
+                  candidateData.educationHistory.map(
+                    (edu: any, index: number) => (
+                      <div
+                        key={edu.id || index}
+                        className="flex items-start gap-4 p-4 rounded-lg bg-gray-50 border border-gray-100"
+                      >
+                        <div className="w-10 h-10 rounded-lg bg-white border border-gray-100 flex items-center justify-center shadow-sm">
+                          <GraduationCap className="w-5 h-5 text-[#00b4d8]" />
+                        </div>
+                        <div>
+                          <h4 className="font-bold text-gray-900">
+                            {edu.degree}
+                          </h4>
+                          <p className="text-[#00b4d8] font-medium">
+                            {edu.institution}
+                          </p>
+                          <p className="text-xs text-gray-400 mt-1">
+                            {edu.year}
+                          </p>
+                        </div>
+                      </div>
+                    ),
+                  )}
               </div>
             </div>
 
             {/* Contact Form */}
             <div className="bg-white rounded-lg shadow p-6">
-              <h3 className="text-xl font-bold text-gray-900 mb-4">Send Message</h3>
+              <h3 className="text-xl font-bold text-gray-900 mb-4">
+                Send Message
+              </h3>
               <div className="space-y-4">
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -201,7 +316,8 @@ export default function CandidateDetailPage() {
                   onClick={handleSendMessage}
                   className="w-full bg-blue-600 text-white py-3 rounded-md hover:bg-blue-700 transition-colors flex items-center justify-center gap-2"
                 >
-                  <Mail className="w-5 h-5" /> Send Email to {candidate.name}
+                  <Mail className="w-5 h-5" /> Send Email to{" "}
+                  {candidateData.name}
                 </button>
               </div>
             </div>
