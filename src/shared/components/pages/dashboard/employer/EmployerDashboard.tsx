@@ -1,9 +1,9 @@
-import DashboardLayout from "../../layouts/DashboardLayout";
+import DashboardLayout from "../../../layouts/DashboardLayout";
 import { Briefcase, Users, FilePlus, Eye, MessageSquare, Settings, CreditCard } from "lucide-react";
-import StatCard from "./components/StatCard";
-import DashboardSection from "./components/DashboardSection";
-import ApplicantTable from "./components/ApplicantTable";
-import type { Applicant } from "./components/ApplicantTable";
+import StatCard from "../components/StatCard";
+import DashboardSection from "../components/DashboardSection";
+import ApplicantTable from "../components/ApplicantTable";
+import type { Applicant } from "../components/ApplicantTable";
 
 export default function EmployerDashboard() {
     const stats = [
