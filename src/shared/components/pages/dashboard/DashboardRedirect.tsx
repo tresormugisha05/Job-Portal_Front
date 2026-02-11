@@ -8,13 +8,15 @@ export default function DashboardRedirect() {
         return <Navigate to="/login" replace />;
     }
 
-    switch (role) {
+    const roleNormalized = role?.toUpperCase();
+
+    switch (roleNormalized) {
         case "ADMIN":
-            return <Navigate to="/dashboard/admin/stats" replace />;
+            return <Navigate to="/dashboard/admin" replace />;
         case "EMPLOYER":
-            return <Navigate to="/dashboard/manage-jobs" replace />;
+            return <Navigate to="/dashboard/employer" replace />;
         case "CANDIDATE":
         default:
-            return <Navigate to="/dashboard/applied-jobs" replace />;
+            return <Navigate to="/dashboard/candidate" replace />;
     }
 }

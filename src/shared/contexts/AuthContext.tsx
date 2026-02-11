@@ -70,6 +70,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         }
 
         if (parsedUser && parsedUser.id) {
+          // Normalize role to uppercase
+          if (parsedUser.role) {
+            parsedUser.role = parsedUser.role.toUpperCase() as UserRole;
+          }
           setUser(parsedUser);
         } else {
           // Invalid user data, clear it
@@ -90,6 +94,15 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         password,
       });
       const { token, user: userDataFromApi } = response.data;
+
+      if (userDataFromApi && !userDataFromApi.id && userDataFromApi._id) {
+        userDataFromApi.id = userDataFromApi._id;
+      }
+
+      // Normalize role to uppercase
+      if (userDataFromApi && userDataFromApi.role) {
+        userDataFromApi.role = userDataFromApi.role.toUpperCase() as UserRole;
+      }
 
       localStorage.setItem("token", token);
       localStorage.setItem("job_portal_user", JSON.stringify(userDataFromApi));
@@ -113,6 +126,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
       if (userDataFromApi && !userDataFromApi.id && userDataFromApi._id) {
         userDataFromApi.id = userDataFromApi._id;
+      }
+
+      // Normalize role to uppercase
+      if (userDataFromApi && userDataFromApi.role) {
+        userDataFromApi.role = userDataFromApi.role.toUpperCase() as UserRole;
       }
 
       localStorage.setItem("token", token);
