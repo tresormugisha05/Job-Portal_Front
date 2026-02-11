@@ -1,5 +1,5 @@
 import DashboardLayout from "../../../layouts/DashboardLayout";
-import { Search, Filter, Mail, Shield, UserX, UserCheck, MoreVertical } from "lucide-react";
+import { Search, Filter, Mail, UserX, UserCheck, Trash2, Eye } from "lucide-react";
 
 export default function AdminUsers() {
     const users = [
@@ -102,7 +102,7 @@ export default function AdminUsers() {
                                         </p>
                                     </td>
                                     <td className="px-6 py-4">
-                                        <span className={`px-2 py-0.5 rounded text-[10px] font-bold uppercase ${user.role === 'EMPLOYER' ? 'bg-purple-50 text-purple-600' : 'bg-blue-50 text-blue-600'
+                                        <span className={`px-2 py-0.5 rounded text-[10px] font-bold uppercase ${user.role === 'EMPLOYER' ? 'bg-purple-100 text-purple-700' : 'bg-blue-100 text-blue-700'
                                             }`}>
                                             {user.role}
                                         </span>
@@ -119,20 +119,20 @@ export default function AdminUsers() {
                                     </td>
                                     <td className="px-6 py-4 text-right">
                                         <div className="flex items-center justify-end gap-2">
+                                            <button className="p-2 text-gray-400 hover:text-blue-500 hover:bg-blue-50 rounded-lg transition-all" title="View Details">
+                                                <Eye className="w-4 h-4" />
+                                            </button>
                                             {user.status === 'Suspended' ? (
                                                 <button className="p-2 text-green-400 hover:text-green-600 hover:bg-green-50 rounded-lg transition-all" title="Activate">
                                                     <UserCheck className="w-4 h-4" />
                                                 </button>
                                             ) : (
-                                                <button className="p-2 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-all" title="Suspend">
+                                                <button className="p-2 text-gray-400 hover:text-amber-600 hover:bg-amber-50 rounded-lg transition-all" title="Suspend">
                                                     <UserX className="w-4 h-4" />
                                                 </button>
                                             )}
-                                            <button className="p-2 text-gray-400 hover:text-blue-500 hover:bg-blue-50 rounded-lg transition-all">
-                                                <Shield className="w-4 h-4" />
-                                            </button>
-                                            <button className="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-lg transition-all">
-                                                <MoreVertical className="w-4 h-4" />
+                                            <button className="p-2 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-lg transition-all" title="Delete User">
+                                                <Trash2 className="w-4 h-4" />
                                             </button>
                                         </div>
                                     </td>

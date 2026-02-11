@@ -35,6 +35,8 @@ import Applicants from "./shared/components/pages/dashboard/employer/Applicants"
 import AdminStats from "./shared/components/pages/dashboard/admin/AdminStats";
 import AdminJobs from "./shared/components/pages/dashboard/admin/AdminJobs";
 import AdminUsers from "./shared/components/pages/dashboard/admin/AdminUsers";
+import AdminApplications from "./shared/components/pages/dashboard/admin/AdminApplications";
+import AdminCategories from "./shared/components/pages/dashboard/admin/AdminCategories";
 
 // Shared Dashboard Pages
 import Settings from "./shared/components/pages/dashboard/components/Settings";
@@ -79,6 +81,8 @@ export default function App() {
           <Route path="/dashboard/admin/stats" element={<AdminStats />} />
           <Route path="/dashboard/admin/jobs" element={<AdminJobs />} />
           <Route path="/dashboard/admin/users" element={<AdminUsers />} />
+          <Route path="/dashboard/admin/applications" element={<AdminApplications />} />
+          <Route path="/dashboard/admin/categories" element={<AdminCategories />} />
 
           <Route path="/dashboard/settings" element={<Settings />} />
         </Routes>
