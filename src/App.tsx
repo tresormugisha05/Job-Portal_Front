@@ -17,15 +17,6 @@ import RegisterPage from "./shared/components/pages/RegisterPage";
 
 // Dashboards
 import DashboardRedirect from "./shared/components/pages/dashboard/DashboardRedirect";
-<<<<<<< HEAD
-import CandidateDashboard from "./shared/components/pages/dashboard/CandidateDashboard";
-import EmployerDashboard from "./shared/components/pages/dashboard/EmployerDashboard";
-import AdminDashboard from "./shared/components/pages/dashboard/AdminDashboard";
-import PostJob from "./shared/components/pages/dashboard/PostJob";
-import CandidateProfile from "./shared/components/pages/dashboard/CandidateProfile";
-// import { Apple } from "lucide-react";
-
-=======
 import CandidateDashboard from "./shared/components/pages/dashboard/candidate/CandidateDashboard";
 import EmployerDashboard from "./shared/components/pages/dashboard/employer/EmployerDashboard";
 import AdminDashboard from "./shared/components/pages/dashboard/admin/AdminDashboard";
@@ -49,7 +40,6 @@ import AdminCategories from "./shared/components/pages/dashboard/admin/AdminCate
 
 // Shared Dashboard Pages
 import Settings from "./shared/components/pages/dashboard/components/Settings";
->>>>>>> c03526dd92bc18056d049f58c39b3f33d5d3f5b1
 
 export default function App() {
   return (
@@ -73,16 +63,11 @@ export default function App() {
 
           {/* Dashboards */}
           <Route path="/dashboard" element={<DashboardRedirect />} />
-<<<<<<< HEAD
-          <Route path="/dashboard/applied-jobs" element={<CandidateDashboard />} />
-          <Route path="/dashboard/saved-jobs" element={<CandidateDashboard/>} />
-=======
 
           {/* Candidate Dashboard */}
           <Route path="/dashboard/candidate" element={<CandidateDashboard />} />
           <Route path="/dashboard/applied-jobs" element={<AppliedJobs />} />
           <Route path="/dashboard/saved-jobs" element={<SavedJobs />} />
->>>>>>> c03526dd92bc18056d049f58c39b3f33d5d3f5b1
           <Route path="/dashboard/profile" element={<CandidateProfile />} />
 
           {/* Employer Dashboard */}
