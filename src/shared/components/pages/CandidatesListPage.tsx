@@ -32,7 +32,7 @@ export default function CandidatesListPage() {
       // Search (Name or Role)
       const matchesSearch =
         candidate.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        candidate.role.toLowerCase().includes(searchQuery.toLowerCase());
+        candidate.professionalTitle.toLowerCase().includes(searchQuery.toLowerCase());
 
       // Location
       const matchesLocation =

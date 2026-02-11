@@ -1,13 +1,40 @@
 import React, { createContext, useContext, useState, useEffect } from "react";
+import api from "../services/Service";
 
 export type UserRole = "CANDIDATE" | "EMPLOYER" | "ADMIN" | "GUEST";
+
+export interface WorkExperience {
+  id: string;
+  title: string;
+  company: string;
+  period: string;
+  description: string;
+}
+
+export interface EducationHistory {
+  id: string;
+  degree: string;
+  institution: string;
+  year: string;
+}
 
 interface User {
   id: string;
   name: string;
   email: string;
-  role: UserRole;
   avatar?: string;
+  role: UserRole; // This is the system role
+  professionalTitle?: string; // Standardized title field
+  location?: string;
+  experience?: string;
+  education?: string;
+  skills?: string[];
+  summary?: string;
+  phone?: string;
+  resume?: string;
+  initials?: string;
+  workExperience?: WorkExperience[];
+  educationHistory?: EducationHistory[];
 }
 
 interface AuthContextType {
@@ -16,14 +43,13 @@ interface AuthContextType {
   isAuthenticated: boolean;
   login: (email: string, password: string) => Promise<void>;
   register: (userData: {
-    FirstName: string;
-    LastName: string;
-    Email: string;
-    Age: string;
-    PhoneNumber: string;
+    name: string;
+    email: string;
+    phone: string;
     password: string;
-    UserType: "Applicant" | "Employer";
+    role: "CANDIDATE" | "EMPLOYER";
   }) => Promise<void>;
+  updateProfile: (updates: Partial<User>) => Promise<void>;
   logout: () => void;
 }
 
@@ -32,93 +58,107 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
 
-  // Simulate persistent session
+  // Check for persistent session
   useEffect(() => {
     const savedUser = localStorage.getItem("job_portal_user");
     if (savedUser) {
-      setUser(JSON.parse(savedUser));
+      try {
+        const parsedUser = JSON.parse(savedUser);
+        // Ensure id exists (handle potential _id from backend)
+        if (parsedUser && !parsedUser.id && parsedUser._id) {
+          parsedUser.id = parsedUser._id;
+        }
+
+        if (parsedUser && parsedUser.id) {
+          // Normalize role to uppercase
+          if (parsedUser.role) {
+            parsedUser.role = parsedUser.role.toUpperCase() as UserRole;
+          }
+          setUser(parsedUser);
+        } else {
+          // Invalid user data, clear it
+          localStorage.removeItem("job_portal_user");
+          localStorage.removeItem("token");
+        }
+      } catch (e) {
+        localStorage.removeItem("job_portal_user");
+        localStorage.removeItem("token");
+      }
     }
   }, []);
 
   const login = async (email: string, password: string) => {
     try {
-      const response = await fetch("http://localhost:5000/api/auth/login", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ email, password }),
+      const response = await api.post("/api/users/login", {
+        email,
+        password,
       });
+      const { token, user: userDataFromApi } = response.data;
 
-      const data = await response.json();
-
-      if (!response.ok) {
-        throw new Error(data.message || "Login failed");
+      if (userDataFromApi && !userDataFromApi.id && userDataFromApi._id) {
+        userDataFromApi.id = userDataFromApi._id;
       }
 
-      const loggedInUser: User = {
-        id: data.user.id || data.user._id,
-        name: data.user.name,
-        email: data.user.email,
-        role: data.user.role,
-        avatar: data.user.avatar,
-      };
-
-      setUser(loggedInUser);
-      localStorage.setItem("job_portal_user", JSON.stringify(loggedInUser));
-      if (data.token) {
-        localStorage.setItem("token", data.token);
+      // Normalize role to uppercase
+      if (userDataFromApi && userDataFromApi.role) {
+        userDataFromApi.role = userDataFromApi.role.toUpperCase() as UserRole;
       }
-    } catch (error) {
-      console.error("Login error:", error);
-      throw error;
+
+      localStorage.setItem("token", token);
+      localStorage.setItem("job_portal_user", JSON.stringify(userDataFromApi));
+
+      setUser(userDataFromApi);
+    } catch (error: any) {
+      throw new Error(error.response?.data?.message || "Login failed");
     }
   };
 
   const register = async (userData: {
-    FirstName: string;
-    LastName: string;
-    Email: string;
-    Age: string;
-    PhoneNumber: string;
+    name: string;
+    email: string;
+    phone: string;
     password: string;
-    UserType: "Applicant" | "Employer";
+    role: "CANDIDATE" | "EMPLOYER";
   }) => {
     try {
-      const response = await fetch("http://localhost:5000/api/auth/register", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(userData),
+      const response = await api.post("/api/users/register", {
+        name: userData.name,
+        email: userData.email,
+        phone: userData.phone,
+        password: userData.password,
+        role: userData.role
       });
+      const { token, user: userDataFromApi } = response.data;
 
-      const data = await response.json();
-
-      if (!response.ok) {
-        throw new Error(data.message || "Registration failed");
+      if (userDataFromApi && !userDataFromApi.id && userDataFromApi._id) {
+        userDataFromApi.id = userDataFromApi._id;
       }
 
-      const newUser: User = {
-        id: data.user.id || data.user._id,
-        name: `${data.user.FirstName} ${data.user.LastName}`,
-        email: data.user.Email,
-        role:
-          data.user.UserType === "applicant" ||
-          data.user.UserType === "Applicant"
-            ? "CANDIDATE"
-            : "EMPLOYER",
-        avatar: data.user.profile,
-      };
-
-      setUser(newUser);
-      localStorage.setItem("job_portal_user", JSON.stringify(newUser));
-      if (data.token) {
-        localStorage.setItem("token", data.token);
+      // Normalize role to uppercase
+      if (userDataFromApi && userDataFromApi.role) {
+        userDataFromApi.role = userDataFromApi.role.toUpperCase() as UserRole;
       }
-    } catch (error) {
-      console.error("Registration error:", error);
-      throw error;
+
+      localStorage.setItem("token", token);
+      localStorage.setItem("job_portal_user", JSON.stringify(userDataFromApi));
+
+      setUser(userDataFromApi);
+    } catch (error: any) {
+      throw new Error(error.response?.data?.message || "Registration failed");
+    }
+  };
+
+  const updateProfile = async (updates: Partial<User>) => {
+    if (!user) return;
+
+    try {
+      const response = await api.put(`/api/auth/${user.id}`, updates);
+      const updatedUser = response.data.data;
+
+      setUser(updatedUser);
+      localStorage.setItem("job_portal_user", JSON.stringify(updatedUser));
+    } catch (error: any) {
+      throw new Error(error.response?.data?.message || "Profile update failed");
     }
   };
 
@@ -133,6 +173,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     isAuthenticated: !!user,
     login,
     register,
+    updateProfile,
     logout,
   };
 

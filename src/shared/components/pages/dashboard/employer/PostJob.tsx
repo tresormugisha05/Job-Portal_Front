@@ -1,9 +1,9 @@
 ﻿import { useState, useRef } from "react";
-import DashboardLayout from "../../layouts/DashboardLayout";
-import DashboardSection from "./components/DashboardSection";
-import { useAuth } from "../../../contexts/AuthContext";
-import { createJob } from "../../../services/jobService";
-import { getEmployerByUserId } from "../../../services/employerService";
+import DashboardLayout from "../../../layouts/DashboardLayout";
+import DashboardSection from "../components/DashboardSection";
+import { useAuth } from "../../../../contexts/AuthContext";
+import { createJob } from "../../../../services/jobService";
+import { getEmployerByUserId } from "../../../../services/employerService";
 import {
     Briefcase, Building2, Send, CheckCircle2,
     Loader2, Image as ImageIcon, X, Upload, Plus, Trash2,

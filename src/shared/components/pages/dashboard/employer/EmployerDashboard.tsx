@@ -1,4 +1,4 @@
-import DashboardLayout from "../../layouts/DashboardLayout";
+import DashboardLayout from "../../../layouts/DashboardLayout";
 import {
   Briefcase,
   Users,
@@ -8,16 +8,16 @@ import {
   Settings,
   CreditCard,
 } from "lucide-react";
-import StatCard from "./components/StatCard";
-import DashboardSection from "./components/DashboardSection";
-import ApplicantTable from "./components/ApplicantTable";
-import type { Applicant } from "./components/ApplicantTable";
+import StatCard from "../components/StatCard";
+import DashboardSection from "../components/DashboardSection";
+import ApplicantTable from "../components/ApplicantTable";
+import type { Applicant } from "../components/ApplicantTable";
 import { useEffect, useState } from "react";
-import { useAuth } from "../../../contexts/AuthContext";
-import { getEmployerByUserId } from "../../../services/employerService";
-import { getJobsByEmployer } from "../../../services/jobService";
-import { getApplicationsByEmployer } from "../../../services/applicationService";
-import Loader from "../../ui/Loader";
+import { useAuth } from "../../../../contexts/AuthContext";
+import { getEmployerByUserId } from "../../../../services/employerService";
+import { getJobsByEmployer } from "../../../../services/jobService";
+import { getApplicationsByEmployer } from "../../../../services/applicationService";
+import Loader from "../../../ui/Loader";
 
 export default function EmployerDashboard() {
   const { user } = useAuth();

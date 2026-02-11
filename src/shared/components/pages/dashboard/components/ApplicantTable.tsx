@@ -3,7 +3,7 @@ import { Eye } from "lucide-react";
 export interface Applicant {
     id: string | number;
     name: string;
-    role: string;
+    professionalTitle: string;
     jobTitle: string;
     appliedDate: string;
     avatar?: string;
@@ -43,7 +43,7 @@ export default function ApplicantTable({ applicants }: ApplicantTableProps) {
                                     </div>
                                     <div>
                                         <p className="text-sm font-bold text-gray-900 line-clamp-1">{applicant.name}</p>
-                                        <p className="text-[10px] text-gray-500 uppercase tracking-wide">{applicant.role}</p>
+                                        <p className="text-[10px] text-gray-500 uppercase tracking-wide">{applicant.professionalTitle}</p>
                                     </div>
                                 </div>
                             </td>

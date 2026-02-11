@@ -1,8 +1,6 @@
 import axios from "axios";
 const api = axios.create({
-  baseURL:
-    import.meta.env.VITE_APP_API_URL ||
-    "http://localhost:3000",
+  baseURL: import.meta.env.VITE_APP_API_URL || "http://localhost:5000",
   timeout: 10000,
   headers: {
     "Content-Type": "application/json",
@@ -25,7 +23,7 @@ api.interceptors.response.use(
   (error) => {
     if (error.response?.status === 401) {
       localStorage.removeItem("token");
-      localStorage.removeItem("job_portal_user");
+      localStorage.removeItem("user");
       window.location.href = "/";
     }
     return Promise.reject(error);

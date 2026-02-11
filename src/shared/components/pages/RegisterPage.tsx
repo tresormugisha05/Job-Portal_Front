@@ -1,6 +1,5 @@
 import { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
-import { useAuth } from "../../contexts/AuthContext";
 import {
   User,
   Briefcase,
@@ -10,22 +9,21 @@ import {
   Loader2,
   ArrowRight,
   CheckCircle2,
+  Phone,
 } from "lucide-react";
 import PageWrapper from "../layouts/PageWrapper";
-
+import { useAuth } from "../../contexts/AuthContext";
 type RegRole = "CANDIDATE" | "EMPLOYER";
 
 export default function RegisterPage() {
-  const { register } = useAuth();
   const navigate = useNavigate();
+  const { register } = useAuth();
   const [isLoading, setIsLoading] = useState(false);
   const [role, setRole] = useState<RegRole>("CANDIDATE");
   const [formData, setFormData] = useState({
-    firstName: "",
-    lastName: "",
+    name: "",
     email: "",
-    age: "",
-    phoneNumber: "",
+    phone: "",
     password: "",
     confirmPassword: "",
   });
@@ -33,40 +31,8 @@ export default function RegisterPage() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-
-    // Validation
-    if (!formData.firstName.trim()) {
-      setError("First name is required");
-      return;
-    }
-    if (!formData.lastName.trim()) {
-      setError("Last name is required");
-      return;
-    }
-    if (!formData.email.trim()) {
-      setError("Email is required");
-      return;
-    }
-    // Basic email validation
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(formData.email)) {
-      setError("Please enter a valid email address");
-      return;
-    }
-    if (!formData.age.trim()) {
-      setError("Age is required");
-      return;
-    }
-    if (!formData.phoneNumber.trim()) {
-      setError("Phone number is required");
-      return;
-    }
     if (formData.password !== formData.confirmPassword) {
       setError("Passwords do not match");
-      return;
-    }
-    if (formData.password.length < 6) {
-      setError("Password must be at least 6 characters");
       return;
     }
 
@@ -75,21 +41,15 @@ export default function RegisterPage() {
 
     try {
       await register({
-        FirstName: formData.firstName,
-        LastName: formData.lastName,
-        Email: formData.email,
-        Age: formData.age,
-        PhoneNumber: formData.phoneNumber,
+        name: formData.name,
+        email: formData.email,
+        phone: formData.phone,
         password: formData.password,
-        UserType: role === "CANDIDATE" ? "Applicant" : "Employer",
+        role: role,
       });
       navigate("/dashboard");
-    } catch (err) {
-      setError(
-        err instanceof Error
-          ? err.message
-          : "Registration failed. Please try again.",
-      );
+    } catch (err: any) {
+      setError(err.message || "Registration failed. Please try again.");
     } finally {
       setIsLoading(false);
     }
@@ -176,7 +136,7 @@ export default function RegisterPage() {
 
               <div className="space-y-2 text-left">
                 <label className="text-xs font-black text-gray-400 uppercase tracking-widest ml-1">
-                  First Name
+                  {role === "CANDIDATE" ? "Full Name" : "Company Name"}
                 </label>
                 <div className="relative group">
                   <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
@@ -185,33 +145,14 @@ export default function RegisterPage() {
                   <input
                     required
                     type="text"
-                    value={formData.firstName}
+                    value={formData.name}
                     onChange={(e) =>
-                      setFormData({ ...formData, firstName: e.target.value })
+                      setFormData({ ...formData, name: e.target.value })
                     }
                     className="block w-full pl-12 pr-4 py-4 bg-gray-50 border-2 border-transparent focus:border-[#00b4d8] focus:bg-white rounded-2xl transition-all outline-none font-medium"
-                    placeholder="John"
-                  />
-                </div>
-              </div>
-
-              <div className="space-y-2 text-left">
-                <label className="text-xs font-black text-gray-400 uppercase tracking-widest ml-1">
-                  Last Name
-                </label>
-                <div className="relative group">
-                  <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                    <User className="h-5 w-5 text-gray-400 group-focus-within:text-[#00b4d8] transition-colors" />
-                  </div>
-                  <input
-                    required
-                    type="text"
-                    value={formData.lastName}
-                    onChange={(e) =>
-                      setFormData({ ...formData, lastName: e.target.value })
+                    placeholder={
+                      role === "CANDIDATE" ? "John Doe" : "Tech Solutions Inc."
                     }
-                    className="block w-full pl-12 pr-4 py-4 bg-gray-50 border-2 border-transparent focus:border-[#00b4d8] focus:bg-white rounded-2xl transition-all outline-none font-medium"
-                    placeholder="Doe"
                   />
                 </div>
               </div>
@@ -237,37 +178,23 @@ export default function RegisterPage() {
                 </div>
               </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6 text-left">
-                <div className="space-y-2">
-                  <label className="text-xs font-black text-gray-400 uppercase tracking-widest ml-1">
-                    Age
-                  </label>
-                  <input
-                    required
-                    type="number"
-                    min="18"
-                    max="120"
-                    value={formData.age}
-                    onChange={(e) =>
-                      setFormData({ ...formData, age: e.target.value })
-                    }
-                    className="block w-full px-4 py-4 bg-gray-50 border-2 border-transparent focus:border-[#00b4d8] focus:bg-white rounded-2xl transition-all outline-none font-medium"
-                    placeholder="25"
-                  />
-                </div>
-                <div className="space-y-2">
-                  <label className="text-xs font-black text-gray-400 uppercase tracking-widest ml-1">
-                    Phone Number
-                  </label>
+              <div className="space-y-2 text-left">
+                <label className="text-xs font-black text-gray-400 uppercase tracking-widest ml-1">
+                  Phone Number
+                </label>
+                <div className="relative group">
+                  <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                    <Phone className="h-5 w-5 text-gray-400 group-focus-within:text-[#00b4d8] transition-colors" />
+                  </div>
                   <input
                     required
                     type="tel"
-                    value={formData.phoneNumber}
+                    value={formData.phone}
                     onChange={(e) =>
-                      setFormData({ ...formData, phoneNumber: e.target.value })
+                      setFormData({ ...formData, phone: e.target.value })
                     }
-                    className="block w-full px-4 py-4 bg-gray-50 border-2 border-transparent focus:border-[#00b4d8] focus:bg-white rounded-2xl transition-all outline-none font-medium"
-                    placeholder="+1 (555) 123-4567"
+                    className="block w-full pl-12 pr-4 py-4 bg-gray-50 border-2 border-transparent focus:border-[#00b4d8] focus:bg-white rounded-2xl transition-all outline-none font-medium"
+                    placeholder="+1234567890"
                   />
                 </div>
               </div>
