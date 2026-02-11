@@ -100,7 +100,7 @@ export default function AdminDashboard() {
             </div>
           </DashboardSection>
 
-          {/* Pending Approvals */}
+          {/* Pending Approval */}
           <DashboardSection title="Pending Employer Approvals">
             <div className="space-y-4">
               {[1, 2, 3].map((i) => (
