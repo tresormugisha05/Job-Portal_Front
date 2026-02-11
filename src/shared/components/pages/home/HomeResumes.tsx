@@ -90,7 +90,7 @@ export default function HomeResumes() {
                     </h3>
                     <div className="flex items-center gap-1.5 text-sm">
                       <Briefcase className="w-3.5 h-3.5 text-[#ff6b6b]" />
-                      <span className="text-gray-500 font-medium">{candidate.role}</span>
+                      <span className="text-gray-500 font-medium">{candidate.professionalTitle}</span>
                     </div>
                   </div>
                 </div>

@@ -34,7 +34,7 @@ export default function CandidateCard({ candidate }: CandidateCardProps) {
                                         <Link to={`/candidates/${candidate.id}`}>{candidate.name}</Link>
                                     </h3>
                                     <span className="hidden sm:inline text-gray-300">|</span>
-                                    <p className="text-[#00b4d8] font-medium text-sm truncate">{candidate.role}</p>
+                                    <p className="text-[#00b4d8] font-medium text-sm truncate">{candidate.professionalTitle}</p>
                                 </div>
 
                                 <div className="flex flex-wrap gap-y-2 gap-x-4 text-sm text-gray-500 mb-4">
