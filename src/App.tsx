@@ -17,11 +17,11 @@ import RegisterPage from "./shared/components/pages/RegisterPage";
 
 // Dashboards
 import DashboardRedirect from "./shared/components/pages/dashboard/DashboardRedirect";
-import CandidateDashboard from "./shared/components/pages/dashboard/CandidateDashboard";
+import CandidateDashboard from "./shared/components/pages/dashboard/candidate/CandidateDashboard";
 import EmployerDashboard from "./shared/components/pages/dashboard/EmployerDashboard";
-import AdminDashboard from "./shared/components/pages/dashboard/AdminDashboard";
+import AdminDashboard from "./shared/components/pages/dashboard/admin/AdminDashboard";
 import PostJob from "./shared/components/pages/dashboard/PostJob";
-import CandidateProfile from "./shared/components/pages/dashboard/CandidateProfile";
+import CandidateProfile from "./shared/components/pages/dashboard/candidate/CandidateProfile";
 
 // Candidate Dashboard Pages
 import AppliedJobs from "./shared/components/pages/dashboard/candidate/AppliedJobs";
@@ -37,7 +37,7 @@ import AdminJobs from "./shared/components/pages/dashboard/admin/AdminJobs";
 import AdminUsers from "./shared/components/pages/dashboard/admin/AdminUsers";
 
 // Shared Dashboard Pages
-import Settings from "./shared/components/pages/dashboard/Settings";
+import Settings from "./shared/components/pages/dashboard/components/Settings";
 
 export default function App() {
   return (
