@@ -16,9 +16,13 @@ export default function JobCard({ job }: JobCardProps) {
                 <div className="flex items-start gap-5">
                     {/* Logo */}
                     <div
-                        className={`w-16 h-16 rounded-xl ${job.logoBg} flex items-center justify-center text-2xl font-bold shrink-0 border border-gray-100 shadow-sm transition-transform group-hover:scale-105 duration-300`}
+                        className={`w-16 h-16 rounded-xl ${job.logoBg || 'bg-gray-100'} flex items-center justify-center text-2xl font-bold shrink-0 border border-gray-100 shadow-sm transition-transform group-hover:scale-105 duration-300`}
                     >
-                        {job.logo}
+                        {job.logo ? (
+                            <img src={job.logo} alt={job.company} className="w-full h-full object-cover rounded-xl" />
+                        ) : (
+                            job.company?.charAt(0) || '?'
+                        )}
                     </div>
 
                     {/* Main Content */}
@@ -46,24 +50,26 @@ export default function JobCard({ job }: JobCardProps) {
                         </div>
 
                         <div className="flex flex-wrap gap-y-2 gap-x-4 text-sm text-gray-500 mb-6">
-                            <span className="flex items-center gap-1.5 font-medium">
-                                <DollarSign className="w-4 h-4 text-gray-400" /> {job.salary}
-                            </span>
+                            {job.salary && (
+                                <span className="flex items-center gap-1.5 font-medium">
+                                    <DollarSign className="w-4 h-4 text-gray-400" /> {job.salary}
+                                </span>
+                            )}
                             <span className="flex items-center gap-1.5 font-medium">
                                 <MapPin className="w-4 h-4 text-gray-400" />
-                                <span className="line-clamp-1">{job.location}</span>
+                                <span className="line-clamp-1">{job.location || 'Remote'}</span>
                             </span>
                             <span className="flex items-center gap-1.5 font-medium">
-                                <Briefcase className="w-4 h-4 text-gray-400" /> {job.type}
+                                <Briefcase className="w-4 h-4 text-gray-400" /> {job.jobType || job.type || 'Full-time'}
                             </span>
                         </div>
 
                         {/* Bottom Actions */}
                         <div className="flex items-center justify-between mt-auto">
                             <span
-                                className={`${job.typeBg} text-white text-[10px] px-3 py-1 font-bold uppercase tracking-wider rounded-full shadow-sm`}
+                                className={`${job.typeBg || 'bg-blue-100 text-blue-600'} text-xs px-3 py-1 font-bold uppercase tracking-wider rounded-full shadow-sm`}
                             >
-                                {job.type}
+                                {job.jobType || job.type || 'Full-time'}
                             </span>
                             <Link
                                 to={`/jobs/${job.id}`}
@@ -77,20 +83,22 @@ export default function JobCard({ job }: JobCardProps) {
             </div>
 
             {/* Tags Bar - Reveal on Hover */}
-            <div className="bg-gray-50 px-6 py-3 border-t border-gray-100 flex items-center gap-3 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
-                <Tag className="w-4 h-4 text-[#00b4d8]" />
-                <div className="flex flex-wrap gap-2 text-xs text-gray-600">
-                    <span className="font-medium text-gray-900">Tags:</span>
-                    {job.tags.slice(0, 3).map((tag, i) => (
-                        <span key={i} className="bg-white border border-gray-200 px-2 py-0.5 rounded text-gray-500">
-                            {tag}
-                        </span>
-                    ))}
-                    {job.tags.length > 3 && (
-                        <span className="text-gray-400">+{job.tags.length - 3}</span>
-                    )}
+            {job.tags && job.tags.length > 0 && (
+                <div className="bg-gray-50 px-6 py-3 border-t border-gray-100 flex items-center gap-3 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
+                    <Tag className="w-4 h-4 text-[#00b4d8]" />
+                    <div className="flex flex-wrap gap-2 text-xs text-gray-600">
+                        <span className="font-medium text-gray-900">Tags:</span>
+                        {job.tags.slice(0, 3).map((tag, i) => (
+                            <span key={i} className="bg-white border border-gray-200 px-2 py-0.5 rounded text-gray-500">
+                                {tag}
+                            </span>
+                        ))}
+                        {job.tags.length > 3 && (
+                            <span className="text-gray-400">+{job.tags.length - 3}</span>
+                        )}
+                    </div>
                 </div>
-            </div>
+            )}
         </div>
     );
 }
