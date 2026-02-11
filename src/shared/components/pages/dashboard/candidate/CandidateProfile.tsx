@@ -691,3 +691,5 @@ export default function CandidateProfile() {
     </DashboardLayout>
   );
 }
+
+//profile page for candidates to edit their profile information, including name, email, phone, professional title, summary, location, experience, education, skills, resume upload, and work experience/education history sections. Uses a clean and modern design with a focus on usability and quick access to important information for job seekers.

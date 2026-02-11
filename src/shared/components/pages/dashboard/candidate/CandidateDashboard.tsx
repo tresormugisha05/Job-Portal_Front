@@ -5,6 +5,7 @@ import DashboardSection from "../components/DashboardSection";
 import RecentActivityList from "../components/RecentActivityList";
 import type { ActivityItem } from "../components/RecentActivityList";
 
+//candidate dashboard with stats on applied jobs, saved jobs, job alerts, and shortlisted applications. Also includes sections for recent applications with status badges and recommended jobs based on profile matching. Uses a clean and modern design with a focus on usability and quick access to important information for job seekers.
 export default function CandidateDashboard() {
   const stats = [
     {
