@@ -3,20 +3,43 @@ import { useSearchParams } from "react-router-dom";
 import PageWrapper from "../layouts/PageWrapper";
 import Loader from "../ui/Loader";
 import usePageLoader from "../../hooks/usePageLoader";
-import { jobs } from "../../data/jobs";
 import JobCard from "../ui/JobCard";
 import PageHeader from "../ui/PageHeader";
-
-// Extract unique values for filters
-const uniqueLocations = [...new Set(jobs.map((job) => job.location.split(',').pop()?.trim() || job.location))].sort();
-const uniqueJobTypes = [...new Set(jobs.map((job) => job.type))].sort();
-const uniqueCategories = ["Developer", "Technology", "Medical", "Accounting", "Design", "Marketing"]; // Simplified for now, or derive from tags
-
-const ITEMS_PER_PAGE = 5;
+import api from "../../services/Service";
 
 export default function JobsListPage() {
   const isLoading = usePageLoader(1000);
   const [searchParams] = useSearchParams();
+  const [jobs, setJobs] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    fetchJobs();
+  }, []);
+
+  const fetchJobs = async () => {
+    try {
+      const response = await api.get("/api/jobs");
+      setJobs(response.data.data || []);
+    } catch (error) {
+      console.error("Error fetching jobs:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Extract unique values for filters from fetched jobs
+  const uniqueLocations = useMemo(() => 
+    [...new Set(jobs.map((job) => job.location?.split(',').pop()?.trim() || job.location))].sort(),
+    [jobs]
+  );
+  const uniqueJobTypes = useMemo(() => 
+    [...new Set(jobs.map((job) => job.jobType || job.type))].sort(),
+    [jobs]
+  );
+  const uniqueCategories = ["Developer", "Technology", "Medical", "Accounting", "Design", "Marketing"];
+
+  const ITEMS_PER_PAGE = 5;
 
   // Filter States initialized from searchParams
   const [searchQuery, setSearchQuery] = useState(searchParams.get("search") || "");
@@ -48,30 +71,31 @@ export default function JobsListPage() {
     return jobs.filter((job) => {
       // Search (Title or Company)
       const matchesSearch =
-        job.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        job.company.toLowerCase().includes(searchQuery.toLowerCase());
+        job.title?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        job.company?.toLowerCase().includes(searchQuery.toLowerCase());
 
       // Location
       const matchesLocation =
         selectedLocation === "" ||
         selectedLocation === "All Locations" ||
-        job.location.includes(selectedLocation);
+        job.location?.includes(selectedLocation);
 
       // Job Type
+      const jobType = job.jobType || job.type;
       const matchesType =
-        selectedJobTypes.length === 0 || selectedJobTypes.includes(job.type);
+        selectedJobTypes.length === 0 || selectedJobTypes.includes(jobType);
 
-      // Categories (Tags) - Check if job tags overlap with selected categories
-      // Note: Logic assumes categories serve as broad tags
+      // Categories (Tags)
+      const jobTags = job.tags || job.category || [];
       const matchesCategory =
         selectedCategories.length === 0 ||
-        job.tags.some((tag) =>
+        (Array.isArray(jobTags) && jobTags.some((tag: string) =>
           selectedCategories.some((cat) => tag.toLowerCase().includes(cat.toLowerCase()))
-        );
+        ));
 
       return matchesSearch && matchesLocation && matchesType && matchesCategory;
     });
-  }, [searchQuery, selectedLocation, selectedJobTypes, selectedCategories]);
+  }, [jobs, searchQuery, selectedLocation, selectedJobTypes, selectedCategories]);
 
   // Pagination Logic
   const totalPages = Math.ceil(filteredJobs.length / ITEMS_PER_PAGE);
@@ -101,7 +125,7 @@ export default function JobsListPage() {
     setCurrentPage(page);
   };
 
-  if (isLoading) {
+  if (isLoading || loading) {
     return <Loader />;
   }
 
@@ -231,7 +255,7 @@ export default function JobsListPage() {
             <div className="space-y-4">
               {paginatedJobs.length > 0 ? (
                 paginatedJobs.map((job) => (
-                  <JobCard key={job.id} job={job} />
+                  <JobCard key={job._id} job={{ ...job, id: job._id }} />
                 ))
               ) : (
                 <div className="bg-white rounded-lg shadow p-8 text-center text-gray-500">

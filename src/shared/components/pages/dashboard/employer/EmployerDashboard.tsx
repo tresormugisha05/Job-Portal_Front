@@ -34,7 +34,7 @@ export default function EmployerDashboard() {
                 ))}
             </div>
 
-            <div className="bg-white p-8 rounded-xl border border-gray-100 shadow-sm mb-10 text-center border-dashed border-2 hover:border-[#00b4d8] transition-colors group">
+            <div className="bg-white p-8 rounded-xl border-2 border-dashed border-gray-100 shadow-sm mb-10 text-center hover:border-[#00b4d8] transition-colors group">
                 <div className="max-w-md mx-auto">
                     <div className="w-16 h-16 bg-blue-50 text-[#00b4d8] rounded-full flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition-transform">
                         <Briefcase className="w-8 h-8" />

@@ -1,40 +1,53 @@
 import DashboardLayout from "../../../layouts/DashboardLayout";
 import { Briefcase, Eye, Edit3, Trash2, Search, Filter, Plus, Clock, MapPin, Users } from "lucide-react";
 import { Link } from "react-router-dom";
+import { useState, useEffect } from "react";
+import api from "../../../../services/Service";
+import { useAuth } from "../../../../contexts/AuthContext";
 
 export default function ManageJobs() {
-    const jobs = [
-        {
-            id: 1,
-            title: "Senior Product Designer",
-            type: "Full Time",
-            location: "Kigali, Rwanda",
-            postedDate: "Oct 24, 2024",
-            applicants: 45,
-            status: "Active",
-            statusColor: "text-green-600 bg-green-50 border-green-100"
-        },
-        {
-            id: 2,
-            title: "Frontend Developer",
-            type: "Full Time",
-            location: "Remote",
-            postedDate: "Oct 20, 2024",
-            applicants: 128,
-            status: "Active",
-            statusColor: "text-green-600 bg-green-50 border-green-100"
-        },
-        {
-            id: 3,
-            title: "Marketing Manager",
-            type: "Part Time",
-            location: "Nairobi, Kenya",
-            postedDate: "Oct 15, 2024",
-            applicants: 12,
-            status: "Expired",
-            statusColor: "text-gray-600 bg-gray-50 border-gray-100"
+    const { user } = useAuth();
+    const [jobs, setJobs] = useState<any[]>([]);
+    const [loading, setLoading] = useState(true);
+
+    useEffect(() => {
+        if (user?.id) {
+            fetchJobs();
         }
-    ];
+    }, [user?.id]);
+
+    const fetchJobs = async () => {
+        try {
+            setLoading(true);
+            const response = await api.get(`/api/jobs/employer/${user?.id}`);
+            setJobs(response.data.data || []);
+        } catch (error) {
+            console.error("Error fetching jobs:", error);
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    const handleDelete = async (jobId: string) => {
+        if (!confirm("Are you sure you want to delete this job?")) return;
+        try {
+            await api.delete(`/api/jobs/${jobId}`);
+            setJobs(jobs.filter(job => job._id !== jobId));
+        } catch (error) {
+            console.error("Error deleting job:", error);
+            alert("Failed to delete job");
+        }
+    };
+
+    if (loading) {
+        return (
+            <DashboardLayout>
+                <div className="flex justify-center items-center h-64">
+                    <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#00b4d8]"></div>
+                </div>
+            </DashboardLayout>
+        );
+    }
 
     return (
         <DashboardLayout>
@@ -82,53 +95,63 @@ export default function ManageJobs() {
                             </tr>
                         </thead>
                         <tbody className="divide-y divide-gray-50">
-                            {jobs.map((job) => (
-                                <tr key={job.id} className="hover:bg-gray-50/50 transition-colors group">
-                                    <td className="px-6 py-4">
-                                        <div>
-                                            <p className="font-bold text-gray-900 group-hover:text-[#00b4d8] transition-colors">{job.title}</p>
-                                            <div className="flex items-center gap-3 mt-1">
-                                                <span className="text-xs text-gray-500 flex items-center gap-1">
-                                                    <Briefcase className="w-3 h-3" /> {job.type}
-                                                </span>
-                                                <span className="text-xs text-gray-500 flex items-center gap-1">
-                                                    <MapPin className="w-3 h-3" /> {job.location}
-                                                </span>
-                                            </div>
-                                        </div>
-                                    </td>
-                                    <td className="px-6 py-4">
-                                        <div className="flex items-center gap-2 font-bold text-gray-700">
-                                            <Users className="w-4 h-4 text-[#00b4d8]" />
-                                            {job.applicants}
-                                        </div>
-                                    </td>
-                                    <td className="px-6 py-4 text-sm text-gray-600">
-                                        <div className="flex items-center gap-2">
-                                            <Clock className="w-4 h-4 text-gray-400" />
-                                            {job.postedDate}
-                                        </div>
-                                    </td>
-                                    <td className="px-6 py-4">
-                                        <span className={`px-3 py-1 rounded-full text-[10px] font-bold uppercase border ${job.statusColor}`}>
-                                            {job.status}
-                                        </span>
-                                    </td>
-                                    <td className="px-6 py-4 text-right">
-                                        <div className="flex items-center justify-end gap-2">
-                                            <button className="p-2 text-gray-400 hover:text-blue-500 hover:bg-blue-50 rounded-lg transition-all" title="View Applicants">
-                                                <Eye className="w-4 h-4" />
-                                            </button>
-                                            <button className="p-2 text-gray-400 hover:text-[#00b4d8] hover:bg-blue-50 rounded-lg transition-all" title="Edit">
-                                                <Edit3 className="w-4 h-4" />
-                                            </button>
-                                            <button className="p-2 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-lg transition-all" title="Delete">
-                                                <Trash2 className="w-4 h-4" />
-                                            </button>
-                                        </div>
+                            {jobs.length === 0 ? (
+                                <tr>
+                                    <td colSpan={5} className="px-6 py-12 text-center text-gray-500">
+                                        No jobs posted yet. <Link to="/dashboard/post-job" className="text-[#00b4d8] hover:underline">Post your first job</Link>
                                     </td>
                                 </tr>
-                            ))}
+                            ) : (
+                                jobs.map((job) => (
+                                    <tr key={job._id} className="hover:bg-gray-50/50 transition-colors group">
+                                        <td className="px-6 py-4">
+                                            <div>
+                                                <p className="font-bold text-gray-900 group-hover:text-[#00b4d8] transition-colors">{job.title}</p>
+                                                <div className="flex items-center gap-3 mt-1">
+                                                    <span className="text-xs text-gray-500 flex items-center gap-1">
+                                                        <Briefcase className="w-3 h-3" /> {job.jobType || job.type}
+                                                    </span>
+                                                    <span className="text-xs text-gray-500 flex items-center gap-1">
+                                                        <MapPin className="w-3 h-3" /> {job.location}
+                                                    </span>
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td className="px-6 py-4">
+                                            <div className="flex items-center gap-2 font-bold text-gray-700">
+                                                <Users className="w-4 h-4 text-[#00b4d8]" />
+                                                {job.applicants?.length || 0}
+                                            </div>
+                                        </td>
+                                        <td className="px-6 py-4 text-sm text-gray-600">
+                                            <div className="flex items-center gap-2">
+                                                <Clock className="w-4 h-4 text-gray-400" />
+                                                {new Date(job.createdAt).toLocaleDateString()}
+                                            </div>
+                                        </td>
+                                        <td className="px-6 py-4">
+                                            <span className={`px-3 py-1 rounded-full text-[10px] font-bold uppercase border ${
+                                                job.isActive ? "text-green-600 bg-green-50 border-green-100" : "text-gray-600 bg-gray-50 border-gray-100"
+                                            }`}>
+                                                {job.isActive ? "Active" : "Inactive"}
+                                            </span>
+                                        </td>
+                                        <td className="px-6 py-4 text-right">
+                                            <div className="flex items-center justify-end gap-2">
+                                                <Link to={`/dashboard/applicants/${job._id}`} className="p-2 text-gray-400 hover:text-blue-500 hover:bg-blue-50 rounded-lg transition-all" title="View Applicants">
+                                                    <Eye className="w-4 h-4" />
+                                                </Link>
+                                                <Link to={`/dashboard/edit-job/${job._id}`} className="p-2 text-gray-400 hover:text-[#00b4d8] hover:bg-blue-50 rounded-lg transition-all" title="Edit">
+                                                    <Edit3 className="w-4 h-4" />
+                                                </Link>
+                                                <button onClick={() => handleDelete(job._id)} className="p-2 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-lg transition-all" title="Delete">
+                                                    <Trash2 className="w-4 h-4" />
+                                                </button>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                ))
+                            )}
                         </tbody>
                     </table>
                 </div>
