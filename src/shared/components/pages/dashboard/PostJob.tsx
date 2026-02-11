@@ -1,6 +1,9 @@
 ﻿import { useState, useRef } from "react";
 import DashboardLayout from "../../layouts/DashboardLayout";
 import DashboardSection from "./components/DashboardSection";
+import { useAuth } from "../../../contexts/AuthContext";
+import { createJob } from "../../../services/jobService";
+import { getEmployerByUserId } from "../../../services/employerService";
 import {
     Briefcase, Building2, Send, CheckCircle2,
     Loader2, Image as ImageIcon, X, Upload, Plus, Trash2,
@@ -78,14 +81,54 @@ export default function PostJob() {
         setFormData({ ...formData, tags: formData.tags.filter(tag => tag !== tagToRemove) });
     };
 
-    const handleSubmit = (e: React.FormEvent) => {
+    const { user } = useAuth();
+    const [error, setError] = useState("");
+
+    const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         setIsSubmitting(true);
-        console.log("Submitting job:", { ...formData, hasBanner: !!banner });
-        setTimeout(() => {
-            setIsSubmitting(false);
+        setError("");
+
+        try {
+            if (!user?.id) {
+                throw new Error("User not authenticated");
+            }
+
+            const employerData = await getEmployerByUserId(user.id);
+            if (!employerData) {
+                throw new Error("Employer profile not found");
+            }
+
+            const employerId = employerData.id || employerData._id;
+            const deadline = new Date();
+            deadline.setDate(deadline.getDate() + 30);
+
+            await createJob({
+                title: formData.title,
+                logo: bannerPreview || "https://via.placeholder.com/150",
+                logoBg: "bg-blue-100 text-blue-600",
+                description: formData.description,
+                requirements: formData.requirements.filter(r => r.trim()),
+                responsibilities: formData.responsibilities.filter(r => r.trim()),
+                category: formData.tags[0] || "Other",
+                jobType: formData.type.replace(" ", "-"),
+                type: formData.type,
+                typeBg: "bg-green-100 text-green-600",
+                location: formData.location,
+                salary: formData.salary,
+                deadline: deadline.toISOString(),
+                employerId: employerId,
+                experience: formData.experience,
+                education: formData.education,
+            });
+
             setIsSuccess(true);
-        }, 2000);
+        } catch (err) {
+            console.error("Error posting job:", err);
+            setError(err instanceof Error ? err.message : "Failed to post job");
+        } finally {
+            setIsSubmitting(false);
+        }
     };
 
     if (isSuccess) {
@@ -118,6 +161,11 @@ export default function PostJob() {
             </div>
 
             <form onSubmit={handleSubmit} className="max-w-5xl space-y-8 pb-20 text-left">
+                {error && (
+                    <div className="p-4 bg-red-50 text-red-600 rounded-2xl text-sm font-bold border border-red-100">
+                        {error}
+                    </div>
+                )}
                 <DashboardSection title="Job Banner / Flyer">
                     <p className="text-xs text-gray-400 uppercase font-bold tracking-widest mb-4">Promotional visual for the job page</p>
                     {bannerPreview ? (

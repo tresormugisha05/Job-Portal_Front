@@ -3,90 +3,146 @@ import React, { createContext, useContext, useState, useEffect } from "react";
 export type UserRole = "CANDIDATE" | "EMPLOYER" | "ADMIN" | "GUEST";
 
 interface User {
-    id: string;
-    name: string;
-    email: string;
-    role: UserRole;
-    avatar?: string;
+  id: string;
+  name: string;
+  email: string;
+  role: UserRole;
+  avatar?: string;
 }
 
 interface AuthContextType {
-    user: User | null;
-    role: UserRole;
-    isAuthenticated: boolean;
-    login: (email: string, password: string) => Promise<void>;
-    register: (userData: { name: string; email: string; role: "CANDIDATE" | "EMPLOYER" }) => Promise<void>;
-    logout: () => void;
+  user: User | null;
+  role: UserRole;
+  isAuthenticated: boolean;
+  login: (email: string, password: string) => Promise<void>;
+  register: (userData: {
+    FirstName: string;
+    LastName: string;
+    Email: string;
+    Age: string;
+    PhoneNumber: string;
+    password: string;
+    UserType: "Applicant" | "Employer";
+  }) => Promise<void>;
+  logout: () => void;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
-    const [user, setUser] = useState<User | null>(null);
+  const [user, setUser] = useState<User | null>(null);
 
-    // Simulate persistent session
-    useEffect(() => {
-        const savedUser = localStorage.getItem("job_portal_user");
-        if (savedUser) {
-            setUser(JSON.parse(savedUser));
-        }
-    }, []);
+  // Simulate persistent session
+  useEffect(() => {
+    const savedUser = localStorage.getItem("job_portal_user");
+    if (savedUser) {
+      setUser(JSON.parse(savedUser));
+    }
+  }, []);
 
-    const login = async (email: string, _password: string) => {
-        // Simulate API delay
-        await new Promise(resolve => setTimeout(resolve, 1000));
+  const login = async (email: string, password: string) => {
+    try {
+      const response = await fetch("http://localhost:5000/api/auth/login", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ email, password }),
+      });
 
-        let mockUser: User;
+      const data = await response.json();
 
-        // Simple mock logic: admin email gets admin role, otherwise based on a "database" simulation
-        // In a real app, this would be a backend call
-        if (email.includes("admin")) {
-            mockUser = { id: "a1", name: "System Admin", email, role: "ADMIN", avatar: "SA" };
-        } else if (email.includes("employer")) {
-            mockUser = { id: "e1", name: "Tech Corp", email, role: "EMPLOYER", avatar: "TC" };
-        } else {
-            mockUser = { id: "c1", name: "John Doe", email, role: "CANDIDATE", avatar: "JD" };
-        }
+      if (!response.ok) {
+        throw new Error(data.message || "Login failed");
+      }
 
-        setUser(mockUser);
-        localStorage.setItem("job_portal_user", JSON.stringify(mockUser));
-    };
+      const loggedInUser: User = {
+        id: data.user.id || data.user._id,
+        name: data.user.name,
+        email: data.user.email,
+        role: data.user.role,
+        avatar: data.user.avatar,
+      };
 
-    const register = async (userData: { name: string; email: string; role: "CANDIDATE" | "EMPLOYER" }) => {
-        // Simulate API delay
-        await new Promise(resolve => setTimeout(resolve, 1500));
+      setUser(loggedInUser);
+      localStorage.setItem("job_portal_user", JSON.stringify(loggedInUser));
+      if (data.token) {
+        localStorage.setItem("token", data.token);
+      }
+    } catch (error) {
+      console.error("Login error:", error);
+      throw error;
+    }
+  };
 
-        const newUser: User = {
-            id: Math.random().toString(36).substr(2, 9),
-            ...userData,
-            avatar: userData.name.split(" ").map(n => n[0]).join("").toUpperCase()
-        };
+  const register = async (userData: {
+    FirstName: string;
+    LastName: string;
+    Email: string;
+    Age: string;
+    PhoneNumber: string;
+    password: string;
+    UserType: "Applicant" | "Employer";
+  }) => {
+    try {
+      const response = await fetch("http://localhost:5000/api/auth/register", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(userData),
+      });
 
-        setUser(newUser);
-        localStorage.setItem("job_portal_user", JSON.stringify(newUser));
-    };
+      const data = await response.json();
 
-    const logout = () => {
-        setUser(null);
-        localStorage.removeItem("job_portal_user");
-    };
+      if (!response.ok) {
+        throw new Error(data.message || "Registration failed");
+      }
 
-    const value = {
-        user,
-        role: user?.role || "GUEST",
-        isAuthenticated: !!user,
-        login,
-        register,
-        logout
-    };
+      const newUser: User = {
+        id: data.user.id || data.user._id,
+        name: `${data.user.FirstName} ${data.user.LastName}`,
+        email: data.user.Email,
+        role:
+          data.user.UserType === "applicant" ||
+          data.user.UserType === "Applicant"
+            ? "CANDIDATE"
+            : "EMPLOYER",
+        avatar: data.user.profile,
+      };
 
-    return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
+      setUser(newUser);
+      localStorage.setItem("job_portal_user", JSON.stringify(newUser));
+      if (data.token) {
+        localStorage.setItem("token", data.token);
+      }
+    } catch (error) {
+      console.error("Registration error:", error);
+      throw error;
+    }
+  };
+
+  const logout = () => {
+    setUser(null);
+    localStorage.removeItem("job_portal_user");
+  };
+
+  const value = {
+    user,
+    role: user?.role || "GUEST",
+    isAuthenticated: !!user,
+    login,
+    register,
+    logout,
+  };
+
+  return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 }
 
 export function useAuth() {
-    const context = useContext(AuthContext);
-    if (context === undefined) {
-        throw new Error("useAuth must be used within an AuthProvider");
-    }
-    return context;
+  const context = useContext(AuthContext);
+  if (context === undefined) {
+    throw new Error("useAuth must be used within an AuthProvider");
+  }
+  return context;
 }
