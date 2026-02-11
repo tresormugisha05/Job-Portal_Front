@@ -94,7 +94,7 @@ export default function Settings() {
                     />
                   </div>
                 </div>
-                <div className="space-y-2">
+                {/* <div className="space-y-2">
                   <label className="text-sm font-bold text-gray-700">
                     Two-Factor Authentication
                   </label>
@@ -117,7 +117,7 @@ export default function Settings() {
                       <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#00b4d8]"></div>
                     </label>
                   </div>
-                </div>
+                </div> */}
                 <div className="pt-4">
                   <button className="bg-[#00b4d8] hover:bg-[#009bc2] text-white px-8 py-3 rounded-xl font-bold transition-all shadow-md active:scale-95 flex items-center gap-2">
                     <Save className="w-4 h-4" /> Save Changes
