@@ -68,7 +68,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const login = async (email: string, password: string) => {
     try {
-      const response = await api.post("/api/candidates/login", {
+      const response = await api.post("/api/auth/login", {
         email,
         password,
       });
@@ -91,7 +91,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     role: "CANDIDATE" | "EMPLOYER";
   }) => {
     try {
-      const response = await api.post("/api/candidates/register", userData);
+      const response = await api.post("/api/auth/register", userData);
       const { token, user: userDataFromApi } = response.data;
 
       localStorage.setItem("token", token);
