@@ -166,7 +166,7 @@ export default function PostJob() {
                 <DashboardSection title="Job Banner / Flyer">
                     <p className="text-xs text-gray-400 uppercase font-bold tracking-widest mb-4">Promotional visual for the job page</p>
                     {bannerPreview ? (
-                        <div className="relative rounded-2xl overflow-hidden border-2 border-[#00b4d8] group aspect-[24/10] bg-gray-100 shadow-lg">
+                        <div className="relative rounded-2xl overflow-hidden border-2 border-[#00b4d8] group aspect-24/10 bg-gray-100 shadow-lg">
                             <img src={bannerPreview} alt="Banner Preview" className="w-full h-full object-cover" />
                             <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-4 backdrop-blur-sm">
                                 <button type="button" onClick={() => fileInputRef.current?.click()} className="bg-white/20 hover:bg-white/40 text-white p-4 rounded-full transition-all shadow-xl">
