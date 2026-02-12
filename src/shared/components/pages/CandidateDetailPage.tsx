@@ -29,9 +29,11 @@ export default function CandidateDetailPage() {
       try {
         setLoading(true);
         setError(null);
+        console.log("CandidateDetailPage: useEffect triggered, id:", id, "user:", user);
 
         if (!id) {
           // Viewing own profile
+          console.log("No id - viewing own profile");
           if (user) {
             // Map user to UserModel structure
             const mappedUser: UserModel = {
@@ -56,16 +58,21 @@ export default function CandidateDetailPage() {
               createdAt: new Date(),
               updatedAt: new Date(),
             };
+            console.log("Mapped user:", mappedUser);
             setCandidateData(mappedUser);
           } else {
+            console.log("No user in context - setting error");
             setError("User not authenticated");
           }
         } else {
           // Fetch other candidate's data
+          console.log("Fetching candidate with id:", id);
           const data = await CandidateService.getUser(id);
+          console.log("Received candidate data:", data);
           setCandidateData(data);
         }
       } catch (err: any) {
+        console.error("Error fetching candidate:", err);
         setError(err.message || "Failed to load candidate data");
       } finally {
         setLoading(false);
@@ -109,6 +116,7 @@ export default function CandidateDetailPage() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
           <div className="text-center">
             <p className="text-gray-600 text-lg">Candidate not found</p>
+            <p className="text-gray-500 text-sm mt-2">candidateData is null - received: {JSON.stringify(candidateData)}</p>
             <Link
               to="/candidates"
               className="inline-flex items-center gap-2 text-blue-600 hover:text-blue-700 mt-4"
@@ -120,6 +128,8 @@ export default function CandidateDetailPage() {
       </PageWrapper>
     );
   }
+
+  console.log("Rendering candidateData:", candidateData);
 
   const handleSendMessage = () => {
     const subject = encodeURIComponent(

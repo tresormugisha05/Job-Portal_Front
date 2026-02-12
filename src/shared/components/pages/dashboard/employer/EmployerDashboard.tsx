@@ -16,7 +16,8 @@ import { useEffect, useState } from "react";
 import { useAuth } from "../../../../contexts/AuthContext";
 import { getEmployerByUserId } from "../../../../services/employerService";
 import { getJobsByEmployer } from "../../../../services/jobService";
-import { getApplicationsByEmployer } from "../../../../services/applicationService";
+import { ApplicationService } from "../../../../services/application.Service";
+import type { ApplicationModel } from "../../../../services/application.Service";
 import Loader from "../../../ui/Loader";
 
 export default function EmployerDashboard() {
@@ -70,7 +71,7 @@ export default function EmployerDashboard() {
             const jobsData = await getJobsByEmployer(employerId);
 
             const applicationsData =
-              await getApplicationsByEmployer(employerId);
+              await ApplicationService.getByEmployer(employerId);
             setApplications(applicationsData);
 
             // Calculate stats
@@ -83,7 +84,7 @@ export default function EmployerDashboard() {
               0,
             );
             const shortlistedCount = applicationsData.filter(
-              (app) => app.status === "shortlisted",
+              (app: ApplicationModel) => app.status === "SHORTLISTED",
             ).length;
 
             setStats([

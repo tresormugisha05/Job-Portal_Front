@@ -111,6 +111,7 @@ export default function JobDetailPage() {
               jobTitle={job.title}
               companyName={job.company}
               jobId={job.id}
+              employerId={job.employerId}
             />
 
             {/* Job Description */}

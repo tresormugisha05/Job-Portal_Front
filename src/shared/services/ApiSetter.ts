@@ -13,6 +13,13 @@ api.interceptors.request.use(
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
     }
+    
+    // For FormData, remove Content-Type header to let axios set it with boundary
+    if (config.data instanceof FormData) {
+      delete config.headers["Content-Type"];
+      console.log("FormData detected - removing Content-Type header for auto-detection");
+    }
+    
     return config;
   },
   (error) => Promise.reject(error),
