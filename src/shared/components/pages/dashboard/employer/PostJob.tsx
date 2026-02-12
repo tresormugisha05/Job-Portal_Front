@@ -23,6 +23,7 @@ export default function PostJob() {
         company: "",
         location: "",
         type: "FULL TIME",
+        category: "Technology",
         salary: "",
         experience: "",
         education: "",
@@ -95,7 +96,7 @@ export default function PostJob() {
                 description: formData.description,
                 responsibilities: formData.responsibilities.filter(r => r.trim()).join(', '),
                 requirements: formData.requirements.filter(r => r.trim()).join(', '),
-                category: formData.tags[0] || "Technology",
+                category: formData.category,
                 deadline: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString(),
                 employerId: user?.id || '',
                 salary: formData.salary,
@@ -133,6 +134,7 @@ export default function PostJob() {
                                     company: "",
                                     location: "",
                                     type: "FULL TIME",
+                                    category: "Technology",
                                     salary: "",
                                     experience: "",
                                     education: "",
@@ -310,6 +312,26 @@ export default function PostJob() {
                                         placeholder="New York, NY or Remote"
                                         className="w-full px-4 py-3 bg-white border border-gray-100 rounded-xl focus:border-[#00b4d8] outline-none transition-all font-semibold text-left"
                                     />
+                                </div>
+
+                                <div className="space-y-2">
+                                    <label className="text-xs font-bold text-gray-500 uppercase tracking-widest flex items-center gap-2">
+                                        <Building2 className="w-3 h-3" /> Category
+                                    </label>
+                                    <select
+                                        value={formData.category}
+                                        onChange={(e) => setFormData({ ...formData, category: e.target.value })}
+                                        className="w-full px-4 py-3 bg-white border border-gray-100 rounded-xl focus:border-[#00b4d8] outline-none appearance-none font-semibold text-left"
+                                    >
+                                        <option>Technology</option>
+                                        <option>Healthcare</option>
+                                        <option>Finance</option>
+                                        <option>Education</option>
+                                        <option>Marketing</option>
+                                        <option>Sales</option>
+                                        <option>Engineering</option>
+                                        <option>Other</option>
+                                    </select>
                                 </div>
 
                                 <div className="space-y-2">
