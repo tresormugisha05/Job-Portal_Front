@@ -48,8 +48,12 @@ export default function RegisterPage() {
         role: role,
       });
       navigate("/dashboard");
-    } catch (err: Error) {
-      setError(err.message || "Registration failed. Please try again.");
+    } catch (err: unknown) {
+      if (err instanceof Error) {
+        setError(err.message || "Registration failed. Please try again.");
+      } else {
+        setError("Registration failed. Please try again.");
+      }
     } finally {
       setIsLoading(false);
     }

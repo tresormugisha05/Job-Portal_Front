@@ -114,7 +114,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       localStorage.setItem("job_portal_user", JSON.stringify(userDataFromApi));
 
       setUser(userDataFromApi);
-    } catch (error: Error) {
+    } catch (error: any) {
       throw new Error(error.response?.data?.message || "Registration failed");
     }
   };
