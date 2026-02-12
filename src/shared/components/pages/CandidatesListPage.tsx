@@ -114,6 +114,7 @@ export default function CandidatesListPage() {
       );
     });
   }, [
+    candidates,
     searchQuery,
     selectedLocation,
     selectedExperienceLevels,
