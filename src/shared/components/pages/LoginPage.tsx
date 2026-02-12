@@ -21,7 +21,7 @@ export default function LoginPage() {
             await login(email, password);
             navigate("/dashboard");
         } catch (err) {
-            setError("Invalid credentials. Use 'admin@jobportal.com' or 'employer@tech.com' for demo.");
+            setError("Invalid credentials.");
         } finally {
             setIsLoading(false);
         }
@@ -115,20 +115,6 @@ export default function LoginPage() {
                         </div>
                     </div>
 
-                    {/* Demo Info */}
-                    <div className="bg-blue-50/50 p-6 rounded-3xl border border-blue-50 text-center">
-                        <p className="text-xs font-black text-[#00b4d8] uppercase tracking-[0.2em] mb-2">Demo Credentials</p>
-                        <div className="grid grid-cols-2 gap-2">
-                            <div className="bg-white p-3 rounded-xl border border-blue-100">
-                                <p className="text-[10px] font-black uppercase text-gray-400">Admin</p>
-                                <p className="text-[11px] font-bold text-gray-700">admin@jobportal.com</p>
-                            </div>
-                            <div className="bg-white p-3 rounded-xl border border-blue-100">
-                                <p className="text-[10px] font-black uppercase text-gray-400">Employer</p>
-                                <p className="text-[11px] font-bold text-gray-700">employer@tech.com</p>
-                            </div>
-                        </div>
-                    </div>
                 </div>
             </div>
         </PageWrapper>
