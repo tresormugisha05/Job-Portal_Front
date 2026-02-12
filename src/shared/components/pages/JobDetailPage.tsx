@@ -1,24 +1,38 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { MapPin, Briefcase, DollarSign, Calendar, Heart } from "lucide-react";
 import { useParams, Link } from "react-router-dom";
 import PageWrapper from "../layouts/PageWrapper";
 import Loader from "../ui/Loader";
-import usePageLoader from "../../hooks/usePageLoader";
-import { jobs } from "../../data/jobs";
-import { employers } from "../../data/employers";
+import { getJobById, getAllJobs } from "../../services/jobService";
+import type { JobData } from "../../services/jobService";
 import ApplyJobModal from "../ui/ApplyJobModal";
 
 export default function JobDetailPage() {
   const { id } = useParams();
-  const isLoading = usePageLoader(1000);
+  const [job, setJob] = useState<JobData | null>(null);
+  const [similarJobs, setSimilarJobs] = useState<JobData[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
   const [isApplyModalOpen, setIsApplyModalOpen] = useState(false);
   const [isSaved, setIsSaved] = useState(false);
 
-  const job = jobs.find(j => j.id === id);
-  const employer = job ? employers.find(e => e.id === job.employerId) : null;
-
-  // Get similar jobs (exclude current job)
-  const similarJobs = jobs.filter(j => j.id !== id).slice(0, 3);
+  useEffect(() => {
+    const fetchJobData = async () => {
+      if (!id) return;
+      try {
+        setIsLoading(true);
+        const jobData = await getJobById(id);
+        setJob(jobData);
+        
+        const allJobs = await getAllJobs();
+        setSimilarJobs(allJobs.filter(j => (j._id || j.id) !== id).slice(0, 3));
+      } catch (error) {
+        console.error("Error fetching job:", error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    fetchJobData();
+  }, [id]);
 
   if (isLoading) {
     return <Loader />;
@@ -45,44 +59,46 @@ export default function JobDetailPage() {
             {/* Job Header */}
             <div className="bg-white rounded-lg shadow p-6 mb-6 border border-gray-100">
               <div className="flex items-start gap-4 mb-6">
-                <div className={`w-16 h-16 rounded-lg flex items-center justify-center ${job.logoBg} flex-shrink-0`}>
-                  <span className="text-2xl font-bold">{job.logo}</span>
+                <div className={`w-16 h-16 rounded-lg flex items-center justify-center ${job.logoBg || 'bg-blue-100'} flex-shrink-0`}>
+                  <span className="text-2xl font-bold">{job.logo || job.company?.charAt(0) || '?'}</span>
                 </div>
                 <div className="flex-1">
                   <h1 className="text-2xl font-bold text-gray-900 mb-2">
                     {job.title}
                   </h1>
                   <p className="text-[#00b4d8] text-lg mb-3 font-medium">
-                    <Link to={`/employers/${job.employerId}`} className="hover:underline">
-                      {job.company}
-                    </Link>
+                    {job.company}
                   </p>
                   <div className="flex flex-wrap gap-3 text-sm text-gray-600">
                     <span className="flex items-center gap-1">
                       <MapPin className="w-4 h-4 text-[#ff6b6b]" /> {job.location}
                     </span>
                     <span className="flex items-center gap-1">
-                      <Briefcase className="w-4 h-4 text-[#ff6b6b]" /> {job.type}
+                      <Briefcase className="w-4 h-4 text-[#ff6b6b]" /> {job.jobType || job.type || 'Full-time'}
                     </span>
-                    <span className="flex items-center gap-1">
-                      <DollarSign className="w-4 h-4 text-[#ff6b6b]" /> {job.salary}
-                    </span>
-                    {job.postedDate && (
+                    {job.salary && (
                       <span className="flex items-center gap-1">
-                        <Calendar className="w-4 h-4 text-[#ff6b6b]" /> Posted {job.postedDate}
+                        <DollarSign className="w-4 h-4 text-[#ff6b6b]" /> {job.salary}
+                      </span>
+                    )}
+                    {job.createdAt && (
+                      <span className="flex items-center gap-1">
+                        <Calendar className="w-4 h-4 text-[#ff6b6b]" /> Posted {new Date(job.createdAt).toLocaleDateString()}
                       </span>
                     )}
                   </div>
                 </div>
               </div>
 
-              <div className="flex flex-wrap gap-2 mb-6">
-                {job.tags.map((tag, idx) => (
-                  <span key={idx} className="px-3 py-1 bg-gray-100 text-gray-600 text-sm rounded-full capitalize">
-                    {tag}
-                  </span>
-                ))}
-              </div>
+              {job.tags && job.tags.length > 0 && (
+                <div className="flex flex-wrap gap-2 mb-6">
+                  {job.tags.map((tag, idx) => (
+                    <span key={idx} className="px-3 py-1 bg-gray-100 text-gray-600 text-sm rounded-full capitalize">
+                      {tag}
+                    </span>
+                  ))}
+                </div>
+              )}
 
               <div className="flex gap-3">
                 <button
@@ -110,6 +126,10 @@ export default function JobDetailPage() {
               onClose={() => setIsApplyModalOpen(false)}
               jobTitle={job.title}
               companyName={job.company}
+<<<<<<< Updated upstream
+=======
+              jobId={job._id || job.id}
+>>>>>>> Stashed changes
             />
 
             {/* Job Description */}
@@ -120,25 +140,31 @@ export default function JobDetailPage() {
                   {job.description || "No description provided."}
                 </p>
 
-                {job.responsibilities && job.responsibilities.length > 0 && (
+                {job.responsibilities && (
                   <>
                     <h3 className="text-lg font-bold text-gray-900 mb-3">
                       Responsibilities:
                     </h3>
                     <ul className="list-disc pl-5 mb-6 space-y-2">
-                      {job.responsibilities.map((item, idx) => (
-                        <li key={idx}>{item}</li>
+                      {(Array.isArray(job.responsibilities) 
+                        ? job.responsibilities 
+                        : job.responsibilities.split(', ')
+                      ).filter(item => item && item.trim()).map((item, idx) => (
+                        <li key={idx}>{item.trim()}</li>
                       ))}
                     </ul>
                   </>
                 )}
 
-                {job.requirements && job.requirements.length > 0 && (
+                {job.requirements && (
                   <>
                     <h3 className="text-lg font-bold text-gray-900 mb-3">Requirements:</h3>
                     <ul className="list-disc pl-5 mb-6 space-y-2">
-                      {job.requirements.map((item, idx) => (
-                        <li key={idx}>{item}</li>
+                      {(Array.isArray(job.requirements) 
+                        ? job.requirements 
+                        : job.requirements.split(', ')
+                      ).filter(item => item && item.trim()).map((item, idx) => (
+                        <li key={idx}>{item.trim()}</li>
                       ))}
                     </ul>
                   </>
@@ -156,28 +182,20 @@ export default function JobDetailPage() {
             </div>
 
             {/* Company Info */}
-            {employer && (
-              <div className="bg-white rounded-lg shadow p-6 border border-gray-100">
-                <h2 className="text-xl font-bold text-gray-900 mb-4">About {employer.name}</h2>
-                <p className="text-gray-600 mb-4 leading-relaxed">
-                  {employer.fullDescription || employer.description}
-                </p>
-                <div className="grid grid-cols-2 gap-4 text-sm text-gray-600">
-                  <div>
-                    <span className="font-bold text-gray-900 block">Open Positions:</span> {employer.openings}
-                  </div>
-                  <div>
-                    <span className="font-bold text-gray-900 block">Industry:</span> Health & Food Services
-                  </div>
-                  <div>
-                    <span className="font-bold text-gray-900 block">Location:</span> {employer.location}
-                  </div>
-                  <div>
-                    <Link to={`/employers/${employer.id}`} className="text-[#00b4d8] hover:underline font-medium">View Company Profile</Link>
-                  </div>
+            <div className="bg-white rounded-lg shadow p-6 border border-gray-100">
+              <h2 className="text-xl font-bold text-gray-900 mb-4">About {job.company}</h2>
+              <p className="text-gray-600 mb-4 leading-relaxed">
+                Join our team and be part of an innovative company driving change in the industry.
+              </p>
+              <div className="grid grid-cols-2 gap-4 text-sm text-gray-600">
+                <div>
+                  <span className="font-bold text-gray-900 block">Location:</span> {job.location}
+                </div>
+                <div>
+                  <span className="font-bold text-gray-900 block">Category:</span> {job.category}
                 </div>
               </div>
-            )}
+            </div>
           </div>
 
           {/* Sidebar */}
@@ -188,16 +206,18 @@ export default function JobDetailPage() {
               <div className="space-y-4 text-sm">
                 <div className="flex justify-between items-center border-b border-gray-50 pb-3">
                   <span className="text-gray-500">Job Type:</span>
-                  <span className="font-medium text-gray-900">{job.type}</span>
+                  <span className="font-medium text-gray-900">{job.jobType || job.type || 'Full-time'}</span>
                 </div>
                 <div className="flex justify-between items-center border-b border-gray-50 pb-3">
                   <span className="text-gray-500">Location:</span>
                   <span className="font-medium text-gray-900 text-right w-1/2 line-clamp-1">{job.location}</span>
                 </div>
-                <div className="flex justify-between items-center border-b border-gray-50 pb-3">
-                  <span className="text-gray-500">Salary:</span>
-                  <span className="font-medium text-gray-900">{job.salary}</span>
-                </div>
+                {job.salary && (
+                  <div className="flex justify-between items-center border-b border-gray-50 pb-3">
+                    <span className="text-gray-500">Salary:</span>
+                    <span className="font-medium text-gray-900">{job.salary}</span>
+                  </div>
+                )}
                 {job.experience && (
                   <div className="flex justify-between items-center border-b border-gray-50 pb-3">
                     <span className="text-gray-500">Experience:</span>
@@ -212,7 +232,7 @@ export default function JobDetailPage() {
                 )}
                 <div className="flex justify-between items-center">
                   <span className="text-gray-500">Posted:</span>
-                  <span className="font-medium text-gray-900">{job.postedDate || "Recently"}</span>
+                  <span className="font-medium text-gray-900">{job.createdAt ? new Date(job.createdAt).toLocaleDateString() : "Recently"}</span>
                 </div>
               </div>
             </div>
@@ -221,17 +241,21 @@ export default function JobDetailPage() {
             <div className="bg-white rounded-lg shadow p-6 border border-gray-100">
               <h3 className="text-lg font-bold text-gray-900 mb-4">Similar Jobs</h3>
               <div className="space-y-4">
-                {similarJobs.map(similar => (
-                  <div key={similar.id} className="border-b border-gray-50 pb-4 last:border-0 last:pb-0">
-                    <h4 className="font-bold text-gray-900 mb-1 hover:text-[#00b4d8] transition-colors cursor-pointer block">
-                      <Link to={`/jobs/${similar.id}`}>{similar.title}</Link>
-                    </h4>
-                    <p className="text-[#00b4d8] text-sm mb-1">{similar.company}</p>
-                    <p className="text-gray-500 text-xs">
-                      {similar.location} • {similar.salary}
-                    </p>
-                  </div>
-                ))}
+                {similarJobs.length > 0 ? (
+                  similarJobs.map(similar => (
+                    <div key={similar._id || similar.id} className="border-b border-gray-50 pb-4 last:border-0 last:pb-0">
+                      <h4 className="font-bold text-gray-900 mb-1 hover:text-[#00b4d8] transition-colors cursor-pointer block">
+                        <Link to={`/jobs/${similar._id || similar.id}`}>{similar.title}</Link>
+                      </h4>
+                      <p className="text-[#00b4d8] text-sm mb-1">{similar.company}</p>
+                      <p className="text-gray-500 text-xs">
+                        {similar.location} {similar.salary && `• ${similar.salary}`}
+                      </p>
+                    </div>
+                  ))
+                ) : (
+                  <p className="text-gray-500 text-sm">No similar jobs found</p>
+                )}
               </div>
             </div>
           </div>
