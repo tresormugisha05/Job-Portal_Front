@@ -13,7 +13,6 @@ import {
 export default function PostJob() {
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [isSuccess, setIsSuccess] = useState(false);
-    const [banner, setBanner] = useState<File | null>(null);
     const [bannerPreview, setBannerPreview] = useState<string | null>(null);
     const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -36,7 +35,6 @@ export default function PostJob() {
     const handleBannerChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files?.[0];
         if (file) {
-            setBanner(file);
             const reader = new FileReader();
             reader.onloadend = () => {
                 setBannerPreview(reader.result as string);
@@ -46,7 +44,6 @@ export default function PostJob() {
     };
 
     const removeBanner = () => {
-        setBanner(null);
         setBannerPreview(null);
         if (fileInputRef.current) {
             fileInputRef.current.value = "";
@@ -99,7 +96,7 @@ export default function PostJob() {
                 throw new Error("Employer profile not found");
             }
 
-            const employerId = employerData.id || employerData._id;
+            const employerId = employerData.id || employerData._id || "";
             const deadline = new Date();
             deadline.setDate(deadline.getDate() + 30);
 
@@ -108,8 +105,8 @@ export default function PostJob() {
                 logo: bannerPreview || "https://via.placeholder.com/150",
                 logoBg: "bg-blue-100 text-blue-600",
                 description: formData.description,
-                requirements: formData.requirements.filter(r => r.trim()),
-                responsibilities: formData.responsibilities.filter(r => r.trim()),
+                requirements: formData.requirements.filter(r => r.trim()).join(', '),
+                responsibilities: formData.responsibilities.filter(r => r.trim()).join(', '),
                 category: formData.tags[0] || "Other",
                 jobType: formData.type.replace(" ", "-"),
                 type: formData.type,
@@ -117,7 +114,7 @@ export default function PostJob() {
                 location: formData.location,
                 salary: formData.salary,
                 deadline: deadline.toISOString(),
-                employerId: employerId,
+                employerId: String(employerId),
                 experience: formData.experience,
                 education: formData.education,
             });

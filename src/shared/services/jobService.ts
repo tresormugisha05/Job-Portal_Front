@@ -19,6 +19,12 @@ export interface JobData {
   isActive?: boolean;
   createdAt?: string;
   updatedAt?: string;
+  logo?: string;
+  logoBg?: string;
+  type?: string;
+  typeBg?: string;
+  experience?: string;
+  education?: string;
 }
 
 export interface JobResponse {

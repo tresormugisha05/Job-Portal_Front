@@ -4,7 +4,7 @@ import {
   getAllEmployers,
   type EmployerData,
 } from "../../../services/employerService";
-import { getAllJobs, type JobData } from "../../../services/jobService";
+import { getAllJobs } from "../../../services/jobService";
 
 interface CompanyWithOpenings extends EmployerData {
   openings: number;
@@ -16,7 +16,6 @@ export default function HomeCompanies() {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [visibleCount, setVisibleCount] = useState(4);
   const [companies, setCompanies] = useState<CompanyWithOpenings[]>([]);
-  const [loading, setLoading] = useState(true);
 
   // Fetch employers and count their jobs
   useEffect(() => {
@@ -68,8 +67,6 @@ export default function HomeCompanies() {
         }
       } catch (error) {
         console.error("Error fetching companies:", error);
-      } finally {
-        setLoading(false);
       }
     };
 
