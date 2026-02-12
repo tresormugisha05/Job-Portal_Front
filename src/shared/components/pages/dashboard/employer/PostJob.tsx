@@ -6,7 +6,7 @@ import {
     Loader2, Image as ImageIcon, X, Upload, Plus, Trash2,
     DollarSign, MapPin, GraduationCap, Award, Tag
 } from "lucide-react";
-import api from "../../../../services/Service";
+import { createJob } from "../../../../services/jobService";
 import { useAuth } from "../../../../contexts/AuthContext";
 
 export default function PostJob() {
@@ -92,22 +92,18 @@ export default function PostJob() {
                 company: formData.company || user?.name || "Company",
                 location: formData.location,
                 jobType: "Full-time",
-                type: formData.type,
-                typeBg: "bg-blue-100 text-blue-600",
-                logoBg: "bg-blue-50",
+                description: formData.description,
+                responsibilities: formData.responsibilities.filter(r => r.trim()).join(', '),
+                requirements: formData.requirements.filter(r => r.trim()).join(', '),
+                category: formData.tags[0] || "Technology",
+                deadline: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString(),
+                employerId: user?.id || '',
                 salary: formData.salary,
                 experience: formData.experience,
                 education: formData.education,
-                description: formData.description,
-                responsibilities: formData.responsibilities.filter(r => r.trim()),
-                requirements: formData.requirements.filter(r => r.trim()),
-                tags: formData.tags,
-                category: formData.tags[0] || "Technology",
-                deadline: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString(),
-                employerId: user?.id
             };
 
-            await api.post("/api/jobs", jobData);
+            await createJob(jobData);
             setIsSuccess(true);
         } catch (err: unknown) {
             console.error("Error posting job:", err);
