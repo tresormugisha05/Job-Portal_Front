@@ -18,7 +18,7 @@ export default function JobsListPage() {
 
   const fetchJobs = async () => {
     try {
-      const response = await api.get("/api/jobs");
+      const response = await api.get("/jobs");
       setJobs(response.data.data || []);
     } catch (error) {
       console.error("Error fetching jobs:", error);
