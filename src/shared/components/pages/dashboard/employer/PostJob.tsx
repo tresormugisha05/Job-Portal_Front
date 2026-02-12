@@ -6,7 +6,7 @@ import {
     Loader2, Image as ImageIcon, X, Upload, Plus, Trash2,
     DollarSign, MapPin, GraduationCap, Award, Tag
 } from "lucide-react";
-import api from "../../../../services/Service";
+import api from "../../../../services/ApiSetter";
 import { useAuth } from "../../../../contexts/AuthContext";
 
 export default function PostJob() {

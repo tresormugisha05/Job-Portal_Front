@@ -2,7 +2,7 @@ import DashboardLayout from "../../../layouts/DashboardLayout";
 import { Briefcase, Eye, Edit3, Trash2, Search, Filter, Plus, Clock, MapPin, Users } from "lucide-react";
 import { Link } from "react-router-dom";
 import { useState, useEffect } from "react";
-import api from "../../../../services/Service";
+import api from "../../../../services/ApiSetter";
 import { useAuth } from "../../../../contexts/AuthContext";
 
 export default function ManageJobs() {

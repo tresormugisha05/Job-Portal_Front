@@ -1,7 +1,7 @@
 import React, { useState } from "react";
-import { X, Upload, CheckCircle, AlertCircle, LogIn, Loader2 } from "lucide-react";
-import { useAuth } from "../../contexts/AuthContext";
-import { Link } from "react-router-dom";
+import { X, Upload, CheckCircle, Loader2 } from "lucide-react";
+import { ApplicationService } from "../../services/application.Service";
+import type { ApplicationModel } from "../../services/application.Service";
 
 interface ApplyJobModalProps {
     isOpen: boolean;
@@ -91,48 +91,23 @@ export default function ApplyJobModal({
         }
 
         try {
-            // Create FormData for API submission
-            const formDataToSend = new FormData();
-            formDataToSend.append('name', formData.name);
-            formDataToSend.append('email', formData.email);
-            formDataToSend.append('message', formData.message);
-            formDataToSend.append('resume', formData.resumeFile);
-            formDataToSend.append('jobTitle', jobTitle);
-            formDataToSend.append('companyName', companyName);
-            
-            formDataToSend.append('jobId', jobId);
-            formDataToSend.append('userId', 'temp-user-id'); // Temporary user ID
-            formDataToSend.append('employerId', 'temp-employer-id'); // Temporary employer ID
+            // Prepare application data
+            const applicationData: Partial<ApplicationModel> = {
+                userId: 'temp-user-id', // Temporary user ID
+                employerId: 'temp-employer-id', // Temporary employer ID
+                name: formData.name,
+                email: formData.email,
+                coverLetter: formData.message, // Map message to coverLetter
+            };
 
-            // Real API call to backend
-            const response = await fetch(`http://localhost:5000/api/applications/${jobId}`, {
-                method: 'POST',
-                body: formDataToSend,
-            });
+            // Submit application using ApplicationService
+            const submittedApplication = await ApplicationService.submit(
+                jobId!,
+                applicationData,
+                formData.resumeFile
+            );
 
-            if (!response.ok) {
-                const errorText = await response.text();
-                console.error('Backend response:', errorText);
-                
-                // Try to parse as JSON, fallback to text
-                try {
-                    const errorData = JSON.parse(errorText);
-                    throw new Error(errorData.message || 'Application failed');
-                } catch {
-                    // Handle HTML error responses
-                    if (errorText.includes('Must supply api_key')) {
-                        throw new Error('Server configuration error. Please contact support.');
-                    } else if (errorText.includes('DOCTYPE html')) {
-                        throw new Error('Server error. Please try again later.');
-                    } else {
-                        throw new Error(errorText || 'Application failed');
-                    }
-                }
-            }
-
-            const responseData = await response.json();
-            console.log('Application submitted successfully:', responseData);
-
+            console.log('Application submitted successfully:', submittedApplication);
             setIsSuccess(true);
         } catch (err) {
             setError(err instanceof Error ? err.message : 'Failed to submit application. Please try again.');

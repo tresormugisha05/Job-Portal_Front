@@ -1,17 +1,19 @@
 import api from "./ApiSetter";
 
 export type ApplicationStatus =
-  | "pending"
-  | "reviewed"
-  | "shortlisted"
-  | "rejected"
-  | "hired";
+  | "PENDING"
+  | "REVIEWED"
+  | "SHORTLISTED"
+  | "REJECTED"
+  | "HIRED";
 
 export interface ApplicationModel {
   _id?: string;
   jobId: string;
   userId: string;
   employerId: string;
+  name: string;
+  email: string;
   resume: string;
   coverLetter?: string;
   status: ApplicationStatus;

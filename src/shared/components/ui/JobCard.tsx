@@ -60,7 +60,7 @@ export default function JobCard({ job }: JobCardProps) {
                                 <span className="line-clamp-1">{job.location || 'Remote'}</span>
                             </span>
                             <span className="flex items-center gap-1.5 font-medium">
-                                <Briefcase className="w-4 h-4 text-gray-400" /> {job.jobType || job.type || 'Full-time'}
+                                <Briefcase className="w-4 h-4 text-gray-400" /> {job.type || 'Full-time'}
                             </span>
                         </div>
 
@@ -69,7 +69,7 @@ export default function JobCard({ job }: JobCardProps) {
                             <span
                                 className={`${job.typeBg || 'bg-blue-100 text-blue-600'} text-xs px-3 py-1 font-bold uppercase tracking-wider rounded-full shadow-sm`}
                             >
-                                {job.jobType || job.type || 'Full-time'}
+                                {job.type || 'Full-time'}
                             </span>
                             <Link
                                 to={`/jobs/${job.id}`}
