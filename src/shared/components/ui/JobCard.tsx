@@ -14,7 +14,6 @@ export default function JobCard({ job }: JobCardProps) {
         <div className="bg-white rounded-lg shadow-sm hover:shadow-lg transition-all border border-gray-200 hover:border-[#00b4d8] group overflow-hidden flex flex-col">
             <div className="p-6">
                 <div className="flex items-start gap-5">
-                    {/* Logo */}
                     <div
                         className={`w-16 h-16 rounded-xl ${job.logoBg || 'bg-gray-100'} flex items-center justify-center text-2xl font-bold shrink-0 border border-gray-100 shadow-sm transition-transform group-hover:scale-105 duration-300`}
                     >
@@ -25,7 +24,6 @@ export default function JobCard({ job }: JobCardProps) {
                         )}
                     </div>
 
-                    {/* Main Content */}
                     <div className="flex-1 min-w-0">
                         <div className="flex justify-between items-start mb-3">
                             <div className="flex-1 pr-4">
@@ -60,7 +58,7 @@ export default function JobCard({ job }: JobCardProps) {
                                 <span className="line-clamp-1">{job.location || 'Remote'}</span>
                             </span>
                             <span className="flex items-center gap-1.5 font-medium">
-                                <Briefcase className="w-4 h-4 text-gray-400" /> {job.jobType || job.type || 'Full-time'}
+                                <Briefcase className="w-4 h-4 text-gray-400" /> {job.type || 'Full-time'}
                             </span>
                         </div>
 
@@ -69,7 +67,7 @@ export default function JobCard({ job }: JobCardProps) {
                             <span
                                 className={`${job.typeBg || 'bg-blue-100 text-blue-600'} text-xs px-3 py-1 font-bold uppercase tracking-wider rounded-full shadow-sm`}
                             >
-                                {job.jobType || job.type || 'Full-time'}
+                                {job.type || 'Full-time'}
                             </span>
                             <Link
                                 to={`/jobs/${job.id}`}

@@ -2,6 +2,7 @@ import { useParams, Link } from "react-router-dom";
 import PageWrapper from "../layouts/PageWrapper";
 import Loader from "../ui/Loader";
 import usePageLoader from "../../hooks/usePageLoader";
+import { useEffect, useState } from "react";
 import {
     ChevronRight,
     MapPin,
@@ -9,17 +10,45 @@ import {
     Twitter,
     Linkedin,
     Link2,
+    Globe,
+    Phone,
+    Mail,
 } from "lucide-react";
-import { employers } from "../../data/employers";
+import { employers as defaultEmployers } from "../../data/employers";
 import { jobs } from "../../data/jobs";
 import JobCard from "../ui/JobCard";
+import { getEmployerById, type EmployerData } from "../../services/employerService";
 
 export default function EmployerDetailPage() {
     const isLoading = usePageLoader(1000);
     const { id } = useParams();
-    const employer = employers.find((e) => e.id === id);
+    const [employer, setEmployer] = useState<EmployerData | null>(null);
+    const [apiLoading, setApiLoading] = useState(true);
 
-    if (isLoading) {
+    useEffect(() => {
+        const fetchEmployer = async () => {
+            try {
+                if (!id) {
+                    setApiLoading(false);
+                    return;
+                }
+                
+                const data = await getEmployerById(id);
+                setEmployer(data);
+            } catch (error) {
+                console.error("Error fetching employer:", error);
+                // Fallback to default data
+                const defaultEmp = defaultEmployers.find(e => e.id === id);
+                setEmployer(defaultEmp as any);
+            } finally {
+                setApiLoading(false);
+            }
+        };
+
+        fetchEmployer();
+    }, [id]);
+
+    if (isLoading || apiLoading) {
         return <Loader />;
     }
 
@@ -250,10 +279,10 @@ export default function EmployerDetailPage() {
                             <div className="bg-white p-8 border border-gray-100 shadow-sm rounded-sm mb-8">
                                 <div className="flex flex-col md:flex-row gap-6 items-start">
                                     {/* Logo */}
-                                    <div className="w-32 h-32 border border-gray-200 flex items-center justify-center p-2 bg-white flex-shrink-0">
+                                    <div className="w-32 h-32 border border-gray-200 flex items-center justify-center p-2 bg-white shrink-0">
                                         <img
-                                            src={employer.logo}
-                                            alt={`${employer.name} Logo`}
+                                            src={employer.logo || "https://via.placeholder.com/128"}
+                                            alt={`${employer.companyName || (employer as any).name} Logo`}
                                             className="w-full h-full object-contain"
                                         />
                                     </div>
@@ -261,7 +290,7 @@ export default function EmployerDetailPage() {
                                     {/* Details */}
                                     <div className="flex-1">
                                         <h2 className="text-2xl font-bold text-gray-900 mb-1">
-                                            {employer.name}
+                                            {employer.companyName || (employer as any).name}
                                         </h2>
                                         <p className="text-gray-500 text-sm mb-3">
                                             {employer.description}
@@ -269,6 +298,59 @@ export default function EmployerDetailPage() {
                                         <div className="flex items-center gap-2 text-gray-500 text-sm mb-6">
                                             <MapPin className="w-4 h-4 text-[#ff6b6b]" />
                                             <span>{employer.location}</span>
+                                        </div>
+
+                                        {/* Contact & Links */}
+                                        <div className="border-t border-gray-100 pt-6">
+                                            <div className="grid grid-cols-1 md:grid-cols-2 gap-y-3 gap-x-8 text-sm">
+                                                {employer.website && (
+                                                    <div className="flex items-center gap-3">
+                                                        <Globe className="w-4 h-4 text-[#00b4d8]" />
+                                                        <a
+                                                            href={employer.website}
+                                                            target="_blank"
+                                                            rel="noopener noreferrer"
+                                                            className="text-gray-600 hover:text-[#00b4d8] transition-colors"
+                                                        >
+                                                            {employer.website.replace(/^https?:\/\//, "")}
+                                                        </a>
+                                                    </div>
+                                                )}
+                                                {employer.contactEmail && (
+                                                    <div className="flex items-center gap-3">
+                                                        <Mail className="w-4 h-4 text-[#00b4d8]" />
+                                                        <a
+                                                            href={`mailto:${employer.contactEmail}`}
+                                                            className="text-gray-600 hover:text-[#00b4d8] transition-colors"
+                                                        >
+                                                            {employer.contactEmail}
+                                                        </a>
+                                                    </div>
+                                                )}
+                                                {employer.contactPhone && (
+                                                    <div className="flex items-center gap-3">
+                                                        <Phone className="w-4 h-4 text-[#00b4d8]" />
+                                                        <a
+                                                            href={`tel:${employer.contactPhone}`}
+                                                            className="text-gray-600 hover:text-[#00b4d8] transition-colors"
+                                                        >
+                                                            {employer.contactPhone}
+                                                        </a>
+                                                    </div>
+                                                )}
+                                                {employer.industry && (
+                                                    <div className="flex items-center gap-3">
+                                                        <span className="text-sm font-bold text-gray-700">Industry:</span>
+                                                        <span className="text-gray-600">{employer.industry}</span>
+                                                    </div>
+                                                )}
+                                                {employer.companySize && (
+                                                    <div className="flex items-center gap-3">
+                                                        <span className="text-sm font-bold text-gray-700">Size:</span>
+                                                        <span className="text-gray-600">{employer.companySize}</span>
+                                                    </div>
+                                                )}
+                                            </div>
                                         </div>
 
                                         {/* Share & Socials */}
@@ -287,75 +369,54 @@ export default function EmployerDetailPage() {
                                                     <button className="text-gray-400 hover:text-blue-700 transition-colors">
                                                         <Linkedin className="w-4 h-4" />
                                                     </button>
-                                                    <button className="text-gray-400 hover:text-red-500 transition-colors">
-                                                        <span className="font-bold">G+</span>
-                                                    </button>
                                                 </div>
                                             </div>
-
-                                            <div className="grid grid-cols-1 md:grid-cols-2 gap-y-3 gap-x-8 text-sm">
-                                                {employer.socials.website && (
-                                                    <div className="flex items-center gap-3">
-                                                        <Link2 className="w-4 h-4 text-[#00b4d8]" />
-                                                        <a
-                                                            href={employer.socials.website}
-                                                            target="_blank"
-                                                            rel="noopener noreferrer"
-                                                            className="text-gray-600 hover:text-[#00b4d8] transition-colors"
-                                                        >
-                                                            {employer.socials.website.replace(
-                                                                /^https?:\/\//,
-                                                                "",
-                                                            )}
-                                                        </a>
-                                                    </div>
-                                                )}
-                                                {employer.socials.facebook && (
-                                                    <div className="flex items-center gap-3">
-                                                        <Facebook className="w-4 h-4 text-[#00b4d8]" />
-                                                        <span className="text-gray-600">
-                                                            {employer.socials.facebook}
-                                                        </span>
-                                                    </div>
-                                                )}
-                                                {employer.socials.twitter && (
-                                                    <div className="flex items-center gap-3">
-                                                        <Twitter className="w-4 h-4 text-[#00b4d8]" />
-                                                        <span className="text-gray-600">
-                                                            {employer.socials.twitter}
-                                                        </span>
-                                                    </div>
-                                                )}
-                                                {employer.socials.linkedin && (
-                                                    <div className="flex items-center gap-3">
-                                                        <Linkedin className="w-4 h-4 text-[#00b4d8]" />
-                                                        <span className="text-gray-600">
-                                                            {employer.socials.linkedin}
-                                                        </span>
-                                                    </div>
-                                                )}
-                                                {employer.socials.googlePlus && (
-                                                    <div className="flex items-center gap-3">
-                                                        <span className="w-4 h-4 text-[#00b4d8] font-bold flex items-center justify-center">
-                                                            G+
-                                                        </span>
-                                                        <span className="text-gray-600">
-                                                            {employer.socials.googlePlus}
-                                                        </span>
-                                                    </div>
-                                                )}
-                                                {employer.socials.pinterest && (
-                                                    <div className="flex items-center gap-3">
-                                                        <span className="w-4 h-4 text-[#00b4d8] font-bold flex items-center justify-center">
-                                                            P
-                                                        </span>
-                                                        <span className="text-gray-600">
-                                                            {employer.socials.pinterest}
-                                                        </span>
-                                                    </div>
-                                                )}
-                                            </div>
                                         </div>
+
+                                        {/* Fallback for old data format with socials */}
+                                        {(employer as any).socials && (
+                                            <div className="border-t border-gray-100 pt-6">
+                                                <div className="grid grid-cols-1 md:grid-cols-2 gap-y-3 gap-x-8 text-sm">
+                                                    {(employer as any).socials.website && (
+                                                        <div className="flex items-center gap-3">
+                                                            <Link2 className="w-4 h-4 text-[#00b4d8]" />
+                                                            <a
+                                                                href={(employer as any).socials.website}
+                                                                target="_blank"
+                                                                rel="noopener noreferrer"
+                                                                className="text-gray-600 hover:text-[#00b4d8] transition-colors"
+                                                            >
+                                                                {(employer as any).socials.website.replace(/^https?:\/\//, "")}
+                                                            </a>
+                                                        </div>
+                                                    )}
+                                                    {(employer as any).socials.facebook && (
+                                                        <div className="flex items-center gap-3">
+                                                            <Facebook className="w-4 h-4 text-[#00b4d8]" />
+                                                            <span className="text-gray-600">
+                                                                {(employer as any).socials.facebook}
+                                                            </span>
+                                                        </div>
+                                                    )}
+                                                    {(employer as any).socials.twitter && (
+                                                        <div className="flex items-center gap-3">
+                                                            <Twitter className="w-4 h-4 text-[#00b4d8]" />
+                                                            <span className="text-gray-600">
+                                                                {(employer as any).socials.twitter}
+                                                            </span>
+                                                        </div>
+                                                    )}
+                                                    {(employer as any).socials.linkedin && (
+                                                        <div className="flex items-center gap-3">
+                                                            <Linkedin className="w-4 h-4 text-[#00b4d8]" />
+                                                            <span className="text-gray-600">
+                                                                {(employer as any).socials.linkedin}
+                                                            </span>
+                                                        </div>
+                                                    )}
+                                                </div>
+                                            </div>
+                                        )}
                                     </div>
                                 </div>
                             </div>
@@ -363,10 +424,10 @@ export default function EmployerDetailPage() {
                             {/* Company Description */}
                             <div className="bg-white p-8 border border-gray-100 shadow-sm rounded-sm mb-8">
                                 <h3 className="text-xl font-bold text-gray-900 mb-4">
-                                    About {employer.name}
+                                    About {employer.companyName || (employer as any).name}
                                 </h3>
                                 <div className="prose prose-sm max-w-none text-gray-600 leading-relaxed">
-                                    {employer.fullDescription || "No description added."}
+                                    {(employer as any).fullDescription || employer.description || "No description added."}
                                 </div>
                             </div>
 
@@ -376,10 +437,10 @@ export default function EmployerDetailPage() {
                                     Open Positions
                                 </h3>
                                 <div className="grid grid-cols-1 gap-6">
-                                    {jobs.filter((job) => job.employerId === employer.id)
+                                    {jobs.filter((job) => job.employerId === employer.id || job.employerId === employer._id)
                                         .length > 0 ? (
                                         jobs
-                                            .filter((job) => job.employerId === employer.id)
+                                            .filter((job) => job.employerId === employer.id || job.employerId === employer._id)
                                             .map((job) => <JobCard key={job.id} job={job} />)
                                     ) : (
                                         <div className="bg-white p-6 rounded border border-gray-100 text-center text-gray-500">

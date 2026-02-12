@@ -110,6 +110,7 @@ export default function JobDetailPage() {
               onClose={() => setIsApplyModalOpen(false)}
               jobTitle={job.title}
               companyName={job.company}
+              jobId={job.id}
             />
 
             {/* Job Description */}
