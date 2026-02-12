@@ -2,7 +2,6 @@ import React, { useState, useEffect } from "react";
 import DashboardLayout from "../../../layouts/DashboardLayout";
 import { useAuth } from "../../../../contexts/AuthContext";
 import api from "../../../../services/ApiSetter";
-
 import type {
   WorkExperience,
   EducationHistory,

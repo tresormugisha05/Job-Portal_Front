@@ -15,6 +15,8 @@ import { Link } from "react-router-dom";
 import { useState, useEffect } from "react";
 import api from "../../../../services/ApiSetter";
 import { useAuth } from "../../../../contexts/AuthContext";
+import { getJobsByEmployer, deleteJob } from "../../../../services/jobService";
+import { getEmployerByUserId } from "../../../../services/employerService";
 
 export default function ManageJobs() {
   const { user } = useAuth();
