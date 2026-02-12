@@ -5,7 +5,7 @@ import Loader from "../ui/Loader";
 import usePageLoader from "../../hooks/usePageLoader";
 import JobCard from "../ui/JobCard";
 import PageHeader from "../ui/PageHeader";
-import api from "../../services/Service";
+import api from "../../services/ApiSetter";
 
 export default function JobsListPage() {
   const isLoading = usePageLoader(1000);

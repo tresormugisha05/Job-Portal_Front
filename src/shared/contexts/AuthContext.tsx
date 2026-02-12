@@ -89,7 +89,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const login = async (email: string, password: string) => {
     try {
-      const response = await api.post("/api/users/login", {
+      const response = await api.post("/auth/login", {
         email,
         password,
       });
@@ -126,7 +126,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         email: userData.email,
         phone: userData.phone,
         password: userData.password,
-        role: userData.role
+        role: userData.role,
       });
       const { token, user: userDataFromApi } = response.data;
 

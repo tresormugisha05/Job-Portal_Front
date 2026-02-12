@@ -81,8 +81,14 @@ export default function App() {
           <Route path="/dashboard/admin/stats" element={<AdminStats />} />
           <Route path="/dashboard/admin/jobs" element={<AdminJobs />} />
           <Route path="/dashboard/admin/users" element={<AdminUsers />} />
-          <Route path="/dashboard/admin/applications" element={<AdminApplications />} />
-          <Route path="/dashboard/admin/categories" element={<AdminCategories />} />
+          <Route
+            path="/dashboard/admin/applications"
+            element={<AdminApplications />}
+          />
+          <Route
+            path="/dashboard/admin/categories"
+            element={<AdminCategories />}
+          />
 
           <Route path="/dashboard/settings" element={<Settings />} />
         </Routes>

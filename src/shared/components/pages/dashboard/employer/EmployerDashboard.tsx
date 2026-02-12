@@ -137,7 +137,8 @@ export default function EmployerDashboard() {
       id: app.id || app._id || index,
       name: app.userId?.fullName || app.userId?.name || "Unknown Candidate",
       role: app.userId?.jobTitle || "Candidate",
-      professionalTitle: app.userId?.professionalTitle || app.userId?.jobTitle || "Candidate",
+      professionalTitle:
+        app.userId?.professionalTitle || app.userId?.jobTitle || "Candidate",
       jobTitle: app.jobId?.title || "Unknown Job",
       appliedDate: app.submissionDate
         ? new Date(app.submissionDate).toLocaleDateString("en-US", {
