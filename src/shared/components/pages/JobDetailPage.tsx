@@ -126,10 +126,7 @@ export default function JobDetailPage() {
               onClose={() => setIsApplyModalOpen(false)}
               jobTitle={job.title}
               companyName={job.company}
-<<<<<<< Updated upstream
-=======
               jobId={job._id || job.id}
->>>>>>> Stashed changes
             />
 
             {/* Job Description */}

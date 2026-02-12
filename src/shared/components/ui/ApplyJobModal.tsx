@@ -8,6 +8,7 @@ interface ApplyJobModalProps {
     onClose: () => void;
     jobTitle: string;
     companyName: string;
+    jobId?: string;
 }
 
 export default function ApplyJobModal({
