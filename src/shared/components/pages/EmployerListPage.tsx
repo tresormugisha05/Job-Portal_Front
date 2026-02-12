@@ -9,7 +9,7 @@ import {
   getAllEmployers,
   type EmployerData,
 } from "../../services/employerService";
-import { getAllJobs, type JobData } from "../../services/jobService";
+import { getAllJobs } from "../../services/jobService";
 
 interface EmployerWithOpenings extends EmployerData {
   openings: number;
