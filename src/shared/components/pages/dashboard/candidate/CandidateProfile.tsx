@@ -22,7 +22,7 @@ import {
   AlertCircle,
 } from "lucide-react";
 
-type UserRole = "CANDIDATE" | "EMPLOYER" | "ADMIN";
+//type UserRole = "CANDIDATE" | "EMPLOYER" | "ADMIN";
 
 export default function CandidateProfile() {
   const { user, updateProfile } = useAuth();
