@@ -2,8 +2,9 @@ import DashboardLayout from "../../../layouts/DashboardLayout";
 import { Briefcase, Eye, Edit3, Trash2, Search, Filter, Plus, Clock, MapPin, Users } from "lucide-react";
 import { Link } from "react-router-dom";
 import { useState, useEffect } from "react";
-import api from "../../../../services/Service";
 import { useAuth } from "../../../../contexts/AuthContext";
+import { getJobsByEmployer, deleteJob } from "../../../../services/jobService";
+import { getEmployerByUserId } from "../../../../services/employerService";
 
 export default function ManageJobs() {
     const { user } = useAuth();
@@ -19,8 +20,12 @@ export default function ManageJobs() {
     const fetchJobs = async () => {
         try {
             setLoading(true);
-            const response = await api.get(`/api/jobs/employer/${user?.id}`);
-            setJobs(response.data.data || []);
+            const employerData = await getEmployerByUserId(user?.id || "");
+            if (employerData) {
+                const employerId = employerData.id || employerData._id || "";
+                const jobsData = await getJobsByEmployer(employerId);
+                setJobs(jobsData);
+            }
         } catch (error) {
             console.error("Error fetching jobs:", error);
         } finally {
@@ -31,8 +36,8 @@ export default function ManageJobs() {
     const handleDelete = async (jobId: string) => {
         if (!confirm("Are you sure you want to delete this job?")) return;
         try {
-            await api.delete(`/api/jobs/${jobId}`);
-            setJobs(jobs.filter(job => job._id !== jobId));
+            await deleteJob(jobId);
+            setJobs(jobs.filter(job => (job.id || job._id) !== jobId));
         } catch (error) {
             console.error("Error deleting job:", error);
             alert("Failed to delete job");
