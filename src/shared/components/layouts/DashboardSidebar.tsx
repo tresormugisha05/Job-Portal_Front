@@ -134,19 +134,15 @@ export default function DashboardSidebar() {
 
       <nav className="flex-1 px-4 space-y-1">
         {filteredItems.map((item) => {
-          const isActive =
-            location.pathname === item.path ||
-            (item.path === "/dashboard" &&
-              location.pathname === "/dashboard/profile");
+          const isActive = location.pathname === item.path;
           return (
             <Link
               key={item.label}
               to={item.path}
-              className={`flex items-center gap-3 px-4 py-3 rounded-lg transition-all ${
-                isActive
+              className={`flex items-center gap-3 px-4 py-3 rounded-lg transition-all ${isActive
                   ? "bg-[#00b4d8] text-white"
                   : "text-gray-400 hover:bg-white/5 hover:text-white"
-              }`}
+                }`}
             >
               {item.icon}
               <span className="font-medium">{item.label}</span>

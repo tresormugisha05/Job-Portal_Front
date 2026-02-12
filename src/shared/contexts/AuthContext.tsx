@@ -152,8 +152,17 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     if (!user) return;
 
     try {
-      const response = await api.put(`/api/auth/${user.id}`, updates);
+      const response = await api.put(`auth/${user.id}`, updates);
       const updatedUser = response.data.data;
+
+      if (updatedUser && !updatedUser.id && updatedUser._id) {
+        updatedUser.id = updatedUser._id;
+      }
+
+      // Normalize role to uppercase
+      if (updatedUser && updatedUser.role) {
+        updatedUser.role = updatedUser.role.toUpperCase() as UserRole;
+      }
 
       setUser(updatedUser);
       localStorage.setItem("job_portal_user", JSON.stringify(updatedUser));
