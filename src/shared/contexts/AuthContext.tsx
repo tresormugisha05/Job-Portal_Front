@@ -19,12 +19,13 @@ export interface EducationHistory {
 }
 
 interface User {
-  id: string;
+  id?: string;
+  _id?: string;
   name: string;
   email: string;
   avatar?: string;
-  role: UserRole; // This is the system role
-  professionalTitle?: string; // Standardized title field
+  role: UserRole;
+  professionalTitle?: string;
   location?: string;
   experience?: string;
   education?: string;
@@ -61,42 +62,36 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     return savedUser ? JSON.parse(savedUser) : null;
   });
 
-  const login = async (email: string) => {
-    // Simulate API delay
-    await new Promise((resolve) => setTimeout(resolve, 1000));
+  const login = async (email: string, password: string) => {
+    try {
+      const response = await api.post("/auth/login", { email, password });
+      
+      // Extract token and user from various possible response formats
+      let token = response.data.token;
+      let userDataFromApi = response.data.user || response.data;
+      
+      // If user object has nested structure, extract it as well 
+      if (userDataFromApi.user && userDataFromApi.token) {
+        token = userDataFromApi.token;
+        userDataFromApi = userDataFromApi.user;
+      }
 
-    let mockUser: User;
+      // Ensure id is always set from _id
+      const userData = {
+        ...userDataFromApi,
+        id: userDataFromApi._id || userDataFromApi.id,
+      };
 
-    // Simple mock logic: admin email gets admin role, otherwise based on a "database" simulation
-    // In a real app, this would be a backend call
-    if (email.includes("admin")) {
-      mockUser = {
-        id: "a1",
-        name: "System Admin",
-        email,
-        role: "ADMIN",
-        avatar: "SA",
-      };
-    } else if (email.includes("employer")) {
-      mockUser = {
-        id: "e1",
-        name: "Tech Corp",
-        email,
-        role: "EMPLOYER",
-        avatar: "TC",
-      };
-    } else {
-      mockUser = {
-        id: "c1",
-        name: "John Doe",
-        email,
-        role: "CANDIDATE",
-        avatar: "JD",
-      };
+      console.log("Login response data:", response.data);
+      console.log("Login user mapped with id:", userData.id);
+      
+      localStorage.setItem("token", token);
+      localStorage.setItem("job_portal_user", JSON.stringify(userData));
+
+      setUser(userData);
+    } catch (error: any) {
+      throw new Error(error.response?.data?.message || "Invalid credentials");
     }
-
-    setUser(mockUser);
-    localStorage.setItem("job_portal_user", JSON.stringify(mockUser));
   };
 
   const register = async (userData: {
@@ -107,32 +102,67 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     role: "CANDIDATE" | "EMPLOYER";
   }) => {
     try {
-      const response = await api.post("/api/candidates/register", userData);
-      const { token, user: userDataFromApi } = response.data;
+      const response = await api.post("/auth/register", userData);
+      
+      // Handle both response formats
+      const userDataFromApi = response.data.user || response.data;
+      const token = response.data.token;
+
+      // Ensure id is set from _id
+      const user_data = {
+        ...userDataFromApi,
+        id: userDataFromApi._id,
+      };
 
       localStorage.setItem("token", token);
-      localStorage.setItem("job_portal_user", JSON.stringify(userDataFromApi));
+      localStorage.setItem("job_portal_user", JSON.stringify(user_data));
 
-      setUser(userDataFromApi);
+      setUser(user_data);
     } catch (error: any) {
       throw new Error(error.response?.data?.message || "Registration failed");
     }
   };
 
   const updateProfile = async (updates: Partial<User>) => {
-    // Simulate API delay
-    await new Promise((resolve) => setTimeout(resolve, 1000));
-
     if (user) {
-      const updatedUser = { ...user, ...updates };
-      setUser(updatedUser);
-      localStorage.setItem("job_portal_user", JSON.stringify(updatedUser));
+      try {
+        // Use id or fallback to _id
+        const userId = user.id || user._id;
+        
+        const updatedData = {
+          ...user,
+          ...updates,
+        };
+        
+        console.log("Sending update to backend with userId:", userId, "data:", updatedData);
+        const response = await api.put(`/auth/${userId}`, updatedData);
+        
+        console.log("Backend response:", response.data);
+        
+        // Handle both response.data and response.data.data formats
+        const updatedUser = response.data.data || response.data;
+        
+        // Ensure id is set from _id
+        const finalUser = {
+          ...updatedUser,
+          id: updatedUser._id || updatedUser.id,
+        };
+        
+        console.log("Updated user from response:", finalUser);
+        
+        setUser(finalUser);
+        localStorage.setItem("job_portal_user", JSON.stringify(finalUser));
+      } catch (error: any) {
+        console.error("Update profile error:", error.response?.data);
+        throw new Error(error.response?.data?.message || "Failed to update profile");
+      }
     }
   };
 
   const logout = () => {
     setUser(null);
     localStorage.removeItem("job_portal_user");
+    localStorage.removeItem("token");
   };
 
   const value = {

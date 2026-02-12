@@ -45,8 +45,8 @@ export default function ApplyJobModal({
             }
             
             // Validate file size (5MB max)
-            if (file.size > 5 * 1024 * 1024) {
-                setError('File size must be less than 5MB');
+            if (file.size > 7 * 1024 * 1024) {
+                setError('File size must be less than 7MB');
                 return;
             }
             
@@ -60,6 +60,7 @@ export default function ApplyJobModal({
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
+        e.stopPropagation(); // Prevent any parent form submission
 
         // Validate form
         if (!formData.name.trim()) {
@@ -76,7 +77,7 @@ export default function ApplyJobModal({
         }
 
         setIsSubmitting(true);
-        setError('');
+        setError(''); // Clear previous errors
 
         // Validate jobId
         if (!jobId) {
@@ -109,8 +110,12 @@ export default function ApplyJobModal({
 
             console.log('Application submitted successfully:', submittedApplication);
             setIsSuccess(true);
+            // Form stays visible for user to see success or error state
         } catch (err) {
-            setError(err instanceof Error ? err.message : 'Failed to submit application. Please try again.');
+            const errorMessage = err instanceof Error ? err.message : 'Failed to submit application. Please try again.';
+            setError(errorMessage);
+            console.error('Application submission error:', errorMessage);
+            // Keep form visible so user can see the error
         } finally {
             setIsSubmitting(false);
         }
