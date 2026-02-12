@@ -121,7 +121,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     role: "CANDIDATE" | "EMPLOYER";
   }) => {
     try {
-      const response = await api.post("/users/register", {
+      const response = await api.post("/auth/register", {
         name: userData.name,
         email: userData.email,
         phone: userData.phone,
