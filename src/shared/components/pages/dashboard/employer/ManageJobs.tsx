@@ -5,28 +5,39 @@ import { useState, useEffect } from "react";
 import api from "../../../../services/Service";
 import { useAuth } from "../../../../contexts/AuthContext";
 
+interface Job {
+    _id: string;
+    title: string;
+    jobType?: string;
+    type?: string;
+    location: string;
+    applicants?: unknown[];
+    createdAt: string;
+    isActive: boolean;
+}
+
 export default function ManageJobs() {
     const { user } = useAuth();
-    const [jobs, setJobs] = useState<any[]>([]);
+    const [jobs, setJobs] = useState<Job[]>([]);
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
-        if (user?.id) {
-            fetchJobs();
-        }
+        const fetchJobs = async () => {
+            if (!user?.id) return;
+            
+            try {
+                setLoading(true);
+                const response = await api.get(`/api/jobs/employer/${user.id}`);
+                setJobs(response.data.data || []);
+            } catch (error) {
+                console.error("Error fetching jobs:", error);
+            } finally {
+                setLoading(false);
+            }
+        };
+        
+        fetchJobs();
     }, [user?.id]);
-
-    const fetchJobs = async () => {
-        try {
-            setLoading(true);
-            const response = await api.get(`/api/jobs/employer/${user?.id}`);
-            setJobs(response.data.data || []);
-        } catch (error) {
-            console.error("Error fetching jobs:", error);
-        } finally {
-            setLoading(false);
-        }
-    };
 
     const handleDelete = async (jobId: string) => {
         if (!confirm("Are you sure you want to delete this job?")) return;

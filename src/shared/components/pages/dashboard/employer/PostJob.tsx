@@ -1,33 +1,35 @@
 ﻿import { useState, useRef } from "react";
-import DashboardLayout from "../../layouts/DashboardLayout";
-import DashboardSection from "./components/DashboardSection";
+import DashboardLayout from "../../../layouts/DashboardLayout";
+import DashboardSection from "../components/DashboardSection";
 import {
     Briefcase, Building2, Send, CheckCircle2,
     Loader2, Image as ImageIcon, X, Upload, Plus, Trash2,
     DollarSign, MapPin, GraduationCap, Award, Tag
 } from "lucide-react";
-import jobService from "../../../services/Job.Service"; // Import jobService
+import api from "../../../../services/Service";
+import { useAuth } from "../../../../contexts/AuthContext";
 
 export default function PostJob() {
+    const { user } = useAuth();
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [isSuccess, setIsSuccess] = useState(false);
+    const [error, setError] = useState<string | null>(null);
+    const [, setBanner] = useState<File | null>(null);
     const [bannerPreview, setBannerPreview] = useState<string | null>(null);
     const fileInputRef = useRef<HTMLInputElement>(null);
 
     const [formData, setFormData] = useState({
         title: "",
-        company: "Pay Walt", // Placeholder, ideally fetched from auth context
+        company: "",
         location: "",
-        type: "Full-time", // Changed to match backend enum
+        type: "FULL TIME",
         salary: "",
         experience: "",
         education: "",
         description: "",
-        tags: [] as string[], // Initialize as empty array
-        responsibilities: [""] as string[],
-        requirements: [""] as string[],
-        category: "Technology", // Added category, default value
-        deadline: "" // Added deadline
+        tags: [] as string[],
+        responsibilities: [""],
+        requirements: [""]
     });
 
     const [newTag, setNewTag] = useState("");
@@ -82,33 +84,34 @@ export default function PostJob() {
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         setIsSubmitting(true);
-        // Assuming employerId is available from an auth context or hardcoded for now
-        const employerId = "65e6488d0111bb1f2b60b7e2"; // Replace with actual employer ID
-
-        const payload = {
-            ...formData,
-            image: bannerPreview || undefined, // Use banner preview as image, or undefined if not present
-            employerId,
-            // Ensure responsibilities and requirements are sent as arrays of strings, filtering out empty strings
-            responsibilities: formData.responsibilities.filter(Boolean),
-            requirements: formData.requirements.filter(Boolean),
-            // deadline is currently a string, backend expects Date. We'll need to transform this.
-            // For now, let's assume it's sent as a string and handled by backend or convert it here.
-            // Converting to ISO string for backend
-            deadline: new Date(formData.deadline).toISOString(),
-            // Ensure category is part of payload
-            category: formData.category,
-        };
-        
-        console.log("Submitting job payload:", payload);
+        setError(null);
 
         try {
-            await jobService.addJob(payload);
+            const jobData = {
+                title: formData.title,
+                company: formData.company || user?.name || "Company",
+                location: formData.location,
+                jobType: "Full-time",
+                type: formData.type,
+                typeBg: "bg-blue-100 text-blue-600",
+                logoBg: "bg-blue-50",
+                salary: formData.salary,
+                experience: formData.experience,
+                education: formData.education,
+                description: formData.description,
+                responsibilities: formData.responsibilities.filter(r => r.trim()),
+                requirements: formData.requirements.filter(r => r.trim()),
+                tags: formData.tags,
+                category: formData.tags[0] || "Technology",
+                deadline: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString(),
+                employerId: user?.id
+            };
+
+            await api.post("/api/jobs", jobData);
             setIsSuccess(true);
-        } catch (error) {
-            console.error("Failed to post job:", error);
-            alert("Failed to post job. Please try again.");
-            setIsSuccess(false);
+        } catch (err: unknown) {
+            console.error("Error posting job:", err);
+            setError("Failed to post job. Please try again.");
         } finally {
             setIsSubmitting(false);
         }
@@ -125,12 +128,35 @@ export default function PostJob() {
                     <p className="text-gray-500 max-w-md mb-8">
                         Your listing for <span className="font-bold text-[#00b4d8]">{formData.title}</span> has been published.
                     </p>
-                    <button
-                        onClick={() => setIsSuccess(false)}
-                        className="bg-[#00b4d8] hover:bg-[#009bc2] text-white px-8 py-3 rounded-lg font-bold uppercase tracking-wider transition-all shadow-md active:scale-95"
-                    >
-                        Post Another Job
-                    </button>
+                    <div className="flex gap-4">
+                        <button
+                            onClick={() => {
+                                setIsSuccess(false);
+                                setFormData({
+                                    title: "",
+                                    company: "",
+                                    location: "",
+                                    type: "FULL TIME",
+                                    salary: "",
+                                    experience: "",
+                                    education: "",
+                                    description: "",
+                                    tags: [],
+                                    responsibilities: [""],
+                                    requirements: [""]
+                                });
+                            }}
+                            className="bg-[#00b4d8] hover:bg-[#009bc2] text-white px-8 py-3 rounded-lg font-bold uppercase tracking-wider transition-all shadow-md active:scale-95"
+                        >
+                            Post Another Job
+                        </button>
+                        <a
+                            href="/dashboard/manage-jobs"
+                            className="bg-gray-100 hover:bg-gray-200 text-gray-700 px-8 py-3 rounded-lg font-bold uppercase tracking-wider transition-all shadow-md active:scale-95"
+                        >
+                            View My Jobs
+                        </a>
+                    </div>
                 </div>
             </DashboardLayout>
         );
@@ -144,6 +170,11 @@ export default function PostJob() {
             </div>
 
             <form onSubmit={handleSubmit} className="max-w-5xl space-y-8 pb-20 text-left">
+                {error && (
+                    <div className="bg-red-50 border border-red-200 text-red-700 px-6 py-4 rounded-xl">
+                        {error}
+                    </div>
+                )}
                 <DashboardSection title="Job Banner / Flyer">
                     <p className="text-xs text-gray-400 uppercase font-bold tracking-widest mb-4">Promotional visual for the job page</p>
                     {bannerPreview ? (
@@ -294,44 +325,12 @@ export default function PostJob() {
                                         onChange={(e) => setFormData({ ...formData, type: e.target.value })}
                                         className="w-full px-4 py-3 bg-white border border-gray-100 rounded-xl focus:border-[#00b4d8] outline-none appearance-none font-semibold text-left"
                                     >
-                                        <option value="Full-time">Full-time</option>
-                                        <option value="Part-time">Part-time</option>
-                                        <option value="Contract">Contract</option>
-                                        <option value="Internship">Internship</option>
-                                        <option value="Remote">Remote</option>
+                                        <option>FULL TIME</option>
+                                        <option>PART TIME</option>
+                                        <option>FREELANCE</option>
+                                        <option>CONTRACT</option>
+                                        <option>INTERNSHIP</option>
                                     </select>
-                                </div>
-
-                                <div className="space-y-2">
-                                    <label className="text-xs font-bold text-gray-500 uppercase tracking-widest flex items-center gap-2">
-                                        <Building2 className="w-3 h-3" /> Job Category
-                                    </label>
-                                    <select
-                                        value={formData.category}
-                                        onChange={(e) => setFormData({ ...formData, category: e.target.value })}
-                                        className="w-full px-4 py-3 bg-white border border-gray-100 rounded-xl focus:border-[#00b4d8] outline-none appearance-none font-semibold text-left"
-                                    >
-                                        <option value="Technology">Technology</option>
-                                        <option value="Healthcare">Healthcare</option>
-                                        <option value="Finance">Finance</option>
-                                        <option value="Education">Education</option>
-                                        <option value="Marketing">Marketing</option>
-                                        <option value="Sales">Sales</option>
-                                        <option value="Engineering">Engineering</option>
-                                        <option value="Other">Other</option>
-                                    </select>
-                                </div>
-
-                                <div className="space-y-2">
-                                    <label className="text-xs font-bold text-gray-500 uppercase tracking-widest flex items-center gap-2">
-                                        <Send className="w-3 h-3" /> Application Deadline
-                                    </label>
-                                    <input
-                                        type="date"
-                                        value={formData.deadline}
-                                        onChange={(e) => setFormData({ ...formData, deadline: e.target.value })}
-                                        className="w-full px-4 py-3 bg-white border border-gray-100 rounded-xl focus:border-[#00b4d8] outline-none transition-all font-semibold text-left"
-                                    />
                                 </div>
 
                                 <div className="space-y-2">
