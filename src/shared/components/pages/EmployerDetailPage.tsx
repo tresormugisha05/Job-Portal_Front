@@ -15,37 +15,60 @@ import {
     Mail,
 } from "lucide-react";
 import { employers as defaultEmployers } from "../../data/employers";
-import { jobs } from "../../data/jobs";
 import JobCard from "../ui/JobCard";
 import { getEmployerById, type EmployerData } from "../../services/employerService";
+import { getJobsByEmployer } from "../../services/jobService";
+import type { Job } from "../../data/jobs";
 
 export default function EmployerDetailPage() {
     const isLoading = usePageLoader(1000);
     const { id } = useParams();
     const [employer, setEmployer] = useState<EmployerData | null>(null);
+    const [jobs, setJobs] = useState<Job[]>([]);
     const [apiLoading, setApiLoading] = useState(true);
 
     useEffect(() => {
-        const fetchEmployer = async () => {
+        const fetchEmployerAndJobs = async () => {
             try {
                 if (!id) {
                     setApiLoading(false);
                     return;
                 }
-                
-                const data = await getEmployerById(id);
-                setEmployer(data);
+
+                setApiLoading(true);
+
+                // Fetch employer data
+                const employerData = await getEmployerById(id);
+                setEmployer(employerData);
+
+                // Fetch jobs for this employer
+                try {
+                    const jobsData = await getJobsByEmployer(id);
+                    // Map jobs to include company name and tags
+                    const mappedJobs = jobsData
+                        .filter(job => job.isActive !== false)
+                        .map(job => ({
+                            ...job,
+                            company: employerData.companyName,
+                            tags: [] as string[], // Add empty tags array for compatibility
+                        }));
+                    setJobs(mappedJobs as any);
+                } catch (jobError) {
+                    console.error("Error fetching jobs:", jobError);
+                    setJobs([]);
+                }
             } catch (error) {
                 console.error("Error fetching employer:", error);
                 // Fallback to default data
                 const defaultEmp = defaultEmployers.find(e => e.id === id);
                 setEmployer(defaultEmp as any);
+                setJobs([]);
             } finally {
                 setApiLoading(false);
             }
         };
 
-        fetchEmployer();
+        fetchEmployerAndJobs();
     }, [id]);
 
     if (isLoading || apiLoading) {
@@ -316,25 +339,25 @@ export default function EmployerDetailPage() {
                                                         </a>
                                                     </div>
                                                 )}
-                                                {employer.contactEmail && (
+                                                {(employer.email || (employer as any).contactEmail) && (
                                                     <div className="flex items-center gap-3">
                                                         <Mail className="w-4 h-4 text-[#00b4d8]" />
                                                         <a
-                                                            href={`mailto:${employer.contactEmail}`}
+                                                            href={`mailto:${employer.email || (employer as any).contactEmail}`}
                                                             className="text-gray-600 hover:text-[#00b4d8] transition-colors"
                                                         >
-                                                            {employer.contactEmail}
+                                                            {employer.email || (employer as any).contactEmail}
                                                         </a>
                                                     </div>
                                                 )}
-                                                {employer.contactPhone && (
+                                                {((employer as any).phone || (employer as any).contactPhone) && (
                                                     <div className="flex items-center gap-3">
                                                         <Phone className="w-4 h-4 text-[#00b4d8]" />
                                                         <a
-                                                            href={`tel:${employer.contactPhone}`}
+                                                            href={`tel:${(employer as any).phone || (employer as any).contactPhone}`}
                                                             className="text-gray-600 hover:text-[#00b4d8] transition-colors"
                                                         >
-                                                            {employer.contactPhone}
+                                                            {(employer as any).phone || (employer as any).contactPhone}
                                                         </a>
                                                     </div>
                                                 )}

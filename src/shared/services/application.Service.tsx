@@ -9,6 +9,7 @@ export type ApplicationStatus =
 
 export interface ApplicationModel {
   _id?: string;
+  id?: string;
   jobId: string;
   userId: string;
   employerId: string;
@@ -24,28 +25,28 @@ export interface ApplicationModel {
 
 export const ApplicationService = {
   getAll: async (): Promise<ApplicationModel[]> => {
-    const response = await api.get("applications");
+    const response = await api.get("/applications");
     return response.data.data;
   },
 
   getById: async (id: string): Promise<ApplicationModel> => {
-    const response = await api.get(`applications/${id}`);
+    const response = await api.get(`/applications/${id}`);
     return response.data.data;
   },
 
   getByJob: async (jobId: string): Promise<ApplicationModel[]> => {
-    const response = await api.get(`applications/job/${jobId}`);
+    const response = await api.get(`/applications/job/${jobId}`);
     return response.data.data;
   },
 
   getByUser: async (userId: string): Promise<ApplicationModel[]> => {
-    const response = await api.get(`applications/user/${userId}`);
+    const response = await api.get(`/applications/user/${userId}`);
     return response.data.data;
   },
 
   getByEmployer: async (employerId: string): Promise<ApplicationModel[]> => {
     const response = await api.get(
-      `applications/employer/${employerId}`
+      `/applications/employer/${employerId}`
     );
     return response.data.data;
   },
@@ -55,29 +56,44 @@ export const ApplicationService = {
     data: Partial<ApplicationModel>,
     resume?: File
   ): Promise<ApplicationModel> => {
+    console.log('=== ApplicationService.submit START ===');
+    console.log('jobId:', jobId);
+    console.log('data:', data);
+    console.log('resume:', resume);
+    
     const formData = new FormData();
-
-    formData.append("jobId", jobId);
 
     Object.entries(data).forEach(([key, value]) => {
       if (value !== undefined && value !== null) {
         formData.append(key, String(value));
+        console.log(`FormData appended: ${key} = ${value}`);
       }
     });
 
     if (resume) {
       formData.append("resume", resume);
+      console.log(`FormData appended: resume = File(${resume.name}, ${resume.size} bytes)`);
+    } else {
+      console.log('WARNING: No resume file provided');
     }
 
-    const response = await api.post(
-      `applications/${jobId}`,
-      formData,
-      {
-        headers: { "Content-Type": "multipart/form-data" },
-      }
-    );
+    console.log('Sending POST request to:', `/applications/${jobId}`);
+    
+    try {
+      const response = await api.post(
+        `/applications/${jobId}`,
+        formData
+      );
 
-    return response.data.data;
+      console.log('Response received:', response.data);
+      return response.data.data || response.data;
+    } catch (error: any) {
+      console.error('=== ApplicationService.submit ERROR ===');
+      console.error('Error:', error);
+      console.error('Response data:', error.response?.data);
+      console.error('Response status:', error.response?.status);
+      throw error;
+    }
   },
 
   updateStatus: async (
@@ -86,13 +102,13 @@ export const ApplicationService = {
     notes?: string
   ): Promise<ApplicationModel> => {
     const response = await api.put(
-      `applications/${id}/status`,
+      `/applications/${id}/status`,
       { status, notes }
     );
     return response.data.data;
   },
 
   delete: async (id: string): Promise<void> => {
-    await api.delete(`applications/${id}`);
+    await api.delete(`/applications/${id}`);
   },
 };

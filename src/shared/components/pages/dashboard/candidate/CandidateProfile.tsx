@@ -39,17 +39,14 @@ export default function CandidateProfile() {
   const [formData, setFormData] = useState({
     name: user?.name || "",
     email: user?.email || "",
-    phone: user?.phone || "+250 788 123 456",
-    professionalTitle: user?.professionalTitle || "Frontend Developer",
-    summary:
-      user?.summary ||
-      "Passionate developer with experience in building modern web applications using React and Tailwind CSS. Always eager to learn new technologies and solve complex problems.",
-    location: user?.location || "Kigali, Rwanda",
-    experience: user?.experience || "3 years",
-    education: user?.education || "Bachelor's Degree",
-    skills:
-      user?.skills?.join(", ") || "React, JavaScript, TypeScript, Tailwind CSS",
-    resume: user?.resume || "Jhon_Doe_Resume_2024.pdf",
+    phone: user?.phone || "",
+    professionalTitle: user?.professionalTitle || "",
+    summary: user?.summary || "",
+    location: user?.location || "",
+    experience: user?.experience || "",
+    education: user?.education || "",
+    skills: Array.isArray(user?.skills) ? user.skills.join(", ") : user?.skills || "",
+    resume: user?.resume || "",
   });
 
   const tabs = [
@@ -88,13 +85,13 @@ export default function CandidateProfile() {
       ],
   );
 
-  // Fetch full profile on mount
+  // Fetch full profile on mount and when user changes
   useEffect(() => {
     if (user?.id) {
       const fetchProfile = async () => {
         try {
           const response = await api.get(`/auth/${user.id}`);
-          const fullUser = response.data.data;
+          const fullUser = response.data.data || response.data;
 
           if (fullUser) {
             setFormData({
@@ -114,10 +111,7 @@ export default function CandidateProfile() {
               setWorkExperience(fullUser.workExperience);
             }
 
-            if (
-              fullUser.educationHistory &&
-              fullUser.educationHistory.length > 0
-            ) {
+            if (fullUser.educationHistory && fullUser.educationHistory.length > 0) {
               setEducationHistory(fullUser.educationHistory);
             }
           }
@@ -127,7 +121,7 @@ export default function CandidateProfile() {
       };
       fetchProfile();
     }
-  }, [user?.id]);
+  }, [user?.id, user]);
 
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
@@ -211,6 +205,7 @@ export default function CandidateProfile() {
         .join("")
         .toUpperCase();
 
+      // Call updateProfile and wait for it to complete
       await updateProfile({
         name: formData.name,
         email: formData.email,
@@ -228,6 +223,26 @@ export default function CandidateProfile() {
           (e) => e.degree && e.institution,
         ),
       });
+
+      // After successful update, fetch the latest data from backend
+      if (user?.id) {
+        const response = await api.get(`/auth/${user.id}`);
+        const fullUser = response.data.data || response.data;
+        if (fullUser) {
+          setFormData({
+            name: fullUser.name || "",
+            email: fullUser.email || "",
+            phone: fullUser.phone || "",
+            professionalTitle: fullUser.professionalTitle || "",
+            summary: fullUser.summary || "",
+            location: fullUser.location || "",
+            experience: fullUser.experience || "",
+            education: fullUser.education || "",
+            skills: fullUser.skills?.join(", ") || "",
+            resume: fullUser.resume || "",
+          });
+        }
+      }
 
       setStatus({
         type: "success",

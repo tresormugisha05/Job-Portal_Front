@@ -14,6 +14,7 @@ import PricingTablesPage from "./shared/components/pages/PricingTablesPage";
 import PostJobPage from "./shared/components/pages/PostJobPage";
 import LoginPage from "./shared/components/pages/LoginPage";
 import RegisterPage from "./shared/components/pages/RegisterPage";
+import PendingVerification from "./shared/components/pages/PendingVerification";
 
 // Dashboards
 import DashboardRedirect from "./shared/components/pages/dashboard/DashboardRedirect";
@@ -22,6 +23,7 @@ import EmployerDashboard from "./shared/components/pages/dashboard/employer/Empl
 import AdminDashboard from "./shared/components/pages/dashboard/admin/AdminDashboard";
 import PostJob from "./shared/components/pages/dashboard/employer/PostJob";
 import CandidateProfile from "./shared/components/pages/dashboard/candidate/CandidateProfile";
+import CompanyProfile from "./shared/components/pages/dashboard/employer/CompanyProfile";
 
 // Candidate Dashboard Pages
 import AppliedJobs from "./shared/components/pages/dashboard/candidate/AppliedJobs";
@@ -37,6 +39,7 @@ import AdminJobs from "./shared/components/pages/dashboard/admin/AdminJobs";
 import AdminUsers from "./shared/components/pages/dashboard/admin/AdminUsers";
 import AdminApplications from "./shared/components/pages/dashboard/admin/AdminApplications";
 import AdminCategories from "./shared/components/pages/dashboard/admin/AdminCategories";
+import AdminEmployers from "./shared/components/pages/dashboard/admin/AdminEmployers";
 
 // Shared Dashboard Pages
 import Settings from "./shared/components/pages/dashboard/components/Settings";
@@ -60,6 +63,7 @@ export default function App() {
           <Route path="/post-job" element={<PostJobPage />} />
           <Route path="/login" element={<LoginPage />} />
           <Route path="/register" element={<RegisterPage />} />
+          <Route path="/pending-verification" element={<PendingVerification />} />
 
           {/* Dashboards */}
           <Route path="/dashboard" element={<DashboardRedirect />} />
@@ -75,6 +79,7 @@ export default function App() {
           <Route path="/dashboard/manage-jobs" element={<ManageJobs />} />
           <Route path="/dashboard/post-job" element={<PostJob />} />
           <Route path="/dashboard/applicants" element={<Applicants />} />
+          <Route path="/dashboard/company-profile" element={<CompanyProfile />} />
 
           {/* Admin Dashboard */}
           <Route path="/dashboard/admin" element={<AdminDashboard />} />
@@ -88,6 +93,10 @@ export default function App() {
           <Route
             path="/dashboard/admin/categories"
             element={<AdminCategories />}
+          />
+          <Route
+            path="/dashboard/admin/employers"
+            element={<AdminEmployers />}
           />
 
           <Route path="/dashboard/settings" element={<Settings />} />

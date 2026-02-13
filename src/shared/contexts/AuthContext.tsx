@@ -19,12 +19,13 @@ export interface EducationHistory {
 }
 
 interface User {
-  id: string;
+  id?: string;
+  _id?: string;
   name: string;
   email: string;
   avatar?: string;
-  role: UserRole; // This is the system role
-  professionalTitle?: string; // Standardized title field
+  role: UserRole;
+  professionalTitle?: string;
   location?: string;
   experience?: string;
   education?: string;
@@ -35,13 +36,15 @@ interface User {
   initials?: string;
   workExperience?: WorkExperience[];
   educationHistory?: EducationHistory[];
+  isVerified?: boolean; // For employer verification
+  companyName?: string; // For employers
 }
 
 interface AuthContextType {
   user: User | null;
   role: UserRole;
   isAuthenticated: boolean;
-  login: (email: string, password: string) => Promise<void>;
+  login: (email: string, password: string, role?: "CANDIDATE" | "EMPLOYER") => Promise<void>;
   register: (userData: {
     name: string;
     email: string;
@@ -61,42 +64,51 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     return savedUser ? JSON.parse(savedUser) : null;
   });
 
-  const login = async (email: string) => {
-    // Simulate API delay
-    await new Promise((resolve) => setTimeout(resolve, 1000));
+  const login = async (email: string, password: string, role?: "CANDIDATE" | "EMPLOYER") => {
+    try {
+      // Try candidate/admin login first
+      let response;
 
-    let mockUser: User;
+      if (role === "EMPLOYER") {
+        // Direct employer login
+        response = await api.post("/employers/login", { email, password });
+      } else if (role === "CANDIDATE") {
+        // Direct candidate login
+        response = await api.post("/auth/login", { email, password });
+      } else {
+        // Fallback: try candidate first, then employer (for backward compatibility)
+        try {
+          response = await api.post("/auth/login", { email, password });
+        } catch (error) {
+          // If candidate login fails, try employer login
+          try {
+            response = await api.post("/employers/login", { email, password });
+          } catch (employerError) {
+            throw error; // Throw original error if both fail
+          }
+        }
+      }
 
-    // Simple mock logic: admin email gets admin role, otherwise based on a "database" simulation
-    // In a real app, this would be a backend call
-    if (email.includes("admin")) {
-      mockUser = {
-        id: "a1",
-        name: "System Admin",
-        email,
-        role: "ADMIN",
-        avatar: "SA",
+      const data = response.data;
+      const token = data.token;
+
+      // Handle different user object structures
+      const userData = data.user || data.data;
+
+      // Ensure id and role are set correctly
+      const finalUser = {
+        ...userData,
+        id: userData._id || userData.id,
+        role: userData.role || (data.data?.companyName ? "EMPLOYER" : "CANDIDATE")
       };
-    } else if (email.includes("employer")) {
-      mockUser = {
-        id: "e1",
-        name: "Tech Corp",
-        email,
-        role: "EMPLOYER",
-        avatar: "TC",
-      };
-    } else {
-      mockUser = {
-        id: "c1",
-        name: "John Doe",
-        email,
-        role: "CANDIDATE",
-        avatar: "JD",
-      };
+
+      localStorage.setItem("token", token);
+      localStorage.setItem("job_portal_user", JSON.stringify(finalUser));
+      setUser(finalUser);
+
+    } catch (error: any) {
+      throw new Error(error.response?.data?.message || "Invalid credentials");
     }
-
-    setUser(mockUser);
-    localStorage.setItem("job_portal_user", JSON.stringify(mockUser));
   };
 
   const register = async (userData: {
@@ -105,34 +117,75 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     phone: string;
     password: string;
     role: "CANDIDATE" | "EMPLOYER";
+    // Employer specific fields
+    companyName?: string;
+    industry?: string;
+    companySize?: string;
+    description?: string;
+    location?: string;
+    contactPhone?: string;
   }) => {
     try {
-      const response = await api.post("auth/register", userData);
-      const { token, user: userDataFromApi } = response.data;
+      let response;
+      if (userData.role === "EMPLOYER") {
+        // Use employer registration endpoint
+        response = await api.post("/employers/register", {
+          ...userData,
+          companyName: userData.name, // Map name to companyName
+          contactPhone: userData.phone, // Map phone to contactPhone
+        });
+      } else {
+        // Use candidate registration endpoint
+        response = await api.post("/auth/register", userData);
+      }
+
+      const data = response.data;
+      const token = data.token || data.data.token;
+      const userObj = data.user || data.data;
+
+      const finalUser = {
+        ...userObj,
+        id: userObj._id || userObj.id,
+        role: userData.role
+      };
 
       localStorage.setItem("token", token);
-      localStorage.setItem("job_portal_user", JSON.stringify(userDataFromApi));
-
-      setUser(userDataFromApi);
+      localStorage.setItem("job_portal_user", JSON.stringify(finalUser));
+      setUser(finalUser);
     } catch (error: any) {
       throw new Error(error.response?.data?.message || "Registration failed");
     }
   };
 
   const updateProfile = async (updates: Partial<User>) => {
-    // Simulate API delay
-    await new Promise((resolve) => setTimeout(resolve, 1000));
-
     if (user) {
-      const updatedUser = { ...user, ...updates };
-      setUser(updatedUser);
-      localStorage.setItem("job_portal_user", JSON.stringify(updatedUser));
+      try {
+        const userId = user.id || user._id;
+        const isEmployer = user.role === "EMPLOYER";
+        const endpoint = isEmployer ? `/employers/${userId}` : `/auth/${userId}`;
+
+        const response = await api.put(endpoint, updates);
+
+        const updatedData = response.data.data || response.data;
+
+        const finalUser = {
+          ...user,
+          ...updatedData,
+          id: updatedData._id || updatedData.id,
+        };
+
+        setUser(finalUser);
+        localStorage.setItem("job_portal_user", JSON.stringify(finalUser));
+      } catch (error: any) {
+        throw new Error(error.response?.data?.message || "Failed to update profile");
+      }
     }
   };
 
   const logout = () => {
     setUser(null);
     localStorage.removeItem("job_portal_user");
+    localStorage.removeItem("token");
   };
 
   const value = {

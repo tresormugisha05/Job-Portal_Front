@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { X, Upload, CheckCircle, Loader2 } from "lucide-react";
 import { ApplicationService } from "../../services/application.Service";
 import type { ApplicationModel } from "../../services/application.Service";
+import { useAuth } from "../../contexts/AuthContext";
 
 interface ApplyJobModalProps {
     isOpen: boolean;
@@ -9,6 +10,7 @@ interface ApplyJobModalProps {
     jobTitle: string;
     companyName: string;
     jobId?: string;
+    employerId?: string;
 }
 
 export default function ApplyJobModal({
@@ -16,8 +18,10 @@ export default function ApplyJobModal({
     onClose,
     jobTitle,
     companyName,
-    jobId
+    jobId,
+    employerId
 }: ApplyJobModalProps) {
+    const { user } = useAuth();
     const [formData, setFormData] = useState({
         name: "",
         email: "",
@@ -30,6 +34,11 @@ export default function ApplyJobModal({
     const [error, setError] = useState("");
     const [fileInputRef, setFileInputRef] = useState<HTMLInputElement | null>(null);
 
+    // Check if user is authenticated and is a CANDIDATE
+    if (!user || user.role !== 'CANDIDATE') {
+        return null;
+    }
+    
     if (!isOpen) return null;
 
     const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -45,8 +54,8 @@ export default function ApplyJobModal({
             }
             
             // Validate file size (5MB max)
-            if (file.size > 5 * 1024 * 1024) {
-                setError('File size must be less than 5MB');
+            if (file.size > 7 * 1024 * 1024) {
+                setError('File size must be less than 7MB');
                 return;
             }
             
@@ -60,6 +69,7 @@ export default function ApplyJobModal({
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
+        e.stopPropagation(); // Prevent any parent form submission
 
         // Validate form
         if (!formData.name.trim()) {
@@ -76,7 +86,7 @@ export default function ApplyJobModal({
         }
 
         setIsSubmitting(true);
-        setError('');
+        setError(''); // Clear previous errors
 
         // Validate jobId
         if (!jobId) {
@@ -85,32 +95,51 @@ export default function ApplyJobModal({
             return;
         }
 
-        const token = localStorage.getItem('token'); // Optional token
-        if (!token) {
-            console.log('No token found, proceeding without authentication');
-        }
+        console.log("Application submit - Job ID:", jobId);
 
         try {
+            // Use real user ID if logged in, otherwise use temporary ID
+            const userId = user?.id || user?._id || `guest-${Date.now()}`;
+            
+            // If user is logged in, use their data; otherwise use form data
+            const applicantName = user?.name || formData.name;
+            const applicantEmail = user?.email || formData.email;
+
             // Prepare application data
             const applicationData: Partial<ApplicationModel> = {
-                userId: 'temp-user-id', // Temporary user ID
-                employerId: 'temp-employer-id', // Temporary employer ID
-                name: formData.name,
-                email: formData.email,
-                coverLetter: formData.message, // Map message to coverLetter
+                userId: userId,
+                employerId: employerId || 'unknown', // Will be handled by backend if not provided
+                name: applicantName,
+                email: applicantEmail,
+                coverLetter: formData.message || undefined,
             };
 
             // Submit application using ApplicationService
-            const submittedApplication = await ApplicationService.submit(
+            await ApplicationService.submit(
                 jobId!,
                 applicationData,
                 formData.resumeFile
             );
 
-            console.log('Application submitted successfully:', submittedApplication);
             setIsSuccess(true);
+            // Form stays visible for user to see success or error state
         } catch (err) {
-            setError(err instanceof Error ? err.message : 'Failed to submit application. Please try again.');
+            let errorMessage = 'Failed to submit application. Please try again.';
+            
+            if (err instanceof Error && 'response' in err) {
+                const axiosError = err as { response?: { data?: { message?: string; error?: string }; status?: number } };
+                
+                if (axiosError.response?.data?.message) {
+                    errorMessage = axiosError.response.data.message;
+                } else if (axiosError.response?.data?.error) {
+                    errorMessage = axiosError.response.data.error;
+                } else if (axiosError.response?.status === 500) {
+                    errorMessage = 'Server error. Please contact support or try again later.';
+                }
+            }
+            
+            setError(errorMessage);
+            // Keep form visible so user can see the error
         } finally {
             setIsSubmitting(false);
         }

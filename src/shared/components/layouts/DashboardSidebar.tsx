@@ -11,6 +11,7 @@ import {
   PlusCircle,
   BarChart3,
   FolderTree,
+  Building2,
 } from "lucide-react";
 import { useAuth, type UserRole } from "../../contexts/AuthContext";
 
@@ -69,6 +70,12 @@ const sidebarItems: SidebarItem[] = [
     icon: <Users className="w-5 h-5" />,
     roles: ["EMPLOYER"],
   },
+  {
+    label: "Company Profile",
+    path: "/dashboard/company-profile",
+    icon: <Building2 className="w-5 h-5" />,
+    roles: ["EMPLOYER"],
+  },
 
   // Admin
   {
@@ -99,6 +106,12 @@ const sidebarItems: SidebarItem[] = [
     label: "Categories",
     path: "/dashboard/admin/categories",
     icon: <FolderTree className="w-5 h-5" />,
+    roles: ["ADMIN"],
+  },
+  {
+    label: "Employers",
+    path: "/dashboard/admin/employers",
+    icon: <Building2 className="w-5 h-5" />,
     roles: ["ADMIN"],
   },
 
@@ -140,8 +153,8 @@ export default function DashboardSidebar() {
               key={item.label}
               to={item.path}
               className={`flex items-center gap-3 px-4 py-3 rounded-lg transition-all ${isActive
-                  ? "bg-[#00b4d8] text-white"
-                  : "text-gray-400 hover:bg-white/5 hover:text-white"
+                ? "bg-[#00b4d8] text-white"
+                : "text-gray-400 hover:bg-white/5 hover:text-white"
                 }`}
             >
               {item.icon}
