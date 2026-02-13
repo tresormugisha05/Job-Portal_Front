@@ -127,7 +127,7 @@ export default function ApplyJobModal({
             let errorMessage = 'Failed to submit application. Please try again.';
             
             if (err instanceof Error && 'response' in err) {
-                const axiosError = err as any;
+                const axiosError = err as { response?: { data?: { message?: string; error?: string }; status?: number } };
                 
                 if (axiosError.response?.data?.message) {
                     errorMessage = axiosError.response.data.message;
