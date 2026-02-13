@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useState } from "react";
-import api from "../services/Service";
+import api from "../services/ApiSetter";
 
 export type UserRole = "CANDIDATE" | "EMPLOYER" | "ADMIN" | "GUEST";
 
@@ -107,14 +107,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     role: "CANDIDATE" | "EMPLOYER";
   }) => {
     try {
-      const response = await api.post("/api/candidates/register", userData);
+      const response = await api.post("/auth/register", userData);
       const { token, user: userDataFromApi } = response.data;
 
       localStorage.setItem("token", token);
       localStorage.setItem("job_portal_user", JSON.stringify(userDataFromApi));
 
       setUser(userDataFromApi);
-    } catch (error: Error) {
+    } catch (error: any) {
       throw new Error(error.response?.data?.message || "Registration failed");
     }
   };

@@ -2,7 +2,7 @@ import DashboardLayout from "../../../layouts/DashboardLayout";
 import { Briefcase, Eye, Edit3, Trash2, Search, Filter, Plus, Clock, MapPin, Users } from "lucide-react";
 import { Link } from "react-router-dom";
 import { useState, useEffect } from "react";
-import api from "../../../../services/Service";
+import api from "../../../../services/ApiSetter";
 import { useAuth } from "../../../../contexts/AuthContext";
 
 interface Job {
@@ -27,7 +27,7 @@ export default function ManageJobs() {
             
             try {
                 setLoading(true);
-                const response = await api.get(`/api/jobs/employer/${user.id}`);
+                const response = await api.get(`/jobs/employer/${user.id}`);
                 setJobs(response.data.data || []);
             } catch (error) {
                 console.error("Error fetching jobs:", error);
@@ -42,7 +42,7 @@ export default function ManageJobs() {
     const handleDelete = async (jobId: string) => {
         if (!confirm("Are you sure you want to delete this job?")) return;
         try {
-            await api.delete(`/api/jobs/${jobId}`);
+            await api.delete(`/jobs/${jobId}`);
             setJobs(jobs.filter(job => job._id !== jobId));
         } catch (error) {
             console.error("Error deleting job:", error);
