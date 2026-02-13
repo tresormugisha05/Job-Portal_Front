@@ -1,12 +1,39 @@
+import { useState, useEffect } from "react";
 import PageWrapper from "../layouts/PageWrapper";
 import PageHeader from "../ui/PageHeader";
 import { Link } from "react-router-dom";
-import { employers } from "../../data/employers";
 import Loader from "../ui/Loader";
-import usePageLoader from "../../hooks/usePageLoader";
+import { getAllEmployers, type EmployerData } from "../../services/employerService";
+import { getAllJobs } from "../../services/jobService";
 
 export default function EmployerListPage() {
-    const isLoading = usePageLoader(1000);
+    const [employers, setEmployers] = useState<EmployerData[]>([]);
+    const [isLoading, setIsLoading] = useState(true);
+
+    useEffect(() => {
+        const fetchData = async () => {
+            try {
+                setIsLoading(true);
+                const [employersData, jobsData] = await Promise.all([
+                    getAllEmployers(),
+                    getAllJobs()
+                ]);
+
+                // Count jobs for each employer
+                const employersWithJobCount = employersData.map(employer => ({
+                    ...employer,
+                    jobCount: jobsData.filter(job => job.employerId === (employer._id || employer.id)).length
+                }));
+
+                setEmployers(employersWithJobCount);
+            } catch (error) {
+                console.error("Error fetching employers:", error);
+            } finally {
+                setIsLoading(false);
+            }
+        };
+        fetchData();
+    }, []);
 
     if (isLoading) {
         return <Loader />;
@@ -14,7 +41,7 @@ export default function EmployerListPage() {
 
     // Group companies by first letter
     const companyGroups = employers.reduce((groups, company) => {
-        const letter = company.name.charAt(0).toUpperCase();
+        const letter = company.companyName.charAt(0).toUpperCase();
         if (!groups[letter]) {
             groups[letter] = [];
         }
@@ -65,29 +92,35 @@ export default function EmployerListPage() {
                     <div className="flex flex-col lg:flex-row gap-8">
                         {/* Left Content: Company List */}
                         <div className="flex-1">
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-x-16 gap-y-12">
-                                {sortedLetters.map((letter) => (
-                                    <div key={letter}>
-                                        <h2 className="text-3xl font-bold text-[#00b4d8] mb-6">
-                                            {letter}
-                                        </h2>
+                            {employers.length === 0 ? (
+                                <div className="bg-white p-8 rounded-lg shadow-sm text-center">
+                                    <p className="text-gray-500">No employers found.</p>
+                                </div>
+                            ) : (
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-x-16 gap-y-12">
+                                    {sortedLetters.map((letter) => (
+                                        <div key={letter}>
+                                            <h2 className="text-3xl font-bold text-[#00b4d8] mb-6">
+                                                {letter}
+                                            </h2>
 
-                                        <ul className="space-y-4">
-                                            {companyGroups[letter].map((company) => (
-                                                <li
-                                                    key={company.id}
-                                                    className="flex items-center gap-3 group cursor-pointer"
-                                                >
-                                                    <div className="w-0 h-0 border-t-[6px] border-t-transparent border-l-[10px] border-l-orange-500 border-b-[6px] border-b-transparent flex-shrink-0"></div>
-                                                    <Link to={`/employers/${company.id}`} className="text-gray-700 font-medium group-hover:text-[#00b4d8] transition-colors text-base">
-                                                        {company.name} ({company.openings})
-                                                    </Link>
-                                                </li>
-                                            ))}
-                                        </ul>
-                                    </div>
-                                ))}
-                            </div>
+                                            <ul className="space-y-4">
+                                                {companyGroups[letter].map((company) => (
+                                                    <li
+                                                        key={company._id || company.id}
+                                                        className="flex items-center gap-3 group cursor-pointer"
+                                                    >
+                                                        <div className="w-0 h-0 border-t-[6px] border-t-transparent border-l-[10px] border-l-orange-500 border-b-[6px] border-b-transparent flex-shrink-0"></div>
+                                                        <Link to={`/employers/${company._id || company.id}`} className="text-gray-700 font-medium group-hover:text-[#00b4d8] transition-colors text-base">
+                                                            {company.companyName} ({company.jobCount || 0})
+                                                        </Link>
+                                                    </li>
+                                                ))}
+                                            </ul>
+                                        </div>
+                                    ))}
+                                </div>
+                            )}
                         </div>
 
                         {/* Right Sidebar */}

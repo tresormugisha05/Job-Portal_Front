@@ -1,7 +1,7 @@
+import { useState, useEffect } from "react";
 import { useParams, Link } from "react-router-dom";
 import PageWrapper from "../layouts/PageWrapper";
 import Loader from "../ui/Loader";
-import usePageLoader from "../../hooks/usePageLoader";
 import {
     ChevronRight,
     MapPin,
@@ -10,14 +10,35 @@ import {
     Linkedin,
     Link2,
 } from "lucide-react";
-import { employers } from "../../data/employers";
-import { jobs } from "../../data/jobs";
+import { getEmployerById, type EmployerData } from "../../services/employerService";
+import { getAllJobs, type JobData } from "../../services/jobService";
 import JobCard from "../ui/JobCard";
 
 export default function EmployerDetailPage() {
-    const isLoading = usePageLoader(1000);
     const { id } = useParams();
-    const employer = employers.find((e) => e.id === id);
+    const [employer, setEmployer] = useState<EmployerData | null>(null);
+    const [employerJobs, setEmployerJobs] = useState<JobData[]>([]);
+    const [isLoading, setIsLoading] = useState(true);
+
+    useEffect(() => {
+        const fetchData = async () => {
+            if (!id) return;
+            try {
+                setIsLoading(true);
+                const [employerData, allJobs] = await Promise.all([
+                    getEmployerById(id),
+                    getAllJobs()
+                ]);
+                setEmployer(employerData);
+                setEmployerJobs(allJobs.filter(job => job.employerId === id));
+            } catch (error) {
+                console.error("Error fetching employer:", error);
+            } finally {
+                setIsLoading(false);
+            }
+        };
+        fetchData();
+    }, [id]);
 
     if (isLoading) {
         return <Loader />;
@@ -251,20 +272,28 @@ export default function EmployerDetailPage() {
                                 <div className="flex flex-col md:flex-row gap-6 items-start">
                                     {/* Logo */}
                                     <div className="w-32 h-32 border border-gray-200 flex items-center justify-center p-2 bg-white flex-shrink-0">
-                                        <img
-                                            src={employer.logo}
-                                            alt={`${employer.name} Logo`}
-                                            className="w-full h-full object-contain"
-                                        />
+                                        {employer.logo ? (
+                                            <img
+                                                src={employer.logo}
+                                                alt={`${employer.companyName} Logo`}
+                                                className="w-full h-full object-contain"
+                                            />
+                                        ) : (
+                                            <div className="w-full h-full bg-blue-100 flex items-center justify-center rounded">
+                                                <span className="text-4xl font-bold text-blue-600">
+                                                    {employer.companyName.charAt(0)}
+                                                </span>
+                                            </div>
+                                        )}
                                     </div>
 
                                     {/* Details */}
                                     <div className="flex-1">
                                         <h2 className="text-2xl font-bold text-gray-900 mb-1">
-                                            {employer.name}
+                                            {employer.companyName}
                                         </h2>
                                         <p className="text-gray-500 text-sm mb-3">
-                                            {employer.description}
+                                            {employer.industry}
                                         </p>
                                         <div className="flex items-center gap-2 text-gray-500 text-sm mb-6">
                                             <MapPin className="w-4 h-4 text-[#ff6b6b]" />
@@ -287,71 +316,33 @@ export default function EmployerDetailPage() {
                                                     <button className="text-gray-400 hover:text-blue-700 transition-colors">
                                                         <Linkedin className="w-4 h-4" />
                                                     </button>
-                                                    <button className="text-gray-400 hover:text-red-500 transition-colors">
-                                                        <span className="font-bold">G+</span>
-                                                    </button>
                                                 </div>
                                             </div>
 
                                             <div className="grid grid-cols-1 md:grid-cols-2 gap-y-3 gap-x-8 text-sm">
-                                                {employer.socials.website && (
+                                                {employer.website && (
                                                     <div className="flex items-center gap-3">
                                                         <Link2 className="w-4 h-4 text-[#00b4d8]" />
                                                         <a
-                                                            href={employer.socials.website}
+                                                            href={employer.website}
                                                             target="_blank"
                                                             rel="noopener noreferrer"
                                                             className="text-gray-600 hover:text-[#00b4d8] transition-colors"
                                                         >
-                                                            {employer.socials.website.replace(
-                                                                /^https?:\/\//,
-                                                                "",
-                                                            )}
+                                                            {employer.website.replace(/^https?:\/\//, "")}
                                                         </a>
                                                     </div>
                                                 )}
-                                                {employer.socials.facebook && (
+                                                {employer.email && (
                                                     <div className="flex items-center gap-3">
-                                                        <Facebook className="w-4 h-4 text-[#00b4d8]" />
-                                                        <span className="text-gray-600">
-                                                            {employer.socials.facebook}
-                                                        </span>
+                                                        <span className="text-[#00b4d8]">✉</span>
+                                                        <span className="text-gray-600">{employer.email}</span>
                                                     </div>
                                                 )}
-                                                {employer.socials.twitter && (
+                                                {employer.contactPhone && (
                                                     <div className="flex items-center gap-3">
-                                                        <Twitter className="w-4 h-4 text-[#00b4d8]" />
-                                                        <span className="text-gray-600">
-                                                            {employer.socials.twitter}
-                                                        </span>
-                                                    </div>
-                                                )}
-                                                {employer.socials.linkedin && (
-                                                    <div className="flex items-center gap-3">
-                                                        <Linkedin className="w-4 h-4 text-[#00b4d8]" />
-                                                        <span className="text-gray-600">
-                                                            {employer.socials.linkedin}
-                                                        </span>
-                                                    </div>
-                                                )}
-                                                {employer.socials.googlePlus && (
-                                                    <div className="flex items-center gap-3">
-                                                        <span className="w-4 h-4 text-[#00b4d8] font-bold flex items-center justify-center">
-                                                            G+
-                                                        </span>
-                                                        <span className="text-gray-600">
-                                                            {employer.socials.googlePlus}
-                                                        </span>
-                                                    </div>
-                                                )}
-                                                {employer.socials.pinterest && (
-                                                    <div className="flex items-center gap-3">
-                                                        <span className="w-4 h-4 text-[#00b4d8] font-bold flex items-center justify-center">
-                                                            P
-                                                        </span>
-                                                        <span className="text-gray-600">
-                                                            {employer.socials.pinterest}
-                                                        </span>
+                                                        <span className="text-[#00b4d8]">📞</span>
+                                                        <span className="text-gray-600">{employer.contactPhone}</span>
                                                     </div>
                                                 )}
                                             </div>
@@ -363,10 +354,10 @@ export default function EmployerDetailPage() {
                             {/* Company Description */}
                             <div className="bg-white p-8 border border-gray-100 shadow-sm rounded-sm mb-8">
                                 <h3 className="text-xl font-bold text-gray-900 mb-4">
-                                    About {employer.name}
+                                    About {employer.companyName}
                                 </h3>
                                 <div className="prose prose-sm max-w-none text-gray-600 leading-relaxed">
-                                    {employer.fullDescription || "No description added."}
+                                    {employer.description || "No description available."}
                                 </div>
                             </div>
 
@@ -376,11 +367,8 @@ export default function EmployerDetailPage() {
                                     Open Positions
                                 </h3>
                                 <div className="grid grid-cols-1 gap-6">
-                                    {jobs.filter((job) => job.employerId === employer.id)
-                                        .length > 0 ? (
-                                        jobs
-                                            .filter((job) => job.employerId === employer.id)
-                                            .map((job) => <JobCard key={job.id} job={job} />)
+                                    {employerJobs.length > 0 ? (
+                                        employerJobs.map((job) => <JobCard key={job._id || job.id} job={job} />)
                                     ) : (
                                         <div className="bg-white p-6 rounded border border-gray-100 text-center text-gray-500">
                                             No open positions found.
