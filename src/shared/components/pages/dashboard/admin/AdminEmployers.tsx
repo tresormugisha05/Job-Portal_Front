@@ -5,9 +5,7 @@ import { getAllEmployers } from "../../../../services/employerService";
 import axios from "axios";
 import Loader from "../../../ui/Loader";
 // api base URL
-const API_BASE_URL =
-  import.meta.env.VITE_API_BASE_URL ||
-  "https://job-portal-back-fdlt.onrender.com/api";
+const API_BASE_URL ="https://job-portal-back-fdlt.onrender.com/api";
 
 interface Employer {
   _id: string;
