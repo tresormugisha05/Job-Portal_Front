@@ -22,12 +22,6 @@ export default function ApplyJobModal({
     employerId
 }: ApplyJobModalProps) {
     const { user } = useAuth();
-    
-    // Check if user is authenticated and is a CANDIDATE
-    if (!user || user.role !== 'CANDIDATE') {
-        return null;
-    }
-    
     const [formData, setFormData] = useState({
         name: "",
         email: "",
@@ -40,6 +34,11 @@ export default function ApplyJobModal({
     const [error, setError] = useState("");
     const [fileInputRef, setFileInputRef] = useState<HTMLInputElement | null>(null);
 
+    // Check if user is authenticated and is a CANDIDATE
+    if (!user || user.role !== 'CANDIDATE') {
+        return null;
+    }
+    
     if (!isOpen) return null;
 
     const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -128,7 +127,7 @@ export default function ApplyJobModal({
             let errorMessage = 'Failed to submit application. Please try again.';
             
             if (err instanceof Error && 'response' in err) {
-                const axiosError = err as any;
+                const axiosError = err as { response?: { data?: { message?: string; error?: string }; status?: number } };
                 
                 if (axiosError.response?.data?.message) {
                     errorMessage = axiosError.response.data.message;
