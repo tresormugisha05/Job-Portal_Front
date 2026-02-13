@@ -107,7 +107,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     role: "CANDIDATE" | "EMPLOYER";
   }) => {
     try {
-      const response = await api.post("/api/candidates/register", userData);
+      const response = await api.post("auth/register", userData);
       const { token, user: userDataFromApi } = response.data;
 
       localStorage.setItem("token", token);

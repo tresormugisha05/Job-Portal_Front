@@ -1,4 +1,4 @@
-const API_BASE_URL = "http://localhost:3000/api";
+const API_BASE_URL = "https://job-portal-back-fdlt.onrender.com";
 
 // Job interfaces
 export interface JobData {
