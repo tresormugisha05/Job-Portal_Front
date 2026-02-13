@@ -36,13 +36,15 @@ interface User {
   initials?: string;
   workExperience?: WorkExperience[];
   educationHistory?: EducationHistory[];
+  isVerified?: boolean; // For employer verification
+  companyName?: string; // For employers
 }
 
 interface AuthContextType {
   user: User | null;
   role: UserRole;
   isAuthenticated: boolean;
-  login: (email: string, password: string) => Promise<void>;
+  login: (email: string, password: string, role?: "CANDIDATE" | "EMPLOYER") => Promise<void>;
   register: (userData: {
     name: string;
     email: string;
@@ -62,33 +64,48 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     return savedUser ? JSON.parse(savedUser) : null;
   });
 
-  const login = async (email: string, password: string) => {
+  const login = async (email: string, password: string, role?: "CANDIDATE" | "EMPLOYER") => {
     try {
-      const response = await api.post("/auth/login", { email, password });
-      
-      // Extract token and user from various possible response formats
-      let token = response.data.token;
-      let userDataFromApi = response.data.user || response.data;
-      
-      // If user object has nested structure, extract it as well 
-      if (userDataFromApi.user && userDataFromApi.token) {
-        token = userDataFromApi.token;
-        userDataFromApi = userDataFromApi.user;
+      // Try candidate/admin login first
+      let response;
+
+      if (role === "EMPLOYER") {
+        // Direct employer login
+        response = await api.post("/employers/login", { email, password });
+      } else if (role === "CANDIDATE") {
+        // Direct candidate login
+        response = await api.post("/auth/login", { email, password });
+      } else {
+        // Fallback: try candidate first, then employer (for backward compatibility)
+        try {
+          response = await api.post("/auth/login", { email, password });
+        } catch (error) {
+          // If candidate login fails, try employer login
+          try {
+            response = await api.post("/employers/login", { email, password });
+          } catch (employerError) {
+            throw error; // Throw original error if both fail
+          }
+        }
       }
 
-      // Ensure id is always set from _id
-      const userData = {
-        ...userDataFromApi,
-        id: userDataFromApi._id || userDataFromApi.id,
+      const data = response.data;
+      const token = data.token;
+
+      // Handle different user object structures
+      const userData = data.user || data.data;
+
+      // Ensure id and role are set correctly
+      const finalUser = {
+        ...userData,
+        id: userData._id || userData.id,
+        role: userData.role || (data.data?.companyName ? "EMPLOYER" : "CANDIDATE")
       };
 
-      console.log("Login response data:", response.data);
-      console.log("Login user mapped with id:", userData.id);
-      
       localStorage.setItem("token", token);
-      localStorage.setItem("job_portal_user", JSON.stringify(userData));
+      localStorage.setItem("job_portal_user", JSON.stringify(finalUser));
+      setUser(finalUser);
 
-      setUser(userData);
     } catch (error: any) {
       throw new Error(error.response?.data?.message || "Invalid credentials");
     }
@@ -100,24 +117,41 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     phone: string;
     password: string;
     role: "CANDIDATE" | "EMPLOYER";
+    // Employer specific fields
+    companyName?: string;
+    industry?: string;
+    companySize?: string;
+    description?: string;
+    location?: string;
+    contactPhone?: string;
   }) => {
     try {
-      const response = await api.post("/auth/register", userData);
-      
-      // Handle both response formats
-      const userDataFromApi = response.data.user || response.data;
-      const token = response.data.token;
+      let response;
+      if (userData.role === "EMPLOYER") {
+        // Use employer registration endpoint
+        response = await api.post("/employers/register", {
+          ...userData,
+          companyName: userData.name, // Map name to companyName
+          contactPhone: userData.phone, // Map phone to contactPhone
+        });
+      } else {
+        // Use candidate registration endpoint
+        response = await api.post("/auth/register", userData);
+      }
 
-      // Ensure id is set from _id
-      const user_data = {
-        ...userDataFromApi,
-        id: userDataFromApi._id,
+      const data = response.data;
+      const token = data.token || data.data.token;
+      const userObj = data.user || data.data;
+
+      const finalUser = {
+        ...userObj,
+        id: userObj._id || userObj.id,
+        role: userData.role
       };
 
       localStorage.setItem("token", token);
-      localStorage.setItem("job_portal_user", JSON.stringify(user_data));
-
-      setUser(user_data);
+      localStorage.setItem("job_portal_user", JSON.stringify(finalUser));
+      setUser(finalUser);
     } catch (error: any) {
       throw new Error(error.response?.data?.message || "Registration failed");
     }
@@ -126,34 +160,23 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const updateProfile = async (updates: Partial<User>) => {
     if (user) {
       try {
-        // Use id or fallback to _id
         const userId = user.id || user._id;
-        
-        const updatedData = {
-          ...user,
-          ...updates,
-        };
-        
-        console.log("Sending update to backend with userId:", userId, "data:", updatedData);
-        const response = await api.put(`/auth/${userId}`, updatedData);
-        
-        console.log("Backend response:", response.data);
-        
-        // Handle both response.data and response.data.data formats
-        const updatedUser = response.data.data || response.data;
-        
-        // Ensure id is set from _id
+        const isEmployer = user.role === "EMPLOYER";
+        const endpoint = isEmployer ? `/employers/${userId}` : `/auth/${userId}`;
+
+        const response = await api.put(endpoint, updates);
+
+        const updatedData = response.data.data || response.data;
+
         const finalUser = {
-          ...updatedUser,
-          id: updatedUser._id || updatedUser.id,
+          ...user,
+          ...updatedData,
+          id: updatedData._id || updatedData.id,
         };
-        
-        console.log("Updated user from response:", finalUser);
-        
+
         setUser(finalUser);
         localStorage.setItem("job_portal_user", JSON.stringify(finalUser));
       } catch (error: any) {
-        console.error("Update profile error:", error.response?.data);
         throw new Error(error.response?.data?.message || "Failed to update profile");
       }
     }

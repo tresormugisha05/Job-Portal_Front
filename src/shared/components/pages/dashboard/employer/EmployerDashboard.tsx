@@ -14,7 +14,8 @@ import ApplicantTable from "../components/ApplicantTable";
 import type { Applicant } from "../components/ApplicantTable";
 import { useEffect, useState } from "react";
 import { useAuth } from "../../../../contexts/AuthContext";
-import { getEmployerByUserId } from "../../../../services/employerService";
+import { useNavigate } from "react-router-dom";
+
 import { getJobsByEmployer } from "../../../../services/jobService";
 import { ApplicationService } from "../../../../services/application.Service";
 import type { ApplicationModel } from "../../../../services/application.Service";
@@ -22,6 +23,7 @@ import Loader from "../../../ui/Loader";
 
 export default function EmployerDashboard() {
   const { user } = useAuth();
+  const navigate = useNavigate();
   const [loading, setLoading] = useState(true);
   const [employer, setEmployer] = useState<any>(null);
   const [applications, setApplications] = useState<any[]>([]);
@@ -53,6 +55,12 @@ export default function EmployerDashboard() {
   ]);
 
   useEffect(() => {
+    // Check if employer is verified
+    if (user?.role === "EMPLOYER" && user?.isVerified === false) {
+      navigate("/pending-verification");
+      return;
+    }
+
     const fetchEmployerData = async () => {
       try {
         if (!user?.id) {
@@ -60,11 +68,12 @@ export default function EmployerDashboard() {
           return;
         }
 
-        // Fetch employer profile
-        const employerData = await getEmployerByUserId(user.id);
-        if (employerData) {
-          setEmployer(employerData);
-          const employerId = employerData.id || employerData._id || "";
+        // If user is employer, they are the employer object now
+        if (user.role === "EMPLOYER") {
+          setEmployer(user);
+          const employerId = user.id || user._id || "";
+
+          if (!employerId) return;
 
           // Fetch employer's jobs and applications
           try {
@@ -125,7 +134,7 @@ export default function EmployerDashboard() {
     };
 
     fetchEmployerData();
-  }, [user?.id]);
+  }, [user]);
 
   if (loading) {
     return <Loader />;
@@ -143,10 +152,10 @@ export default function EmployerDashboard() {
       jobTitle: app.jobId?.title || "Unknown Job",
       appliedDate: app.submissionDate
         ? new Date(app.submissionDate).toLocaleDateString("en-US", {
-            year: "numeric",
-            month: "short",
-            day: "numeric",
-          })
+          year: "numeric",
+          month: "short",
+          day: "numeric",
+        })
         : "N/A",
       avatar: app.userId?.profilePicture,
     }));

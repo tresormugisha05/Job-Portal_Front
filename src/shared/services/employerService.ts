@@ -5,16 +5,19 @@ export interface EmployerData {
   _id?: string;
   id?: string;
   companyName: string;
-  industry: string;
-  companySize: string;
+  industry?: string;
+  companySize?: string;
   website?: string;
-  description: string;
-  location: string;
-  contactEmail: string;
-  contactPhone: string;
+  description?: string;
+  location?: string;
+  email?: string;
+  phone?: string;
+  // Legacy fields for backward compatibility
+  contactEmail?: string;
+  contactPhone?: string;
   logo?: string;
   isVerified?: boolean;
-  userId: string;
+  userId?: string;
   createdAt?: string;
   updatedAt?: string;
 }
@@ -28,7 +31,7 @@ export interface EmployerResponse {
 // Get all employers
 export const getAllEmployers = async (): Promise<EmployerData[]> => {
   try {
-    const response = await fetch(`${API_BASE_URL}/employers`, {
+    const response = await fetch(`${API_BASE_URL}/employers/all`, {
       method: "GET",
       headers: {
         "Content-Type": "application/json",
