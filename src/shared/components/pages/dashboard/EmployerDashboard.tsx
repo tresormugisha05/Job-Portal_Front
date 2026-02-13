@@ -14,8 +14,8 @@ import ApplicantTable from "./components/ApplicantTable";
 import type { Applicant } from "./components/ApplicantTable";
 import { useEffect, useState } from "react";
 import { useAuth } from "../../../contexts/AuthContext";
-import { getEmployerByUserId } from "../../../services/employerService";
 import { getJobsByEmployer } from "../../../services/jobService";
+import { getEmployerById } from "../../../services/employerService";
 import { ApplicationService } from "../../../services/application.Service";
 import type { ApplicationModel } from "../../../services/application.Service";
 import Loader from "../../ui/Loader";
@@ -61,7 +61,7 @@ export default function EmployerDashboard() {
         }
 
         // Fetch employer profile
-        const employerData = await getEmployerByUserId(user.id);
+        const employerData = await getEmployerById(user.id);
         if (employerData) {
           setEmployer(employerData);
           const employerId = employerData.id || employerData._id || "";
