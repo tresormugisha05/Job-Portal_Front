@@ -1,8 +1,7 @@
+import { useState, useEffect } from "react";
 import { useParams, Link } from "react-router-dom";
 import PageWrapper from "../layouts/PageWrapper";
 import Loader from "../ui/Loader";
-import usePageLoader from "../../hooks/usePageLoader";
-import { useEffect, useState } from "react";
 import {
     ChevronRight,
     MapPin,
@@ -10,68 +9,38 @@ import {
     Twitter,
     Linkedin,
     Link2,
-    Globe,
-    Phone,
-    Mail,
 } from "lucide-react";
-import { employers as defaultEmployers } from "../../data/employers";
-import JobCard from "../ui/JobCard";
 import { getEmployerById, type EmployerData } from "../../services/employerService";
-import { getJobsByEmployer } from "../../services/jobService";
-import type { Job } from "../../data/jobs";
+import { getAllJobs, type JobData } from "../../services/jobService";
+import JobCard from "../ui/JobCard";
 
 export default function EmployerDetailPage() {
-    const isLoading = usePageLoader(1000);
     const { id } = useParams();
     const [employer, setEmployer] = useState<EmployerData | null>(null);
-    const [jobs, setJobs] = useState<Job[]>([]);
-    const [apiLoading, setApiLoading] = useState(true);
+    const [employerJobs, setEmployerJobs] = useState<JobData[]>([]);
+    const [isLoading, setIsLoading] = useState(true);
 
     useEffect(() => {
-        const fetchEmployerAndJobs = async () => {
+        const fetchData = async () => {
+            if (!id) return;
             try {
-                if (!id) {
-                    setApiLoading(false);
-                    return;
-                }
-
-                setApiLoading(true);
-
-                // Fetch employer data
-                const employerData = await getEmployerById(id);
+                setIsLoading(true);
+                const [employerData, allJobs] = await Promise.all([
+                    getEmployerById(id),
+                    getAllJobs()
+                ]);
                 setEmployer(employerData);
-
-                // Fetch jobs for this employer
-                try {
-                    const jobsData = await getJobsByEmployer(id);
-                    // Map jobs to include company name and tags
-                    const mappedJobs = jobsData
-                        .filter(job => job.isActive !== false)
-                        .map(job => ({
-                            ...job,
-                            company: employerData.companyName,
-                            tags: [] as string[], // Add empty tags array for compatibility
-                        }));
-                    setJobs(mappedJobs as any);
-                } catch (jobError) {
-                    console.error("Error fetching jobs:", jobError);
-                    setJobs([]);
-                }
+                setEmployerJobs(allJobs.filter(job => job.employerId === id));
             } catch (error) {
                 console.error("Error fetching employer:", error);
-                // Fallback to default data
-                const defaultEmp = defaultEmployers.find(e => e.id === id);
-                setEmployer(defaultEmp as any);
-                setJobs([]);
             } finally {
-                setApiLoading(false);
+                setIsLoading(false);
             }
         };
-
-        fetchEmployerAndJobs();
+        fetchData();
     }, [id]);
 
-    if (isLoading || apiLoading) {
+    if (isLoading) {
         return <Loader />;
     }
 
@@ -302,78 +271,33 @@ export default function EmployerDetailPage() {
                             <div className="bg-white p-8 border border-gray-100 shadow-sm rounded-sm mb-8">
                                 <div className="flex flex-col md:flex-row gap-6 items-start">
                                     {/* Logo */}
-                                    <div className="w-32 h-32 border border-gray-200 flex items-center justify-center p-2 bg-white shrink-0">
-                                        <img
-                                            src={employer.logo || "https://via.placeholder.com/128"}
-                                            alt={`${employer.companyName || (employer as any).name} Logo`}
-                                            className="w-full h-full object-contain"
-                                        />
+                                    <div className="w-32 h-32 border border-gray-200 flex items-center justify-center p-2 bg-white flex-shrink-0">
+                                        {employer.logo ? (
+                                            <img
+                                                src={employer.logo}
+                                                alt={`${employer.companyName} Logo`}
+                                                className="w-full h-full object-contain"
+                                            />
+                                        ) : (
+                                            <div className="w-full h-full bg-blue-100 flex items-center justify-center rounded">
+                                                <span className="text-4xl font-bold text-blue-600">
+                                                    {employer.companyName.charAt(0)}
+                                                </span>
+                                            </div>
+                                        )}
                                     </div>
 
                                     {/* Details */}
                                     <div className="flex-1">
                                         <h2 className="text-2xl font-bold text-gray-900 mb-1">
-                                            {employer.companyName || (employer as any).name}
+                                            {employer.companyName}
                                         </h2>
                                         <p className="text-gray-500 text-sm mb-3">
-                                            {employer.description}
+                                            {employer.industry}
                                         </p>
                                         <div className="flex items-center gap-2 text-gray-500 text-sm mb-6">
                                             <MapPin className="w-4 h-4 text-[#ff6b6b]" />
                                             <span>{employer.location}</span>
-                                        </div>
-
-                                        {/* Contact & Links */}
-                                        <div className="border-t border-gray-100 pt-6">
-                                            <div className="grid grid-cols-1 md:grid-cols-2 gap-y-3 gap-x-8 text-sm">
-                                                {employer.website && (
-                                                    <div className="flex items-center gap-3">
-                                                        <Globe className="w-4 h-4 text-[#00b4d8]" />
-                                                        <a
-                                                            href={employer.website}
-                                                            target="_blank"
-                                                            rel="noopener noreferrer"
-                                                            className="text-gray-600 hover:text-[#00b4d8] transition-colors"
-                                                        >
-                                                            {employer.website.replace(/^https?:\/\//, "")}
-                                                        </a>
-                                                    </div>
-                                                )}
-                                                {(employer.email || (employer as any).contactEmail) && (
-                                                    <div className="flex items-center gap-3">
-                                                        <Mail className="w-4 h-4 text-[#00b4d8]" />
-                                                        <a
-                                                            href={`mailto:${employer.email || (employer as any).contactEmail}`}
-                                                            className="text-gray-600 hover:text-[#00b4d8] transition-colors"
-                                                        >
-                                                            {employer.email || (employer as any).contactEmail}
-                                                        </a>
-                                                    </div>
-                                                )}
-                                                {((employer as any).phone || (employer as any).contactPhone) && (
-                                                    <div className="flex items-center gap-3">
-                                                        <Phone className="w-4 h-4 text-[#00b4d8]" />
-                                                        <a
-                                                            href={`tel:${(employer as any).phone || (employer as any).contactPhone}`}
-                                                            className="text-gray-600 hover:text-[#00b4d8] transition-colors"
-                                                        >
-                                                            {(employer as any).phone || (employer as any).contactPhone}
-                                                        </a>
-                                                    </div>
-                                                )}
-                                                {employer.industry && (
-                                                    <div className="flex items-center gap-3">
-                                                        <span className="text-sm font-bold text-gray-700">Industry:</span>
-                                                        <span className="text-gray-600">{employer.industry}</span>
-                                                    </div>
-                                                )}
-                                                {employer.companySize && (
-                                                    <div className="flex items-center gap-3">
-                                                        <span className="text-sm font-bold text-gray-700">Size:</span>
-                                                        <span className="text-gray-600">{employer.companySize}</span>
-                                                    </div>
-                                                )}
-                                            </div>
                                         </div>
 
                                         {/* Share & Socials */}
@@ -394,52 +318,35 @@ export default function EmployerDetailPage() {
                                                     </button>
                                                 </div>
                                             </div>
-                                        </div>
 
-                                        {/* Fallback for old data format with socials */}
-                                        {(employer as any).socials && (
-                                            <div className="border-t border-gray-100 pt-6">
-                                                <div className="grid grid-cols-1 md:grid-cols-2 gap-y-3 gap-x-8 text-sm">
-                                                    {(employer as any).socials.website && (
-                                                        <div className="flex items-center gap-3">
-                                                            <Link2 className="w-4 h-4 text-[#00b4d8]" />
-                                                            <a
-                                                                href={(employer as any).socials.website}
-                                                                target="_blank"
-                                                                rel="noopener noreferrer"
-                                                                className="text-gray-600 hover:text-[#00b4d8] transition-colors"
-                                                            >
-                                                                {(employer as any).socials.website.replace(/^https?:\/\//, "")}
-                                                            </a>
-                                                        </div>
-                                                    )}
-                                                    {(employer as any).socials.facebook && (
-                                                        <div className="flex items-center gap-3">
-                                                            <Facebook className="w-4 h-4 text-[#00b4d8]" />
-                                                            <span className="text-gray-600">
-                                                                {(employer as any).socials.facebook}
-                                                            </span>
-                                                        </div>
-                                                    )}
-                                                    {(employer as any).socials.twitter && (
-                                                        <div className="flex items-center gap-3">
-                                                            <Twitter className="w-4 h-4 text-[#00b4d8]" />
-                                                            <span className="text-gray-600">
-                                                                {(employer as any).socials.twitter}
-                                                            </span>
-                                                        </div>
-                                                    )}
-                                                    {(employer as any).socials.linkedin && (
-                                                        <div className="flex items-center gap-3">
-                                                            <Linkedin className="w-4 h-4 text-[#00b4d8]" />
-                                                            <span className="text-gray-600">
-                                                                {(employer as any).socials.linkedin}
-                                                            </span>
-                                                        </div>
-                                                    )}
-                                                </div>
+                                            <div className="grid grid-cols-1 md:grid-cols-2 gap-y-3 gap-x-8 text-sm">
+                                                {employer.website && (
+                                                    <div className="flex items-center gap-3">
+                                                        <Link2 className="w-4 h-4 text-[#00b4d8]" />
+                                                        <a
+                                                            href={employer.website}
+                                                            target="_blank"
+                                                            rel="noopener noreferrer"
+                                                            className="text-gray-600 hover:text-[#00b4d8] transition-colors"
+                                                        >
+                                                            {employer.website.replace(/^https?:\/\//, "")}
+                                                        </a>
+                                                    </div>
+                                                )}
+                                                {employer.email && (
+                                                    <div className="flex items-center gap-3">
+                                                        <span className="text-[#00b4d8]">✉</span>
+                                                        <span className="text-gray-600">{employer.email}</span>
+                                                    </div>
+                                                )}
+                                                {employer.contactPhone && (
+                                                    <div className="flex items-center gap-3">
+                                                        <span className="text-[#00b4d8]">📞</span>
+                                                        <span className="text-gray-600">{employer.contactPhone}</span>
+                                                    </div>
+                                                )}
                                             </div>
-                                        )}
+                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -447,10 +354,10 @@ export default function EmployerDetailPage() {
                             {/* Company Description */}
                             <div className="bg-white p-8 border border-gray-100 shadow-sm rounded-sm mb-8">
                                 <h3 className="text-xl font-bold text-gray-900 mb-4">
-                                    About {employer.companyName || (employer as any).name}
+                                    About {employer.companyName}
                                 </h3>
                                 <div className="prose prose-sm max-w-none text-gray-600 leading-relaxed">
-                                    {(employer as any).fullDescription || employer.description || "No description added."}
+                                    {employer.description || "No description available."}
                                 </div>
                             </div>
 
@@ -460,11 +367,8 @@ export default function EmployerDetailPage() {
                                     Open Positions
                                 </h3>
                                 <div className="grid grid-cols-1 gap-6">
-                                    {jobs.filter((job) => job.employerId === employer.id || job.employerId === employer._id)
-                                        .length > 0 ? (
-                                        jobs
-                                            .filter((job) => job.employerId === employer.id || job.employerId === employer._id)
-                                            .map((job) => <JobCard key={job.id} job={job} />)
+                                    {employerJobs.length > 0 ? (
+                                        employerJobs.map((job) => <JobCard key={job._id || job.id} job={job} />)
                                     ) : (
                                         <div className="bg-white p-6 rounded border border-gray-100 text-center text-gray-500">
                                             No open positions found.

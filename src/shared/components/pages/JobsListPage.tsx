@@ -6,6 +6,7 @@ import usePageLoader from "../../hooks/usePageLoader";
 import JobCard from "../ui/JobCard";
 import PageHeader from "../ui/PageHeader";
 import api from "../../services/ApiSetter";
+
 export default function JobsListPage() {
   const isLoading = usePageLoader(1000);
   const [searchParams] = useSearchParams();
@@ -85,12 +86,16 @@ export default function JobsListPage() {
         selectedJobTypes.length === 0 || selectedJobTypes.includes(jobType);
 
       // Categories (Tags)
-      const jobTags = job.tags || job.category || [];
+      const jobCategory = job.category;
+      const jobTags = job.tags || [];
       const matchesCategory =
         selectedCategories.length === 0 ||
-        (Array.isArray(jobTags) && jobTags.some((tag: string) =>
-          selectedCategories.some((cat) => tag.toLowerCase().includes(cat.toLowerCase()))
-        ));
+        selectedCategories.some((cat) => 
+          jobCategory?.toLowerCase().includes(cat.toLowerCase()) ||
+          (Array.isArray(jobTags) && jobTags.some((tag: string) =>
+            tag.toLowerCase().includes(cat.toLowerCase())
+          ))
+        );
 
       return matchesSearch && matchesLocation && matchesType && matchesCategory;
     });
@@ -254,7 +259,7 @@ export default function JobsListPage() {
             <div className="space-y-4">
               {paginatedJobs.length > 0 ? (
                 paginatedJobs.map((job) => (
-                  <JobCard key={job._id} job={{ ...job, id: job._id }} />
+                  <JobCard key={job._id || job.id} job={{ ...job, id: job._id || job.id }} />
                 ))
               ) : (
                 <div className="bg-white rounded-lg shadow p-8 text-center text-gray-500">

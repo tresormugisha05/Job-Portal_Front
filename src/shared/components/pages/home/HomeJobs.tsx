@@ -1,5 +1,6 @@
-import { useState, useMemo } from "react";
-import { jobs } from "../../../data/jobs";
+import { useState, useMemo, useEffect } from "react";
+import { getAllJobs } from "../../../services/jobService";
+import type { JobData } from "../../../services/jobService";
 import JobCard from "../../ui/JobCard";
 
 // Define filter types
@@ -7,6 +8,22 @@ type FilterType = "RECENT JOBS" | "FEATURED" | "FULL TIME" | "PART TIME";
 
 export default function HomeJobs() {
   const [activeFilter, setActiveFilter] = useState<FilterType>("RECENT JOBS");
+  const [jobs, setJobs] = useState<JobData[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchJobs = async () => {
+      try {
+        const data = await getAllJobs();
+        setJobs(data);
+      } catch (error) {
+        console.error("Error fetching jobs:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchJobs();
+  }, []);
 
   // Filter jobs based on active tab
   const filteredJobs = useMemo(() => {
@@ -17,26 +34,23 @@ export default function HomeJobs() {
         filtered = filtered.filter((job) => job.featured);
         break;
       case "FULL TIME":
-        filtered = filtered.filter((job) => job.type === "FULL TIME");
+        filtered = filtered.filter((job) => (job.jobType || job.type) === "Full-time");
         break;
       case "PART TIME":
-        filtered = filtered.filter((job) => job.type === "PART TIME");
+        filtered = filtered.filter((job) => (job.jobType || job.type) === "Part-time");
         break;
       case "RECENT JOBS":
       default:
-        // Sort by date descending if date exists, otherwise fallback to original order
         filtered = filtered.sort((a, b) => {
-          if (a.date && b.date) {
-            return new Date(b.date).getTime() - new Date(a.date).getTime();
-          }
-          return 0;
+          const dateA = a.createdAt ? new Date(a.createdAt).getTime() : 0;
+          const dateB = b.createdAt ? new Date(b.createdAt).getTime() : 0;
+          return dateB - dateA;
         });
         break;
     }
 
-    // Limit to 6 jobs for the home page view
     return filtered.slice(0, 6);
-  }, [activeFilter]);
+  }, [activeFilter, jobs]);
 
   const tabs: FilterType[] = [
     "FEATURED",
@@ -75,15 +89,21 @@ export default function HomeJobs() {
         </div>
 
         {/* Job Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          {filteredJobs.length > 0 ? (
-            filteredJobs.map((job) => <JobCard key={job.id} job={job} />)
-          ) : (
-            <div className="col-span-1 md:col-span-2 text-center py-12 text-gray-500">
-              No jobs found for this category.
-            </div>
-          )}
-        </div>
+        {loading ? (
+          <div className="text-center py-12">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#00b4d8] mx-auto"></div>
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {filteredJobs.length > 0 ? (
+              filteredJobs.map((job) => <JobCard key={job._id || job.id} job={{ ...job, id: job._id || job.id }} />)
+            ) : (
+              <div className="col-span-1 md:col-span-2 text-center py-12 text-gray-500">
+                No jobs found for this category.
+              </div>
+            )}
+          </div>
+        )}
       </div>
     </section>
   );

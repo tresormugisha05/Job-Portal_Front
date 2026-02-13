@@ -126,32 +126,13 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     contactPhone?: string;
   }) => {
     try {
-      let response;
-      if (userData.role === "EMPLOYER") {
-        // Use employer registration endpoint
-        response = await api.post("/employers/register", {
-          ...userData,
-          companyName: userData.name, // Map name to companyName
-          contactPhone: userData.phone, // Map phone to contactPhone
-        });
-      } else {
-        // Use candidate registration endpoint
-        response = await api.post("/auth/register", userData);
-      }
-
-      const data = response.data;
-      const token = data.token || data.data.token;
-      const userObj = data.user || data.data;
-
-      const finalUser = {
-        ...userObj,
-        id: userObj._id || userObj.id,
-        role: userData.role
-      };
+      const response = await api.post("/auth/register", userData);
+      const { token, user: userDataFromApi } = response.data;
 
       localStorage.setItem("token", token);
-      localStorage.setItem("job_portal_user", JSON.stringify(finalUser));
-      setUser(finalUser);
+      localStorage.setItem("job_portal_user", JSON.stringify(userDataFromApi));
+
+      setUser(userDataFromApi);
     } catch (error: any) {
       throw new Error(error.response?.data?.message || "Registration failed");
     }
