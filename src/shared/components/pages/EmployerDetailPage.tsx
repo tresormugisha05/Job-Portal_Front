@@ -368,7 +368,7 @@ export default function EmployerDetailPage() {
                                 </h3>
                                 <div className="grid grid-cols-1 gap-6">
                                     {employerJobs.length > 0 ? (
-                                        employerJobs.map((job) => <JobCard key={job._id || job.id} job={job} />)
+                                        employerJobs.map((job) => <JobCard key={job._id || job.id} job={{ ...job, id: job.id || job._id || '', type: job.jobType || job.type || '' }} />)
                                     ) : (
                                         <div className="bg-white p-6 rounded border border-gray-100 text-center text-gray-500">
                                             No open positions found.
