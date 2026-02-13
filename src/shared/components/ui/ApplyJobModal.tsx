@@ -1,8 +1,7 @@
 import React, { useState } from "react";
-import { X, Upload, CheckCircle, Loader2 } from "lucide-react";
-import { ApplicationService } from "../../services/application.Service";
-import type { ApplicationModel } from "../../services/application.Service";
+import { X, Upload, CheckCircle, AlertCircle, LogIn, Loader2 } from "lucide-react";
 import { useAuth } from "../../contexts/AuthContext";
+import { Link } from "react-router-dom";
 
 interface ApplyJobModalProps {
     isOpen: boolean;
@@ -10,139 +9,38 @@ interface ApplyJobModalProps {
     jobTitle: string;
     companyName: string;
     jobId?: string;
-    employerId?: string;
 }
 
 export default function ApplyJobModal({
     isOpen,
     onClose,
     jobTitle,
-    companyName,
-    jobId,
-    employerId
+    companyName
 }: ApplyJobModalProps) {
-    const { user } = useAuth();
+    const { role, isAuthenticated } = useAuth();
     const [formData, setFormData] = useState({
         name: "",
         email: "",
         message: "",
-        resumeFile: null as File | null,
     });
 
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [isSuccess, setIsSuccess] = useState(false);
-    const [error, setError] = useState("");
-    const [fileInputRef, setFileInputRef] = useState<HTMLInputElement | null>(null);
 
-    // Check if user is authenticated and is a CANDIDATE
-    if (!user || user.role !== 'CANDIDATE') {
-        return null;
-    }
-    
     if (!isOpen) return null;
 
-    const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
-        const file = e.target.files?.[0];
-        if (file) {
-            // Validate file type
-            const allowedTypes = ['.pdf', '.doc', '.docx'];
-            const fileExtension = '.' + file.name.split('.').pop()?.toLowerCase();
-            
-            if (!allowedTypes.includes(fileExtension)) {
-                setError('Please upload a PDF, DOC, or DOCX file');
-                return;
-            }
-            
-            // Validate file size (5MB max)
-            if (file.size > 7 * 1024 * 1024) {
-                setError('File size must be less than 7MB');
-                return;
-            }
-            
-            setFormData(prev => ({
-                ...prev,
-                resumeFile: file
-            }));
-            setError(''); // Clear error on successful upload
-        }
-    };
+    const isCandidate = role === "CANDIDATE";
 
-    const handleSubmit = async (e: React.FormEvent) => {
+    const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
-        e.stopPropagation(); // Prevent any parent form submission
-
-        // Validate form
-        if (!formData.name.trim()) {
-            setError('Please enter your full name');
-            return;
-        }
-        if (!formData.email.trim()) {
-            setError('Please enter your email address');
-            return;
-        }
-        if (!formData.resumeFile) {
-            setError('Please upload your resume');
-            return;
-        }
+        if (!isCandidate) return;
 
         setIsSubmitting(true);
-        setError(''); // Clear previous errors
-
-        // Validate jobId
-        if (!jobId) {
-            setError('Job ID is missing');
+        // Simulate API call
+        setTimeout(() => {
             setIsSubmitting(false);
-            return;
-        }
-
-        console.log("Application submit - Job ID:", jobId);
-
-        try {
-            // Use real user ID if logged in, otherwise use temporary ID
-            const userId = user?.id || user?._id || `guest-${Date.now()}`;
-            
-            // If user is logged in, use their data; otherwise use form data
-            const applicantName = user?.name || formData.name;
-            const applicantEmail = user?.email || formData.email;
-
-            // Prepare application data
-            const applicationData: Partial<ApplicationModel> = {
-                userId: userId,
-                employerId: employerId || 'unknown', // Will be handled by backend if not provided
-                name: applicantName,
-                email: applicantEmail,
-                coverLetter: formData.message || undefined,
-            };
-
-            // Submit application using ApplicationService
-            await ApplicationService.submit(
-                jobId!,
-                applicationData,
-                formData.resumeFile
-            );
-
             setIsSuccess(true);
-            // Form stays visible for user to see success or error state
-        } catch (err) {
-            let errorMessage = 'Failed to submit application. Please try again.';
-            
-            if (err instanceof Error && 'response' in err) {
-                const axiosError = err as { response?: { data?: { message?: string; error?: string }; status?: number } };
-                
-                if (axiosError.response?.data?.message) {
-                    errorMessage = axiosError.response.data.message;
-                } else if (axiosError.response?.data?.error) {
-                    errorMessage = axiosError.response.data.error;
-                } else if (axiosError.response?.status === 500) {
-                    errorMessage = 'Server error. Please contact support or try again later.';
-                }
-            }
-            
-            setError(errorMessage);
-            // Keep form visible so user can see the error
-        } finally {
-            setIsSubmitting(false);
-        }
+        }, 1500);
     };
 
     if (isSuccess) {
@@ -190,18 +88,35 @@ export default function ApplyJobModal({
                     </button>
                 </div>
 
-                <div className="p-8">
-                    <p className="text-gray-500 mb-8 text-center">
+                <div className="p-8 text-center">
+                    <p className="text-gray-500 mb-8">
                         Apply for the <span className="text-[#00b4d8] font-bold">{jobTitle}</span> position at <span className="text-[#00b4d8] font-bold">{companyName}</span>.
                     </p>
 
-                    <form onSubmit={handleSubmit} className="space-y-6 text-left">
-                            {/* Error Display */}
-                            {error && (
-                                <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg">
-                                    {error}
-                                </div>
+                    {!isCandidate ? (
+                        <div className="bg-orange-50 border border-orange-100 p-8 rounded-xl text-center">
+                            <div className="w-16 h-16 bg-white rounded-full flex items-center justify-center mx-auto mb-4 shadow-sm">
+                                <AlertCircle className="w-8 h-8 text-orange-500" />
+                            </div>
+                            <h3 className="text-lg font-bold text-gray-900 mb-2">Login Required</h3>
+                            <p className="text-gray-600 mb-6">
+                                You must be logged in as a <span className="font-bold">Candidate</span> to apply for this job.
+                            </p>
+                            <Link
+                                to="/login"
+                                className="inline-flex items-center gap-2 bg-[#ff6b6b] hover:bg-[#ff5252] text-white px-8 py-3 rounded-lg font-bold uppercase tracking-wider transition-all shadow-md active:scale-95"
+                            >
+                                <LogIn className="w-5 h-5" /> Go to Login
+                            </Link>
+                            {!isAuthenticated && (
+                                <p className="mt-4 text-xs text-gray-400 italic">No account? Select the Candidate role on the login page.</p>
                             )}
+                            {isAuthenticated && (
+                                <p className="mt-4 text-xs text-red-400 font-medium">Your current role ({role}) does not have permission to apply.</p>
+                            )}
+                        </div>
+                    ) : (
+                        <form onSubmit={handleSubmit} className="space-y-6 text-left">
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                                 <div className="space-y-2">
                                     <label className="text-xs font-bold text-gray-700 uppercase tracking-wider">Full Name</label>
@@ -229,31 +144,10 @@ export default function ApplyJobModal({
 
                             <div className="space-y-2">
                                 <label className="text-xs font-bold text-gray-700 uppercase tracking-wider">Upload Resume</label>
-                                {/* Hidden File Input */}
-                                <input
-                                    ref={(el) => setFileInputRef(el)}
-                                    type="file"
-                                    accept=".pdf,.doc,.docx"
-                                    onChange={handleFileUpload}
-                                    className="hidden"
-                                />
-                                {/* Clickable Upload Area */}
-                                <div 
-                                    onClick={() => fileInputRef?.click()}
-                                    className="border-2 border-dashed border-gray-200 rounded-xl p-8 text-center hover:border-[#00b4d8] hover:bg-blue-50/30 transition-all cursor-pointer group"
-                                >
+                                <div className="border-2 border-dashed border-gray-200 rounded-xl p-8 text-center hover:border-[#00b4d8] hover:bg-blue-50/30 transition-all cursor-pointer group">
                                     <Upload className="w-10 h-10 text-gray-400 mx-auto mb-3 group-hover:text-[#00b4d8] transition-colors" />
-                                    {formData.resumeFile ? (
-                                        <div className="space-y-1">
-                                            <p className="text-sm font-medium text-green-600">{formData.resumeFile.name}</p>
-                                            <p className="text-xs text-gray-400">{(formData.resumeFile.size / 1024 / 1024).toFixed(2)} MB</p>
-                                        </div>
-                                    ) : (
-                                        <div className="space-y-1">
-                                            <p className="text-sm font-medium text-gray-600 mb-1">Click to upload or drag and drop</p>
-                                            <p className="text-xs text-gray-400">PDF, DOC, DOCX (Max 5MB)</p>
-                                        </div>
-                                    )}
+                                    <p className="text-sm font-medium text-gray-600 mb-1">Click to upload or drag and drop</p>
+                                    <p className="text-xs text-gray-400">PDF, DOC, DOCX (Max 5MB)</p>
                                 </div>
                             </div>
 
@@ -291,6 +185,7 @@ export default function ApplyJobModal({
                                 </button>
                             </div>
                         </form>
+                    )}
                 </div>
             </div>
         </div>

@@ -1,4 +1,4 @@
-const API_BASE_URL = "https://job-portal-back-fdlt.onrender.com";
+const API_BASE_URL = "https://job-portal-back-fdlt.onrender.com/api";
 
 // Job interfaces
 export interface JobData {
@@ -6,6 +6,7 @@ export interface JobData {
   id?: string;
   title: string;
   description: string;
+  company: string;
   requirements: string;
   responsibilities: string;
   category: string;
@@ -25,6 +26,8 @@ export interface JobData {
   typeBg?: string;
   experience?: string;
   education?: string;
+  tags?: string[];
+  featured?: boolean;
 }
 
 export interface JobResponse {

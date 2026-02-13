@@ -2,13 +2,23 @@ import DashboardLayout from "../../../layouts/DashboardLayout";
 import { Briefcase, Eye, Edit3, Trash2, Search, Filter, Plus, Clock, MapPin, Users } from "lucide-react";
 import { Link } from "react-router-dom";
 import { useState, useEffect } from "react";
-import { getJobsByEmployer, deleteJob } from "../../../../services/jobService";
-import type { JobData } from "../../../../services/jobService";
+import api from "../../../../services/ApiSetter";
 import { useAuth } from "../../../../contexts/AuthContext";
+
+interface Job {
+    _id: string;
+    title: string;
+    jobType?: string;
+    type?: string;
+    location: string;
+    applicants?: unknown[];
+    createdAt: string;
+    isActive: boolean;
+}
 
 export default function ManageJobs() {
     const { user } = useAuth();
-    const [jobs, setJobs] = useState<JobData[]>([]);
+    const [jobs, setJobs] = useState<Job[]>([]);
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
@@ -17,8 +27,8 @@ export default function ManageJobs() {
             
             try {
                 setLoading(true);
-                const jobs = await getJobsByEmployer(user.id);
-                setJobs(jobs);
+                const response = await api.get(`/jobs/employer/${user.id}`);
+                setJobs(response.data.data || []);
             } catch (error) {
                 console.error("Error fetching jobs:", error);
             } finally {
@@ -32,8 +42,8 @@ export default function ManageJobs() {
     const handleDelete = async (jobId: string) => {
         if (!confirm("Are you sure you want to delete this job?")) return;
         try {
-            await deleteJob(jobId);
-            setJobs(jobs.filter(job => (job._id || job.id) !== jobId));
+            await api.delete(`/jobs/${jobId}`);
+            setJobs(jobs.filter(job => job._id !== jobId));
         } catch (error) {
             console.error("Error deleting job:", error);
             alert("Failed to delete job");
@@ -104,7 +114,7 @@ export default function ManageJobs() {
                                 </tr>
                             ) : (
                                 jobs.map((job) => (
-                                    <tr key={job._id || job.id} className="hover:bg-gray-50/50 transition-colors group">
+                                    <tr key={job._id} className="hover:bg-gray-50/50 transition-colors group">
                                         <td className="px-6 py-4">
                                             <div>
                                                 <p className="font-bold text-gray-900 group-hover:text-[#00b4d8] transition-colors">{job.title}</p>
@@ -121,13 +131,13 @@ export default function ManageJobs() {
                                         <td className="px-6 py-4">
                                             <div className="flex items-center gap-2 font-bold text-gray-700">
                                                 <Users className="w-4 h-4 text-[#00b4d8]" />
-                                                {job.applicationCount || 0}
+                                                {job.applicants?.length || 0}
                                             </div>
                                         </td>
                                         <td className="px-6 py-4 text-sm text-gray-600">
                                             <div className="flex items-center gap-2">
                                                 <Clock className="w-4 h-4 text-gray-400" />
-                                                {job.createdAt ? new Date(job.createdAt).toLocaleDateString() : 'N/A'}
+                                                {new Date(job.createdAt).toLocaleDateString()}
                                             </div>
                                         </td>
                                         <td className="px-6 py-4">
@@ -139,13 +149,13 @@ export default function ManageJobs() {
                                         </td>
                                         <td className="px-6 py-4 text-right">
                                             <div className="flex items-center justify-end gap-2">
-                                                <Link to={`/dashboard/applicants/${job._id || job.id}`} className="p-2 text-gray-400 hover:text-blue-500 hover:bg-blue-50 rounded-lg transition-all" title="View Applicants">
+                                                <Link to={`/dashboard/applicants/${job._id}`} className="p-2 text-gray-400 hover:text-blue-500 hover:bg-blue-50 rounded-lg transition-all" title="View Applicants">
                                                     <Eye className="w-4 h-4" />
                                                 </Link>
-                                                <Link to={`/dashboard/edit-job/${job._id || job.id}`} className="p-2 text-gray-400 hover:text-[#00b4d8] hover:bg-blue-50 rounded-lg transition-all" title="Edit">
+                                                <Link to={`/dashboard/edit-job/${job._id}`} className="p-2 text-gray-400 hover:text-[#00b4d8] hover:bg-blue-50 rounded-lg transition-all" title="Edit">
                                                     <Edit3 className="w-4 h-4" />
                                                 </Link>
-                                                <button onClick={() => handleDelete(job._id || job.id || '')} className="p-2 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-lg transition-all" title="Delete">
+                                                <button onClick={() => handleDelete(job._id)} className="p-2 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-lg transition-all" title="Delete">
                                                     <Trash2 className="w-4 h-4" />
                                                 </button>
                                             </div>
