@@ -22,9 +22,11 @@ export default function JobDetailPage() {
         setIsLoading(true);
         const jobData = await getJobById(id);
         setJob(jobData);
-        
+
         const allJobs = await getAllJobs();
-        setSimilarJobs(allJobs.filter(j => (j._id || j.id) !== id).slice(0, 3));
+        setSimilarJobs(
+          allJobs.filter((j) => (j._id || j.id) !== id).slice(0, 3),
+        );
       } catch (error) {
         console.error("Error fetching job:", error);
       } finally {
@@ -43,11 +45,18 @@ export default function JobDetailPage() {
       <PageWrapper>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 text-center">
           <h1 className="text-2xl font-bold text-gray-900">Job Not Found</h1>
-          <p className="text-gray-600 mt-2">The job you are looking for does not exist.</p>
-          <Link to="/jobs" className="text-[#00b4d8] hover:underline mt-4 inline-block">Browse All Jobs</Link>
+          <p className="text-gray-600 mt-2">
+            The job you are looking for does not exist.
+          </p>
+          <Link
+            to="/jobs"
+            className="text-[#00b4d8] hover:underline mt-4 inline-block"
+          >
+            Browse All Jobs
+          </Link>
         </div>
       </PageWrapper>
-    )
+    );
   }
 
   return (
@@ -59,8 +68,12 @@ export default function JobDetailPage() {
             {/* Job Header */}
             <div className="bg-white rounded-lg shadow p-6 mb-6 border border-gray-100">
               <div className="flex items-start gap-4 mb-6">
-                <div className={`w-16 h-16 rounded-lg flex items-center justify-center ${job.logoBg || 'bg-blue-100'} flex-shrink-0`}>
-                  <span className="text-2xl font-bold">{job.logo || job.company?.charAt(0) || '?'}</span>
+                <div
+                  className={`w-16 h-16 rounded-lg flex items-center justify-center ${job.logoBg || "bg-blue-100"} flex-shrink-0`}
+                >
+                  <span className="text-2xl font-bold">
+                    {job.logo || job.company?.charAt(0) || "?"}
+                  </span>
                 </div>
                 <div className="flex-1">
                   <h1 className="text-2xl font-bold text-gray-900 mb-2">
@@ -71,19 +84,23 @@ export default function JobDetailPage() {
                   </p>
                   <div className="flex flex-wrap gap-3 text-sm text-gray-600">
                     <span className="flex items-center gap-1">
-                      <MapPin className="w-4 h-4 text-[#ff6b6b]" /> {job.location}
+                      <MapPin className="w-4 h-4 text-[#ff6b6b]" />{" "}
+                      {job.location}
                     </span>
                     <span className="flex items-center gap-1">
-                      <Briefcase className="w-4 h-4 text-[#ff6b6b]" /> {job.jobType || job.type || 'Full-time'}
+                      <Briefcase className="w-4 h-4 text-[#ff6b6b]" />{" "}
+                      {job.jobType || job.type || "Full-time"}
                     </span>
                     {job.salary && (
                       <span className="flex items-center gap-1">
-                        <DollarSign className="w-4 h-4 text-[#ff6b6b]" /> {job.salary}
+                        <DollarSign className="w-4 h-4 text-[#ff6b6b]" />{" "}
+                        {job.salary}
                       </span>
                     )}
                     {job.createdAt && (
                       <span className="flex items-center gap-1">
-                        <Calendar className="w-4 h-4 text-[#ff6b6b]" /> Posted {new Date(job.createdAt).toLocaleDateString()}
+                        <Calendar className="w-4 h-4 text-[#ff6b6b]" /> Posted{" "}
+                        {new Date(job.createdAt).toLocaleDateString()}
                       </span>
                     )}
                   </div>
@@ -93,7 +110,10 @@ export default function JobDetailPage() {
               {job.tags && job.tags.length > 0 && (
                 <div className="flex flex-wrap gap-2 mb-6">
                   {job.tags.map((tag, idx) => (
-                    <span key={idx} className="px-3 py-1 bg-gray-100 text-gray-600 text-sm rounded-full capitalize">
+                    <span
+                      key={idx}
+                      className="px-3 py-1 bg-gray-100 text-gray-600 text-sm rounded-full capitalize"
+                    >
                       {tag}
                     </span>
                   ))}
@@ -109,12 +129,15 @@ export default function JobDetailPage() {
                 </button>
                 <button
                   onClick={() => setIsSaved(!isSaved)}
-                  className={`px-6 py-2 border rounded-lg transition-all flex items-center gap-2 font-bold uppercase tracking-wider text-xs active:scale-95 ${isSaved
+                  className={`px-6 py-2 border rounded-lg transition-all flex items-center gap-2 font-bold uppercase tracking-wider text-xs active:scale-95 ${
+                    isSaved
                       ? "bg-red-50 border-[#ff6b6b] text-[#ff6b6b]"
                       : "bg-white border-gray-200 text-gray-700 hover:bg-gray-50"
-                    }`}
+                  }`}
                 >
-                  <Heart className={`w-4 h-4 transition-colors ${isSaved ? "fill-current" : ""}`} />
+                  <Heart
+                    className={`w-4 h-4 transition-colors ${isSaved ? "fill-current" : ""}`}
+                  />
                   {isSaved ? "Saved" : "Save Job"}
                 </button>
               </div>
@@ -125,13 +148,15 @@ export default function JobDetailPage() {
               isOpen={isApplyModalOpen}
               onClose={() => setIsApplyModalOpen(false)}
               jobTitle={job.title}
-              companyName={job.company}
+              companyName={job.company || "Company"}
               jobId={job._id || job.id}
             />
 
             {/* Job Description */}
             <div className="bg-white rounded-lg shadow p-6 mb-6 border border-gray-100">
-              <h2 className="text-xl font-bold text-gray-900 mb-4">Job Description</h2>
+              <h2 className="text-xl font-bold text-gray-900 mb-4">
+                Job Description
+              </h2>
               <div className="prose max-w-none text-gray-600 leading-relaxed">
                 <p className="mb-6">
                   {job.description || "No description provided."}
@@ -143,31 +168,39 @@ export default function JobDetailPage() {
                       Responsibilities:
                     </h3>
                     <ul className="list-disc pl-5 mb-6 space-y-2">
-                      {(Array.isArray(job.responsibilities) 
-                        ? job.responsibilities 
-                        : job.responsibilities.split(', ')
-                      ).filter(item => item && item.trim()).map((item, idx) => (
-                        <li key={idx}>{item.trim()}</li>
-                      ))}
+                      {(Array.isArray(job.responsibilities)
+                        ? job.responsibilities
+                        : job.responsibilities.split(", ")
+                      )
+                        .filter((item) => item && item.trim())
+                        .map((item, idx) => (
+                          <li key={idx}>{item.trim()}</li>
+                        ))}
                     </ul>
                   </>
                 )}
 
                 {job.requirements && (
                   <>
-                    <h3 className="text-lg font-bold text-gray-900 mb-3">Requirements:</h3>
+                    <h3 className="text-lg font-bold text-gray-900 mb-3">
+                      Requirements:
+                    </h3>
                     <ul className="list-disc pl-5 mb-6 space-y-2">
-                      {(Array.isArray(job.requirements) 
-                        ? job.requirements 
-                        : job.requirements.split(', ')
-                      ).filter(item => item && item.trim()).map((item, idx) => (
-                        <li key={idx}>{item.trim()}</li>
-                      ))}
+                      {(Array.isArray(job.requirements)
+                        ? job.requirements
+                        : job.requirements.split(", ")
+                      )
+                        .filter((item) => item && item.trim())
+                        .map((item, idx) => (
+                          <li key={idx}>{item.trim()}</li>
+                        ))}
                     </ul>
                   </>
                 )}
 
-                <h3 className="text-lg font-bold text-gray-900 mb-3">What We Offer:</h3>
+                <h3 className="text-lg font-bold text-gray-900 mb-3">
+                  What We Offer:
+                </h3>
                 <ul className="list-disc pl-5 space-y-2">
                   <li>Competitive salary and benefits package</li>
                   <li>Health, dental, and vision insurance</li>
@@ -180,16 +213,25 @@ export default function JobDetailPage() {
 
             {/* Company Info */}
             <div className="bg-white rounded-lg shadow p-6 border border-gray-100">
-              <h2 className="text-xl font-bold text-gray-900 mb-4">About {job.company}</h2>
+              <h2 className="text-xl font-bold text-gray-900 mb-4">
+                About {job.company}
+              </h2>
               <p className="text-gray-600 mb-4 leading-relaxed">
-                Join our team and be part of an innovative company driving change in the industry.
+                Join our team and be part of an innovative company driving
+                change in the industry.
               </p>
               <div className="grid grid-cols-2 gap-4 text-sm text-gray-600">
                 <div>
-                  <span className="font-bold text-gray-900 block">Location:</span> {job.location}
+                  <span className="font-bold text-gray-900 block">
+                    Location:
+                  </span>{" "}
+                  {job.location}
                 </div>
                 <div>
-                  <span className="font-bold text-gray-900 block">Category:</span> {job.category}
+                  <span className="font-bold text-gray-900 block">
+                    Category:
+                  </span>{" "}
+                  {job.category}
                 </div>
               </div>
             </div>
@@ -199,54 +241,80 @@ export default function JobDetailPage() {
           <div className="lg:col-span-1">
             {/* Job Summary */}
             <div className="bg-white rounded-lg shadow p-6 mb-6 border border-gray-100">
-              <h3 className="text-lg font-bold text-gray-900 mb-4">Job Summary</h3>
+              <h3 className="text-lg font-bold text-gray-900 mb-4">
+                Job Summary
+              </h3>
               <div className="space-y-4 text-sm">
                 <div className="flex justify-between items-center border-b border-gray-50 pb-3">
                   <span className="text-gray-500">Job Type:</span>
-                  <span className="font-medium text-gray-900">{job.jobType || job.type || 'Full-time'}</span>
+                  <span className="font-medium text-gray-900">
+                    {job.jobType || job.type || "Full-time"}
+                  </span>
                 </div>
                 <div className="flex justify-between items-center border-b border-gray-50 pb-3">
                   <span className="text-gray-500">Location:</span>
-                  <span className="font-medium text-gray-900 text-right w-1/2 line-clamp-1">{job.location}</span>
+                  <span className="font-medium text-gray-900 text-right w-1/2 line-clamp-1">
+                    {job.location}
+                  </span>
                 </div>
                 {job.salary && (
                   <div className="flex justify-between items-center border-b border-gray-50 pb-3">
                     <span className="text-gray-500">Salary:</span>
-                    <span className="font-medium text-gray-900">{job.salary}</span>
+                    <span className="font-medium text-gray-900">
+                      {job.salary}
+                    </span>
                   </div>
                 )}
                 {job.experience && (
                   <div className="flex justify-between items-center border-b border-gray-50 pb-3">
                     <span className="text-gray-500">Experience:</span>
-                    <span className="font-medium text-gray-900">{job.experience}</span>
+                    <span className="font-medium text-gray-900">
+                      {job.experience}
+                    </span>
                   </div>
                 )}
                 {job.education && (
                   <div className="flex justify-between items-center border-b border-gray-50 pb-3">
                     <span className="text-gray-500">Education:</span>
-                    <span className="font-medium text-gray-900">{job.education}</span>
+                    <span className="font-medium text-gray-900">
+                      {job.education}
+                    </span>
                   </div>
                 )}
                 <div className="flex justify-between items-center">
                   <span className="text-gray-500">Posted:</span>
-                  <span className="font-medium text-gray-900">{job.createdAt ? new Date(job.createdAt).toLocaleDateString() : "Recently"}</span>
+                  <span className="font-medium text-gray-900">
+                    {job.createdAt
+                      ? new Date(job.createdAt).toLocaleDateString()
+                      : "Recently"}
+                  </span>
                 </div>
               </div>
             </div>
 
             {/* Similar Jobs */}
             <div className="bg-white rounded-lg shadow p-6 border border-gray-100">
-              <h3 className="text-lg font-bold text-gray-900 mb-4">Similar Jobs</h3>
+              <h3 className="text-lg font-bold text-gray-900 mb-4">
+                Similar Jobs
+              </h3>
               <div className="space-y-4">
                 {similarJobs.length > 0 ? (
-                  similarJobs.map(similar => (
-                    <div key={similar._id || similar.id} className="border-b border-gray-50 pb-4 last:border-0 last:pb-0">
+                  similarJobs.map((similar) => (
+                    <div
+                      key={similar._id || similar.id}
+                      className="border-b border-gray-50 pb-4 last:border-0 last:pb-0"
+                    >
                       <h4 className="font-bold text-gray-900 mb-1 hover:text-[#00b4d8] transition-colors cursor-pointer block">
-                        <Link to={`/jobs/${similar._id || similar.id}`}>{similar.title}</Link>
+                        <Link to={`/jobs/${similar._id || similar.id}`}>
+                          {similar.title}
+                        </Link>
                       </h4>
-                      <p className="text-[#00b4d8] text-sm mb-1">{similar.company}</p>
+                      <p className="text-[#00b4d8] text-sm mb-1">
+                        {similar.company}
+                      </p>
                       <p className="text-gray-500 text-xs">
-                        {similar.location} {similar.salary && `• ${similar.salary}`}
+                        {similar.location}{" "}
+                        {similar.salary && `• ${similar.salary}`}
                       </p>
                     </div>
                   ))

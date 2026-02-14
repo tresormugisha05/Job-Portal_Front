@@ -25,6 +25,10 @@ export interface JobData {
   typeBg?: string;
   experience?: string;
   education?: string;
+  // Additional properties used in components
+  company?: string;
+  tags?: string[];
+  featured?: boolean;
 }
 
 export interface JobResponse {

@@ -20,6 +20,8 @@ export interface EmployerData {
   userId?: string;
   createdAt?: string;
   updatedAt?: string;
+  // Job count for display purposes
+  jobCount?: number;
 }
 
 export interface EmployerResponse {
