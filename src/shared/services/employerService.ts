@@ -1,21 +1,23 @@
-const API_BASE_URL =
-  import.meta.env.VITE_APP_API_URL ||
-  "mongodb+srv://teta:2E5Vr9Kz5kZboBwK@cluster0.62mwlgl.mongodb.net/?appName=Cluster0";
+import api from "./ApiSetter";
 
+// Employer interfaces
 export interface EmployerData {
   _id?: string;
   id?: string;
   companyName: string;
-  industry: string;
-  companySize: string;
+  industry?: string;
+  companySize?: string;
   website?: string;
-  description: string;
-  location: string;
-  email: string;
-  contactPhone: string;
+  description?: string;
+  location?: string;
+  email?: string;
+  phone?: string;
+  // Legacy fields for backward compatibility
+  contactEmail?: string;
+  contactPhone?: string;
   logo?: string;
   isVerified?: boolean;
-  jobCount?: number;
+  userId?: string;
   createdAt?: string;
   updatedAt?: string;
 }
@@ -29,21 +31,11 @@ export interface EmployerResponse {
 // Get all employers
 export const getAllEmployers = async (): Promise<EmployerData[]> => {
   try {
-    const response = await fetch(`${API_BASE_URL}/employers/all`, {
-      method: "GET",
-      headers: {
-        "Content-Type": "application/json",
-      },
-    });
+    const response = await api.get(`/employers/all`);
 
-    const data: EmployerResponse = await response.json();
-
-    if (!response.ok) {
-      throw new Error(data.message || "Failed to fetch employers");
-    }
-
-    if (Array.isArray(data.data)) {
-      return data.data.map((employer) => ({
+    // Normalize data to handle both single and array responses
+    if (Array.isArray(response.data.data)) {
+      return response.data.data.map((employer: EmployerData) => ({
         ...employer,
         id: employer._id || employer.id,
       }));
@@ -59,23 +51,12 @@ export const getAllEmployers = async (): Promise<EmployerData[]> => {
 // Get employer by ID
 export const getEmployerById = async (id: string): Promise<EmployerData> => {
   try {
-    const response = await fetch(`${API_BASE_URL}/employers/${id}`, {
-      method: "GET",
-      headers: {
-        "Content-Type": "application/json",
-      },
-    });
+    const response = await api.get(`/employers/${id}`);
 
-    const data: EmployerResponse = await response.json();
-
-    if (!response.ok) {
-      throw new Error(data.message || "Failed to fetch employer");
-    }
-
-    if (!Array.isArray(data.data)) {
+    if (!Array.isArray(response.data.data)) {
       return {
-        ...data.data,
-        id: data.data?._id || data.data?.id,
+        ...response.data.data,
+        id: response.data.data?._id || response.data.data?.id,
       } as EmployerData;
     }
 
@@ -86,30 +67,88 @@ export const getEmployerById = async (id: string): Promise<EmployerData> => {
   }
 };
 
-// Get top hiring companies
-export const getTopHiringCompanies = async (): Promise<EmployerData[]> => {
+// Create a new employer
+export const createEmployer = async (
+  employerData: EmployerData,
+): Promise<EmployerData> => {
   try {
-    const response = await fetch(`${API_BASE_URL}/employers/top-hiring`, {
-      method: "GET",
-      headers: {
-        "Content-Type": "application/json",
-      },
-    });
+    const response = await api.post(`/employers`, employerData);
 
-    const data: EmployerResponse = await response.json();
-
-    if (!response.ok) {
-      throw new Error(data.message || "Failed to fetch top hiring companies");
+    if (!Array.isArray(response.data.data)) {
+      return {
+        ...response.data.data,
+        id: response.data.data?._id || response.data.data?.id,
+      } as EmployerData;
     }
 
-    if (Array.isArray(data.data)) {
-      return data.data.map((employer) => ({
+    throw new Error("Invalid response format");
+  } catch (error) {
+    console.error("Error creating employer:", error);
+    throw error;
+  }
+};
+
+// Update employer
+export const updateEmployer = async (
+  id: string,
+  employerData: Partial<EmployerData>,
+): Promise<EmployerData> => {
+  try {
+    const response = await api.put(`/employers/${id}`, employerData);
+
+    if (!Array.isArray(response.data.data)) {
+      return {
+        ...response.data.data,
+        id: response.data.data?._id || response.data.data?.id,
+      } as EmployerData;
+    }
+
+    throw new Error("Invalid response format");
+  } catch (error) {
+    console.error("Error updating employer:", error);
+    throw error;
+  }
+};
+
+// Delete employer
+export const deleteEmployer = async (id: string): Promise<boolean> => {
+  try {
+    await api.delete(`/employers/${id}`);
+    return true;
+  } catch (error) {
+    console.error("Error deleting employer:", error);
+    throw error;
+  }
+};
+
+// Get employer by userId (for dashboard)
+export const getEmployerByUserId = async (
+  userId: string,
+): Promise<EmployerData | null> => {
+  try {
+    const response = await api.get(`/employers?userId=${userId}`);
+
+    if (Array.isArray(response.data.data) && response.data.data.length > 0) {
+      const employer = response.data.data[0];
+      return {
         ...employer,
         id: employer._id || employer.id,
-      }));
+      };
     }
 
-    return [];
+    return null;
+  } catch (error) {
+    console.error("Error fetching employer by userId:", error);
+    return null;
+  }
+};
+
+// Get top hiring companies
+export const getTopHiringCompanies = async () => {
+  try {
+    const response = await api.get(`/employers/top-hiring`);
+
+    return Array.isArray(response.data.data) ? response.data.data : [];
   } catch (error) {
     console.error("Error fetching top hiring companies:", error);
     throw error;

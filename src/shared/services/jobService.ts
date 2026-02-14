@@ -1,4 +1,4 @@
-const API_BASE_URL = import.meta.env.VITE_APP_API_URL || "http://localhost:5000/api";
+import api from "./ApiSetter";
 
 // Job interfaces
 export interface JobData {
@@ -6,7 +6,6 @@ export interface JobData {
   id?: string;
   title: string;
   description: string;
-  company: string;
   requirements: string;
   responsibilities: string;
   category: string;
@@ -26,8 +25,6 @@ export interface JobData {
   typeBg?: string;
   experience?: string;
   education?: string;
-  tags?: string[];
-  featured?: boolean;
 }
 
 export interface JobResponse {
@@ -39,21 +36,10 @@ export interface JobResponse {
 // Get all jobs
 export const getAllJobs = async (): Promise<JobData[]> => {
   try {
-    const response = await fetch(`${API_BASE_URL}/jobs`, {
-      method: "GET",
-      headers: {
-        "Content-Type": "application/json",
-      },
-    });
+    const response = await api.get(`/jobs`);
 
-    const data: JobResponse = await response.json();
-
-    if (!response.ok) {
-      throw new Error(data.message || "Failed to fetch jobs");
-    }
-
-    if (Array.isArray(data.data)) {
-      return data.data.map((job) => ({
+    if (Array.isArray(response.data.data)) {
+      return response.data.data.map((job: JobData) => ({
         ...job,
         id: job._id || job.id,
       }));
@@ -69,23 +55,12 @@ export const getAllJobs = async (): Promise<JobData[]> => {
 // Get job by ID
 export const getJobById = async (id: string): Promise<JobData> => {
   try {
-    const response = await fetch(`${API_BASE_URL}/jobs/${id}`, {
-      method: "GET",
-      headers: {
-        "Content-Type": "application/json",
-      },
-    });
+    const response = await api.get(`/jobs/${id}`);
 
-    const data: JobResponse = await response.json();
-
-    if (!response.ok) {
-      throw new Error(data.message || "Failed to fetch job");
-    }
-
-    if (!Array.isArray(data.data)) {
+    if (!Array.isArray(response.data.data)) {
       return {
-        ...data.data,
-        id: data.data?._id || data.data?.id,
+        ...response.data.data,
+        id: response.data.data?._id || response.data.data?.id,
       } as JobData;
     }
 
@@ -101,27 +76,10 @@ export const getJobsByEmployer = async (
   employerId: string,
 ): Promise<JobData[]> => {
   try {
-    const token = localStorage.getItem("token");
+    const response = await api.get(`/jobs/employer/${employerId}`);
 
-    const response = await fetch(
-      `${API_BASE_URL}/jobs/employer/${employerId}`,
-      {
-        method: "GET",
-        headers: {
-          "Content-Type": "application/json",
-          ...(token && { Authorization: `Bearer ${token}` }),
-        },
-      },
-    );
-
-    const data: JobResponse = await response.json();
-
-    if (!response.ok) {
-      throw new Error(data.message || "Failed to fetch jobs");
-    }
-
-    if (Array.isArray(data.data)) {
-      return data.data.map((job) => ({
+    if (Array.isArray(response.data.data)) {
+      return response.data.data.map((job: JobData) => ({
         ...job,
         id: job._id || job.id,
       }));
@@ -137,27 +95,12 @@ export const getJobsByEmployer = async (
 // Create a new job
 export const createJob = async (jobData: JobData): Promise<JobData> => {
   try {
-    const token = localStorage.getItem("token");
+    const response = await api.post(`/jobs`, jobData);
 
-    const response = await fetch(`${API_BASE_URL}/jobs`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        ...(token && { Authorization: `Bearer ${token}` }),
-      },
-      body: JSON.stringify(jobData),
-    });
-
-    const data: JobResponse = await response.json();
-
-    if (!response.ok) {
-      throw new Error(data.message || "Failed to create job");
-    }
-
-    if (!Array.isArray(data.data)) {
+    if (!Array.isArray(response.data.data)) {
       return {
-        ...data.data,
-        id: data.data?._id || data.data?.id,
+        ...response.data.data,
+        id: response.data.data?._id || response.data.data?.id,
       } as JobData;
     }
 
@@ -174,27 +117,12 @@ export const updateJob = async (
   jobData: Partial<JobData>,
 ): Promise<JobData> => {
   try {
-    const token = localStorage.getItem("token");
+    const response = await api.put(`/jobs/${id}`, jobData);
 
-    const response = await fetch(`${API_BASE_URL}/jobs/${id}`, {
-      method: "PUT",
-      headers: {
-        "Content-Type": "application/json",
-        ...(token && { Authorization: `Bearer ${token}` }),
-      },
-      body: JSON.stringify(jobData),
-    });
-
-    const data: JobResponse = await response.json();
-
-    if (!response.ok) {
-      throw new Error(data.message || "Failed to update job");
-    }
-
-    if (!Array.isArray(data.data)) {
+    if (!Array.isArray(response.data.data)) {
       return {
-        ...data.data,
-        id: data.data?._id || data.data?.id,
+        ...response.data.data,
+        id: response.data.data?._id || response.data.data?.id,
       } as JobData;
     }
 
@@ -208,22 +136,7 @@ export const updateJob = async (
 // Delete a job
 export const deleteJob = async (id: string): Promise<boolean> => {
   try {
-    const token = localStorage.getItem("token");
-
-    const response = await fetch(`${API_BASE_URL}/jobs/${id}`, {
-      method: "DELETE",
-      headers: {
-        "Content-Type": "application/json",
-        ...(token && { Authorization: `Bearer ${token}` }),
-      },
-    });
-
-    const data: JobResponse = await response.json();
-
-    if (!response.ok) {
-      throw new Error(data.message || "Failed to delete job");
-    }
-
+    await api.delete(`/jobs/${id}`);
     return true;
   } catch (error) {
     console.error("Error deleting job:", error);
@@ -234,24 +147,12 @@ export const deleteJob = async (id: string): Promise<boolean> => {
 // Search jobs
 export const searchJobs = async (query: string): Promise<JobData[]> => {
   try {
-    const response = await fetch(
-      `${API_BASE_URL}/jobs/search?q=${encodeURIComponent(query)}`,
-      {
-        method: "GET",
-        headers: {
-          "Content-Type": "application/json",
-        },
-      },
+    const response = await api.get(
+      `/jobs/search?q=${encodeURIComponent(query)}`,
     );
 
-    const data: JobResponse = await response.json();
-
-    if (!response.ok) {
-      throw new Error(data.message || "Failed to search jobs");
-    }
-
-    if (Array.isArray(data.data)) {
-      return data.data.map((job) => ({
+    if (Array.isArray(response.data.data)) {
+      return response.data.data.map((job: JobData) => ({
         ...job,
         id: job._id || job.id,
       }));
