@@ -368,8 +368,26 @@ export default function EmployerDetailPage() {
                                 </h3>
                                 <div className="grid grid-cols-1 gap-6">
                                     {employerJobs.length > 0 ? (
-                                        employerJobs.map((job) => <JobCard key={job._id || job.id} job={{ ...job, id: job.id || job._id || '', type: job.jobType || job.type || '', typeBg: job.typeBg || '', logoBg: job.logoBg || '', salary: job.salary || '', logo: job.logo || '', tags: job.tags || [], responsibilities: typeof job.responsibilities === 'string' ? job.responsibilities.split(',').map(r => r.trim()) : job.responsibilities || [], requirements: typeof job.requirements === 'string' ? job.requirements.split(',').map(r => r.trim()) : job.requirements || [] }} />)
-                                    ) : (
+                                        employerJobs.map((job) => (
+                                            <JobCard
+                                                key={job._id || job.id}
+                                                job={{
+                                                    ...job,
+                                                    id: job.id || job._id || '',
+                                                    employerId: job.employerId || '',
+                                                    company: job.company || '',
+                                                    location: job.location || 'Remote',
+                                                    type: job.jobType || job.type || 'Full-time',
+                                                    typeBg: job.typeBg || 'bg-blue-100 text-blue-600',
+                                                    salary: job.salary || 'Negotiable',
+                                                    logo: job.logo || '',
+                                                    logoBg: job.logoBg || 'bg-gray-100',
+                                                    tags: job.tags || [],
+                                                    responsibilities: typeof job.responsibilities === 'string' ? job.responsibilities.split(',').map(r => r.trim()) : job.responsibilities || [],
+                                                    requirements: typeof job.requirements === 'string' ? job.requirements.split(',').map(r => r.trim()) : job.requirements || []
+                                                } as any}
+                                            />)
+                                        )) : (
                                         <div className="bg-white p-6 rounded border border-gray-100 text-center text-gray-500">
                                             No open positions found.
                                         </div>

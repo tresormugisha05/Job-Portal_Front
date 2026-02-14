@@ -78,8 +78,8 @@ export default function HomeJobs() {
                 key={tab}
                 onClick={() => setActiveFilter(tab)}
                 className={`px-4 sm:px-6 py-2.5 text-xs sm:text-sm font-medium uppercase tracking-wide transition-colors ${activeFilter === tab
-                    ? "bg-[#00b4d8] text-white"
-                    : "bg-white text-gray-700 hover:bg-gray-50"
+                  ? "bg-[#00b4d8] text-white"
+                  : "bg-white text-gray-700 hover:bg-gray-50"
                   } ${index > 0 ? "border-l border-gray-200" : ""}`}
               >
                 {tab}
@@ -96,7 +96,24 @@ export default function HomeJobs() {
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {filteredJobs.length > 0 ? (
-              filteredJobs.map((job) => <JobCard key={job._id || job.id} job={{ ...job, id: job._id || job.id }} />)
+              filteredJobs.map((job) => (
+                <JobCard
+                  key={job._id || job.id}
+                  job={{
+                    ...job,
+                    id: job._id || job.id || "",
+                    salary: job.salary || "Negotiable",
+                    type: job.jobType || job.type || "Full-time",
+                    logo: job.logo || "",
+                    logoBg: job.logoBg || "bg-gray-100",
+                    typeBg: job.typeBg || "bg-blue-100 text-blue-600",
+                    tags: job.tags || [],
+                    company: job.company || "Unknown",
+                    location: job.location || "Remote",
+                    employerId: job.employerId || ""
+                  } as any}
+                />
+              ))
             ) : (
               <div className="col-span-1 md:col-span-2 text-center py-12 text-gray-500">
                 No jobs found for this category.
