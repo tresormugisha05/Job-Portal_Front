@@ -27,7 +27,7 @@ export interface EmployerResponse {
 // Get all employers
 export const getAllEmployers = async (): Promise<EmployerData[]> => {
   try {
-    const response = await fetch(`${API_BASE_URL}/employers`, {
+    const response = await fetch(`${API_BASE_URL}/employers/all`, {
       method: "GET",
       headers: {
         "Content-Type": "application/json",
