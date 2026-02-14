@@ -1,3 +1,4 @@
+/* eslint-disable react-refresh/only-export-components */
 import React, { createContext, useContext, useState } from "react";
 import api from "../services/ApiSetter";
 
@@ -79,13 +80,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         // Fallback: try candidate first, then employer (for backward compatibility)
         try {
           response = await api.post("/auth/login", { email, password });
-        } catch (error) {
+        } catch {
           // If candidate login fails, try employer login
-          try {
-            response = await api.post("/employers/login", { email, password });
-          } catch (employerError) {
-            throw error; // Throw original error if both fail
-          }
+          response = await api.post("/employers/login", { email, password });
         }
       }
 
@@ -106,8 +103,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       localStorage.setItem("job_portal_user", JSON.stringify(finalUser));
       setUser(finalUser);
 
-    } catch (error: any) {
-      throw new Error(error.response?.data?.message || "Invalid credentials");
+    } catch (error: unknown) {
+      const err = error as { response?: { data?: { message?: string } } };
+      throw new Error(err.response?.data?.message || "Invalid credentials");
     }
   };
 
@@ -133,12 +131,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         response = await api.post("/employers/register", {
           companyName: userData.name,
           email: userData.email,
-          contactPhone: userData.phone,
+          phone: userData.phone,
           password: userData.password,
-          industry: userData.industry || "Technology",
-          companySize: userData.companySize || "1-10",
-          description: userData.description || "",
-          location: userData.location || "",
         });
       } else {
         // Use candidate registration endpoint
@@ -159,8 +153,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       localStorage.setItem("job_portal_user", JSON.stringify(finalUser));
 
       setUser(finalUser);
-    } catch (error: any) {
-      throw new Error(error.response?.data?.message || "Registration failed");
+    } catch (error: unknown) {
+      const err = error as { response?: { data?: { message?: string } } };
+      throw new Error(err.response?.data?.message || "Registration failed");
     }
   };
 
@@ -183,8 +178,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
         setUser(finalUser);
         localStorage.setItem("job_portal_user", JSON.stringify(finalUser));
-      } catch (error: any) {
-        throw new Error(error.response?.data?.message || "Failed to update profile");
+      } catch (error: unknown) {
+        const err = error as { response?: { data?: { message?: string } } };
+        throw new Error(err.response?.data?.message || "Failed to update profile");
       }
     }
   };
