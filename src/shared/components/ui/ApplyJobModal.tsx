@@ -1,7 +1,8 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { X, Upload, CheckCircle, AlertCircle, LogIn, Loader2 } from "lucide-react";
 import { useAuth } from "../../contexts/AuthContext";
 import { Link } from "react-router-dom";
+import { ApplicationService } from "../../services/application.Service";
 
 interface ApplyJobModalProps {
     isOpen: boolean;
@@ -15,32 +16,62 @@ export default function ApplyJobModal({
     isOpen,
     onClose,
     jobTitle,
-    companyName
+    companyName,
+    jobId
 }: ApplyJobModalProps) {
-    const { role, isAuthenticated } = useAuth();
-    const [formData, setFormData] = useState({
+    const { role, isAuthenticated, user } = useAuth();
+    const [formData, setFormData] = useState<{
+        name: string;
+        email: string;
+        message: string;
+        resume: File | null;
+    }>({
         name: "",
         email: "",
         message: "",
+        resume: null
     });
 
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [isSuccess, setIsSuccess] = useState(false);
 
+    useEffect(() => {
+        if (isOpen && user) {
+            setFormData(prev => ({
+                ...prev,
+                name: user.name || "",
+                email: user.email || ""
+            }));
+        }
+    }, [isOpen, user]);
+
     if (!isOpen) return null;
 
     const isCandidate = role === "CANDIDATE";
 
-    const handleSubmit = (e: React.FormEvent) => {
+    const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-        if (!isCandidate) return;
+        if (!isCandidate || !jobId) return;
 
         setIsSubmitting(true);
-        // Simulate API call
-        setTimeout(() => {
-            setIsSubmitting(false);
+        try {
+            await ApplicationService.submit(
+                jobId,
+                {
+                    name: formData.name,
+                    email: formData.email,
+                    coverLetter: formData.message
+                },
+                formData.resume || undefined
+            );
             setIsSuccess(true);
-        }, 1500);
+        } catch (error: any) {
+            console.error("Error submitting application:", error);
+            const errorMessage = error.response?.data?.message || "Failed to submit application. Please try again.";
+            alert(errorMessage);
+        } finally {
+            setIsSubmitting(false);
+        }
     };
 
     if (isSuccess) {
@@ -144,9 +175,21 @@ export default function ApplyJobModal({
 
                             <div className="space-y-2">
                                 <label className="text-xs font-bold text-gray-700 uppercase tracking-wider">Upload Resume</label>
-                                <div className="border-2 border-dashed border-gray-200 rounded-xl p-8 text-center hover:border-[#00b4d8] hover:bg-blue-50/30 transition-all cursor-pointer group">
+                                <div className="border-2 border-dashed border-gray-200 rounded-xl p-8 text-center hover:border-[#00b4d8] hover:bg-blue-50/30 transition-all cursor-pointer group relative">
+                                    <input
+                                        type="file"
+                                        accept=".pdf,.doc,.docx"
+                                        className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+                                        onChange={(e) => {
+                                            if (e.target.files && e.target.files[0]) {
+                                                setFormData({ ...formData, resume: e.target.files[0] });
+                                            }
+                                        }}
+                                    />
                                     <Upload className="w-10 h-10 text-gray-400 mx-auto mb-3 group-hover:text-[#00b4d8] transition-colors" />
-                                    <p className="text-sm font-medium text-gray-600 mb-1">Click to upload or drag and drop</p>
+                                    <p className="text-sm font-medium text-gray-600 mb-1">
+                                        {formData.resume ? formData.resume.name : "Click to upload or drag and drop"}
+                                    </p>
                                     <p className="text-xs text-gray-400">PDF, DOC, DOCX (Max 5MB)</p>
                                 </div>
                             </div>

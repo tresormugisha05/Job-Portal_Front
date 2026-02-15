@@ -39,7 +39,7 @@ export default function CandidateProfile() {
   const [formData, setFormData] = useState({
     name: user?.name || "",
     email: user?.email || "",
-    phone: user?.phone || "",
+    phone: user?.contactPhone || "",
     professionalTitle: user?.professionalTitle || "",
     summary: user?.summary || "",
     location: user?.location || "",
@@ -209,7 +209,7 @@ export default function CandidateProfile() {
       await updateProfile({
         name: formData.name,
         email: formData.email,
-        phone: formData.phone,
+        contactPhone: formData.phone,
         professionalTitle: formData.professionalTitle,
         summary: formData.summary,
         location: formData.location,
@@ -291,8 +291,8 @@ export default function CandidateProfile() {
               key={tab.id}
               onClick={() => setActiveTab(tab.id)}
               className={`flex items-center gap-2 px-6 py-2.5 rounded-lg text-sm font-bold transition-all ${activeTab === tab.id
-                  ? "bg-[#00b4d8] text-white shadow-md shadow-[#00b4d8]/20"
-                  : "text-gray-500 hover:text-gray-900 hover:bg-gray-50"
+                ? "bg-[#00b4d8] text-white shadow-md shadow-[#00b4d8]/20"
+                : "text-gray-500 hover:text-gray-900 hover:bg-gray-50"
                 }`}
             >
               <tab.icon className="w-4 h-4" />

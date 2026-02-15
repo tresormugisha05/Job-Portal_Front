@@ -10,6 +10,10 @@ export default function EmployerListPage() {
     const [employers, setEmployers] = useState<EmployerData[]>([]);
     const [isLoading, setIsLoading] = useState(true);
 
+    const [categories, setCategories] = useState<{ name: string; count: number }[]>([]);
+    const [locations, setLocations] = useState<{ name: string; count: number }[]>([]);
+    const [jobTypes, setJobTypes] = useState<{ name: string; count: number }[]>([]);
+
     useEffect(() => {
         const fetchData = async () => {
             try {
@@ -22,10 +26,41 @@ export default function EmployerListPage() {
                 // Count jobs for each employer
                 const employersWithJobCount = employersData.map(employer => ({
                     ...employer,
-                    jobCount: jobsData.filter(job => job.employerId === (employer._id || employer.id)).length
+                    jobCount: jobsData.filter(job => {
+                        const jobEmployerId = typeof job.employerId === 'object' && job.employerId !== null
+                            ? (job.employerId as any)._id || (job.employerId as any).id
+                            : job.employerId;
+                        return jobEmployerId === (employer._id || employer.id);
+                    }).length
                 }));
 
                 setEmployers(employersWithJobCount);
+
+                // Calculate dynamic stats from jobsData
+                const categoryMap = new Map<string, number>();
+                const locationMap = new Map<string, number>();
+                const typeMap = new Map<string, number>();
+
+                jobsData.forEach(job => {
+                    // Categories
+                    const cat = job.category || "Other";
+                    categoryMap.set(cat, (categoryMap.get(cat) || 0) + 1);
+
+                    // Locations
+                    if (job.location) {
+                        const loc = job.location.split(',').pop()?.trim() || job.location;
+                        locationMap.set(loc, (locationMap.get(loc) || 0) + 1);
+                    }
+
+                    // Job Types
+                    const type = job.jobType || job.type || "Other";
+                    typeMap.set(type, (typeMap.get(type) || 0) + 1);
+                });
+
+                setCategories(Array.from(categoryMap.entries()).map(([name, count]) => ({ name, count })).sort((a, b) => b.count - a.count).slice(0, 8));
+                setLocations(Array.from(locationMap.entries()).map(([name, count]) => ({ name, count })).sort((a, b) => b.count - a.count).slice(0, 8));
+                setJobTypes(Array.from(typeMap.entries()).map(([name, count]) => ({ name, count })).sort((a, b) => b.count - a.count));
+
             } catch (error) {
                 console.error("Error fetching employers:", error);
             } finally {
@@ -51,36 +86,6 @@ export default function EmployerListPage() {
 
     // Sort letters
     const sortedLetters = Object.keys(companyGroups).sort();
-
-    const categories = [
-        { name: "Accounting", count: 1 },
-        { name: "Developer", count: 7 },
-        { name: "Educations", count: 0 },
-        { name: "Government", count: 0 },
-        { name: "Media & News", count: 4 },
-        { name: "Medical", count: 2 },
-        { name: "Restaurants", count: 2 },
-        { name: "Technology", count: 3 },
-    ];
-
-    const locations = [
-        { name: "Delhi", count: 6 },
-        { name: "Gurgaon", count: 0 },
-        { name: "Hawaii", count: 3 },
-        { name: "Hyderabad", count: 0 },
-        { name: "Kolkata", count: 0 },
-        { name: "New York", count: 5 },
-        { name: "Ohio", count: 2 },
-        { name: "Virginia", count: 2 },
-    ];
-
-    const jobTypes = [
-        { name: "Freelance", count: 9 },
-        { name: "Full Time", count: 3 },
-        { name: "Internship", count: 2 },
-        { name: "Part Time", count: 3 },
-        { name: "Temporary", count: 2 },
-    ];
 
     return (
         <PageWrapper disableTopPadding={true}>

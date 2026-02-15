@@ -1,10 +1,9 @@
 import { useState, useEffect } from "react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import {
-  getAllEmployers,
+  getTopHiringCompanies,
   type EmployerData,
 } from "../../../services/employerService";
-import { getAllJobs } from "../../../services/jobService";
 
 interface CompanyWithOpenings extends EmployerData {
   openings: number;
@@ -17,51 +16,39 @@ export default function HomeCompanies() {
   const [visibleCount, setVisibleCount] = useState(4);
   const [companies, setCompanies] = useState<CompanyWithOpenings[]>([]);
 
-  // Fetch employers and count their jobs
+  // Fetch top hiring companies
   useEffect(() => {
     const fetchCompaniesData = async () => {
       try {
-        const employers = await getAllEmployers();
-        const jobs = await getAllJobs();
+        const topEmployers = await getTopHiringCompanies();
 
-        if (employers && employers.length > 0) {
-          // Filter only verified employers and count their active jobs
-          const companiesWithOpenings: CompanyWithOpenings[] = employers
-            .filter((emp) => emp.isVerified === true) // Only show verified employers
-            .map((emp) => {
-              // Count active jobs for this employer
-              const employerJobs = jobs.filter(
-                (job) =>
-                  job.employerId === (emp._id || emp.id) &&
-                  job.isActive !== false,
-              );
-              const openings = employerJobs.length;
+        if (topEmployers && topEmployers.length > 0) {
+          const companiesWithOpenings: CompanyWithOpenings[] = topEmployers.map((emp: EmployerData) => {
+            // Get first letter of company name for logo
+            const companyName = emp.companyName || "Unknown";
+            const logoText = companyName.charAt(0).toUpperCase();
 
-              // Get first letter of company name for logo
-              const companyName = emp.companyName || "Unknown";
-              const logoText = companyName.charAt(0).toUpperCase();
+            // Color backgrounds array
+            const colorBgs = [
+              "bg-blue-100 text-blue-600",
+              "bg-green-100 text-green-600",
+              "bg-purple-100 text-purple-600",
+              "bg-red-100 text-red-600",
+              "bg-orange-100 text-orange-600",
+              "bg-pink-100 text-pink-600",
+              "bg-indigo-100 text-indigo-600",
+              "bg-cyan-100 text-cyan-600",
+            ];
 
-              // Color backgrounds array
-              const colorBgs = [
-                "bg-blue-100 text-blue-600",
-                "bg-green-100 text-green-600",
-                "bg-purple-100 text-purple-600",
-                "bg-red-100 text-red-600",
-                "bg-orange-100 text-orange-600",
-                "bg-pink-100 text-pink-600",
-                "bg-indigo-100 text-indigo-600",
-                "bg-cyan-100 text-cyan-600",
-              ];
+            const bgIndex = companyName.charCodeAt(0) % colorBgs.length;
 
-              const bgIndex = companyName.charCodeAt(0) % colorBgs.length;
-
-              return {
-                ...emp,
-                openings,
-                logo: logoText,
-                logoBg: colorBgs[bgIndex],
-              };
-            });
+            return {
+              ...emp,
+              openings: emp.jobCount || 0,
+              logo: logoText,
+              logoBg: colorBgs[bgIndex],
+            };
+          });
 
           setCompanies(companiesWithOpenings);
         }
@@ -177,11 +164,10 @@ export default function HomeCompanies() {
             <button
               key={i}
               onClick={() => setCurrentIndex(i)}
-              className={`w-2 h-2 rounded-full transition-all ${
-                currentIndex === i
-                  ? "bg-[#00b4d8] w-4"
-                  : "bg-white/30 hover:bg-white/50"
-              }`}
+              className={`w-2 h-2 rounded-full transition-all ${currentIndex === i
+                ? "bg-[#00b4d8] w-4"
+                : "bg-white/30 hover:bg-white/50"
+                }`}
             />
           ))}
         </div>

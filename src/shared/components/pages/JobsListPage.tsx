@@ -5,12 +5,13 @@ import Loader from "../ui/Loader";
 import usePageLoader from "../../hooks/usePageLoader";
 import JobCard from "../ui/JobCard";
 import PageHeader from "../ui/PageHeader";
-import api from "../../services/ApiSetter";
+
+import { getAllJobs, type JobData } from "../../services/jobService";
 
 export default function JobsListPage() {
   const isLoading = usePageLoader(1000);
   const [searchParams] = useSearchParams();
-  const [jobs, setJobs] = useState<any[]>([]);
+  const [jobs, setJobs] = useState<JobData[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -19,8 +20,8 @@ export default function JobsListPage() {
 
   const fetchJobs = async () => {
     try {
-      const response = await api.get("/jobs");
-      setJobs(response.data.data || []);
+      const data = await getAllJobs();
+      setJobs(data || []);
     } catch (error) {
       console.error("Error fetching jobs:", error);
     } finally {
@@ -29,6 +30,14 @@ export default function JobsListPage() {
   };
 
   // Extract unique values for filters from fetched jobs
+  const uniqueLocations = useMemo(() =>
+    [...new Set(jobs.map((job) => job.location?.split(',').pop()?.trim() || job.location))].filter(Boolean).sort(),
+    [jobs]
+  );
+  const uniqueJobTypes = useMemo(() =>
+    [...new Set(jobs.map((job) => job.jobType || job.type))].filter(Boolean).sort(),
+    [jobs]
+  );
   const uniqueCategories = useMemo(() =>
     [...new Set(jobs.map((job) => job.category))].filter(Boolean).sort(),
     [jobs]
@@ -76,17 +85,17 @@ export default function JobsListPage() {
         job.location?.includes(selectedLocation);
 
       // Job Type
-      const jobType = job.jobType || job.type;
+      const jobType = job.jobType || job.type || "";
       const matchesType =
         selectedJobTypes.length === 0 || selectedJobTypes.includes(jobType);
 
       // Categories (Tags)
-      const jobCategory = job.category;
+      const jobCategory = job.category || "";
       const jobTags = job.tags || [];
       const matchesCategory =
         selectedCategories.length === 0 ||
         selectedCategories.some((cat) =>
-          jobCategory?.toLowerCase().includes(cat.toLowerCase()) ||
+          jobCategory.toLowerCase().includes(cat.toLowerCase()) ||
           (Array.isArray(jobTags) && jobTags.some((tag: string) =>
             tag.toLowerCase().includes(cat.toLowerCase())
           ))
@@ -186,8 +195,8 @@ export default function JobsListPage() {
                     <label key={category} className="flex items-center text-gray-600 hover:text-[#00b4d8] cursor-pointer transition-colors">
                       <input
                         type="checkbox"
-                        checked={selectedCategories.includes(category)}
-                        onChange={() => handleCategoryChange(category)}
+                        checked={selectedCategories.includes(category || "")}
+                        onChange={() => handleCategoryChange(category || "")}
                         className="mr-2 rounded border-gray-300 text-[#00b4d8] focus:ring-[#00b4d8]"
                       />
                       <span>{category}</span>
@@ -206,8 +215,8 @@ export default function JobsListPage() {
                     <label key={type} className="flex items-center text-gray-600 hover:text-[#00b4d8] cursor-pointer transition-colors">
                       <input
                         type="checkbox"
-                        checked={selectedJobTypes.includes(type)}
-                        onChange={() => handleJobTypeChange(type)}
+                        checked={selectedJobTypes.includes(type || "")}
+                        onChange={() => handleJobTypeChange(type || "")}
                         className="mr-2 rounded border-gray-300 text-[#00b4d8] focus:ring-[#00b4d8]"
                       />
                       <span>{type}</span>
@@ -258,11 +267,18 @@ export default function JobsListPage() {
                     key={job._id || job.id}
                     job={{
                       ...job,
-                      id: job._id || job.id,
+                      id: job._id || job.id || "",
                       company: typeof job.employerId === 'object' ? (job.employerId as any).companyName : (job.company || "Unknown"),
                       location: job.location || (typeof job.employerId === 'object' ? (job.employerId as any).location : "Remote"),
-                      logo: typeof job.employerId === 'object' ? (job.employerId as any).logo : "",
-                    }}
+                      logo: typeof job.employerId === 'object' ? (job.employerId as any).logo : (job.logo || ""),
+                      logoBg: job.logoBg || "bg-gray-100",
+                      type: job.jobType || job.type || "Full Time",
+                      typeBg: job.typeBg || "bg-blue-100 text-blue-600",
+                      salary: job.salary || "Negotiable",
+                      tags: job.tags || [],
+                      employerId: typeof job.employerId === 'object' ? (job.employerId as any)._id : (job.employerId || ""),
+                      title: job.title || "Untitled Job", // Ensure title is never undefined
+                    } as any}
                   />
                 ))
               ) : (

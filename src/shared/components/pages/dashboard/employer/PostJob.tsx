@@ -4,7 +4,7 @@ import DashboardSection from "../components/DashboardSection";
 import {
     Briefcase, Building2, Send, CheckCircle2,
     Loader2, Image as ImageIcon, X, Upload, Plus, Trash2,
-    DollarSign, MapPin, GraduationCap, Award, Tag
+    DollarSign, MapPin, GraduationCap, Award, Tag, Clock
 } from "lucide-react";
 import api from "../../../../services/ApiSetter";
 import { useAuth } from "../../../../contexts/AuthContext";
@@ -30,7 +30,8 @@ export default function PostJob() {
         description: "",
         tags: [] as string[],
         responsibilities: [""],
-        requirements: [""]
+        requirements: [""],
+        deadline: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0]
     });
 
     const [newTag, setNewTag] = useState("");
@@ -97,7 +98,7 @@ export default function PostJob() {
                 responsibilities: formData.responsibilities.filter(r => r.trim()).join(', '),
                 requirements: formData.requirements.filter(r => r.trim()).join(', '),
                 category: formData.category,
-                deadline: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString(),
+                deadline: new Date(formData.deadline).toISOString(),
                 employerId: user?.id || '',
                 salary: formData.salary,
                 experience: formData.experience,
@@ -141,7 +142,8 @@ export default function PostJob() {
                                     description: "",
                                     tags: [],
                                     responsibilities: [""],
-                                    requirements: [""]
+                                    requirements: [""],
+                                    deadline: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0]
                                 });
                             }}
                             className="bg-[#00b4d8] hover:bg-[#009bc2] text-white px-8 py-3 rounded-lg font-bold uppercase tracking-wider transition-all shadow-md active:scale-95"
@@ -216,6 +218,19 @@ export default function PostJob() {
                                         value={formData.title}
                                         onChange={(e) => setFormData({ ...formData, title: e.target.value })}
                                         placeholder="e.g. Senior Product Designer"
+                                        className="w-full px-5 py-4 bg-gray-50 border border-gray-100 rounded-2xl focus:ring-4 focus:ring-[#00b4d8]/10 focus:border-[#00b4d8] transition-all outline-none font-medium text-left"
+                                    />
+                                </div>
+                                <div className="space-y-2">
+                                    <label className="text-xs font-bold text-gray-700 uppercase tracking-widest flex items-center gap-2">
+                                        <Clock className="w-3 h-3 text-[#00b4d8]" /> Application Deadline
+                                    </label>
+                                    <input
+                                        required
+                                        type="date"
+                                        min={new Date().toISOString().split("T")[0]}
+                                        value={formData.deadline}
+                                        onChange={(e) => setFormData({ ...formData, deadline: e.target.value })}
                                         className="w-full px-5 py-4 bg-gray-50 border border-gray-100 rounded-2xl focus:ring-4 focus:ring-[#00b4d8]/10 focus:border-[#00b4d8] transition-all outline-none font-medium text-left"
                                     />
                                 </div>

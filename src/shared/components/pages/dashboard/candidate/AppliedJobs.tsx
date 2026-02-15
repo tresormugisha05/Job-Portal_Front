@@ -1,39 +1,45 @@
+import { useEffect, useState } from "react";
 import DashboardLayout from "../../../layouts/DashboardLayout";
-import { Briefcase, MapPin, Calendar, ChevronRight, Search, Filter } from "lucide-react";
+import { Briefcase, MapPin, Calendar, ChevronRight } from "lucide-react";
+import { ApplicationService, type ApplicationModel } from "../../../../../shared/services/application.Service";
+import { useAuth } from "../../../../../shared/contexts/AuthContext";
+import { Link } from "react-router-dom";
+import Loader from "../../../ui/Loader";
 
 export default function AppliedJobs() {
-    const applications = [
-        {
-            id: 1,
-            title: "UI Designer",
-            company: "LWPtech Inc.",
-            location: "Kigali, Rwanda",
-            appliedDate: "Oct 24, 2024",
-            status: "Pending",
-            statusColor: "text-blue-600 bg-blue-50 border-blue-100",
-            salary: "$35k - $40k"
-        },
-        {
-            id: 2,
-            title: "Frontend Developer",
-            company: "Google",
-            location: "Mountain View, CA",
-            appliedDate: "Oct 20, 2024",
-            status: "Shortlisted",
-            statusColor: "text-green-600 bg-green-50 border-green-100",
-            salary: "$120k - $150k"
-        },
-        {
-            id: 3,
-            title: "UX Researcher",
-            company: "Airbnb",
-            location: "San Francisco, CA",
-            appliedDate: "Oct 15, 2024",
-            status: "Rejected",
-            statusColor: "text-red-600 bg-red-50 border-red-100",
-            salary: "$90k - $110k"
+    const { user } = useAuth();
+    const [applications, setApplications] = useState<ApplicationModel[]>([]);
+    const [isLoading, setIsLoading] = useState(true);
+
+    useEffect(() => {
+        const fetchApplications = async () => {
+            const userId = user?._id || user?.id;
+            if (!userId) return;
+            try {
+                setIsLoading(true);
+                const data = await ApplicationService.getByUser(userId);
+                setApplications(data);
+            } catch (error) {
+                console.error("Error fetching applications:", error);
+            } finally {
+                setIsLoading(false);
+            }
+        };
+
+        fetchApplications();
+    }, [user]);
+
+    const getStatusColor = (status: string) => {
+        switch (status) {
+            case "PENDING": return "text-blue-600 bg-blue-50 border-blue-100";
+            case "SHORTLISTED": return "text-green-600 bg-green-50 border-green-100";
+            case "REJECTED": return "text-red-600 bg-red-50 border-red-100";
+            case "HIRED": return "text-purple-600 bg-purple-50 border-purple-100";
+            default: return "text-gray-600 bg-gray-50 border-gray-100";
         }
-    ];
+    };
+
+    if (isLoading) return <Loader />;
 
     return (
         <DashboardLayout>
@@ -42,19 +48,7 @@ export default function AppliedJobs() {
                     <h1 className="text-2xl font-bold text-gray-900 mb-2">Applied Jobs</h1>
                     <p className="text-gray-500 text-sm">You have applied for {applications.length} jobs in total.</p>
                 </div>
-                <div className="flex items-center gap-3">
-                    <div className="relative">
-                        <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
-                        <input
-                            type="text"
-                            placeholder="Search applications..."
-                            className="pl-10 pr-4 py-2 bg-white border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#00b4d8]/20 focus:border-[#00b4d8] transition-all"
-                        />
-                    </div>
-                    <button className="p-2 bg-white border border-gray-200 rounded-lg text-gray-600 hover:bg-gray-50 transition-colors">
-                        <Filter className="w-4 h-4" />
-                    </button>
-                </div>
+                {/* Search and Filters (Optional for now) */}
             </div>
 
             <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
@@ -69,44 +63,54 @@ export default function AppliedJobs() {
                             </tr>
                         </thead>
                         <tbody className="divide-y divide-gray-50">
-                            {applications.map((app) => (
-                                <tr key={app.id} className="hover:bg-gray-50/50 transition-colors group">
-                                    <td className="px-6 py-4">
-                                        <div className="flex items-center gap-4">
-                                            <div className="w-10 h-10 bg-gray-100 rounded-lg flex items-center justify-center font-bold text-gray-400">
-                                                {app.company.charAt(0)}
-                                            </div>
-                                            <div>
-                                                <p className="font-bold text-gray-900 group-hover:text-[#00b4d8] transition-colors">{app.title}</p>
-                                                <div className="flex items-center gap-3 mt-1">
-                                                    <span className="text-xs text-gray-500 flex items-center gap-1">
-                                                        <Briefcase className="w-3 h-3" /> {app.company}
-                                                    </span>
-                                                    <span className="text-xs text-gray-500 flex items-center gap-1">
-                                                        <MapPin className="w-3 h-3" /> {app.location}
-                                                    </span>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </td>
-                                    <td className="px-6 py-4">
-                                        <div className="flex items-center gap-2 text-sm text-gray-600">
-                                            <Calendar className="w-4 h-4 text-gray-400" />
-                                            {app.appliedDate}
-                                        </div>
-                                    </td>
-                                    <td className="px-6 py-4">
-                                        <span className={`px-3 py-1 rounded-full text-[10px] font-bold uppercase border ${app.statusColor}`}>
-                                            {app.status}
-                                        </span>
-                                    </td>
-                                    <td className="px-6 py-4">
-                                        <button className="p-2 text-gray-400 hover:text-[#00b4d8] hover:bg-blue-50 rounded-lg transition-all">
-                                            <ChevronRight className="w-5 h-5" />
-                                        </button>
+                            {applications.length === 0 ? (
+                                <tr>
+                                    <td colSpan={4} className="px-6 py-8 text-center text-gray-500">
+                                        You haven't applied to any jobs yet.
                                     </td>
                                 </tr>
-                            ))}
+                            ) : (
+                                applications.map((app) => (
+                                    <tr key={app._id || app.id} className="hover:bg-gray-50/50 transition-colors group">
+                                        <td className="px-6 py-4">
+                                            <div className="flex items-center gap-4">
+                                                <div className="w-10 h-10 bg-gray-100 rounded-lg flex items-center justify-center font-bold text-gray-400">
+                                                    {(app as any).jobId?.company?.charAt(0) || "?"}
+                                                </div>
+                                                <div>
+                                                    <p className="font-bold text-gray-900 group-hover:text-[#00b4d8] transition-colors">
+                                                        {(app as any).jobId?.title || "Unknown Job"}
+                                                    </p>
+                                                    <div className="flex items-center gap-3 mt-1">
+                                                        <span className="text-xs text-gray-500 flex items-center gap-1">
+                                                            <Briefcase className="w-3 h-3" /> {(app as any).jobId?.company || "Unknown Company"}
+                                                        </span>
+                                                        <span className="text-xs text-gray-500 flex items-center gap-1">
+                                                            <MapPin className="w-3 h-3" /> {(app as any).jobId?.location || "Remote"}
+                                                        </span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td className="px-6 py-4">
+                                            <div className="flex items-center gap-2 text-sm text-gray-600">
+                                                <Calendar className="w-4 h-4 text-gray-400" />
+                                                {app.submissionDate ? new Date(app.submissionDate).toLocaleDateString() : "N/A"}
+                                            </div>
+                                        </td>
+                                        <td className="px-6 py-4">
+                                            <span className={`px-3 py-1 rounded-full text-[10px] font-bold uppercase border ${getStatusColor(app.status)}`}>
+                                                {app.status}
+                                            </span>
+                                        </td>
+                                        <td className="px-6 py-4">
+                                            <Link to={`/jobs/${(app as any).jobId?._id || (app as any).jobId?.id}`} className="p-2 text-gray-400 hover:text-[#00b4d8] hover:bg-blue-50 rounded-lg transition-all inline-block">
+                                                <ChevronRight className="w-5 h-5" />
+                                            </Link>
+                                        </td>
+                                    </tr>
+                                ))
+                            )}
                         </tbody>
                     </table>
                 </div>

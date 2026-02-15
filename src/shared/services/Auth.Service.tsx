@@ -19,7 +19,7 @@ export interface UserModel {
   _id?: string;
   name: string;
   email: string;
-  phone: string;
+  contactPhone: string;
   password: string;
   avatar?: string;
   role: UserRole;
@@ -53,20 +53,20 @@ export const CandidateService = {
       }
       const endpoint = `/auth/${id}`;
       console.log("Calling endpoint:", endpoint);
-      
+
       const response = await api.get(endpoint);
       console.log("CandidateService.getUser full response:", response);
       console.log("response.data structure:", response.data);
       console.log("response.status:", response.status);
-      
+
       // Handle both { data: UserModel } and UserModel response formats
       let userData = response.data;
-      
+
       // If response.data.data exists and is an object (not an array), use it
       if (
-        response.data && 
-        typeof response.data === 'object' && 
-        response.data.data && 
+        response.data &&
+        typeof response.data === 'object' &&
+        response.data.data &&
         typeof response.data.data === 'object' &&
         !Array.isArray(response.data.data)
       ) {
@@ -76,13 +76,13 @@ export const CandidateService = {
         userData = response.data;
         console.log("Using response.data directly");
       }
-      
+
       console.log("Final userData returned:", userData);
-      
+
       if (!userData || !userData.email) {
         throw new Error("Invalid user data received - missing email field");
       }
-      
+
       return userData as UserModel;
     } catch (error) {
       console.error("Error in getUser:", error);

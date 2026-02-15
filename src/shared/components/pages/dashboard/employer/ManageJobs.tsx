@@ -1,5 +1,5 @@
 import DashboardLayout from "../../../layouts/DashboardLayout";
-import { Briefcase, Eye, Edit3, Trash2, Search, Filter, Plus, Clock, MapPin, Users } from "lucide-react";
+import { Briefcase, Eye, Edit3, Trash2, Search, Filter, Plus, Clock, MapPin, Users, Power } from "lucide-react";
 import { Link } from "react-router-dom";
 import { useState, useEffect } from "react";
 import api from "../../../../services/ApiSetter";
@@ -24,7 +24,7 @@ export default function ManageJobs() {
     useEffect(() => {
         const fetchJobs = async () => {
             if (!user?.id) return;
-            
+
             try {
                 setLoading(true);
                 const response = await api.get(`/jobs/employer/${user.id}`);
@@ -35,7 +35,7 @@ export default function ManageJobs() {
                 setLoading(false);
             }
         };
-        
+
         fetchJobs();
     }, [user?.id]);
 
@@ -47,6 +47,23 @@ export default function ManageJobs() {
         } catch (error) {
             console.error("Error deleting job:", error);
             alert("Failed to delete job");
+        }
+    };
+
+    const handleToggleStatus = async (jobId: string, currentStatus: boolean) => {
+        try {
+            const response = await api.put(`/jobs/${jobId}`, {
+                isActive: !currentStatus
+            });
+
+            if (response.data.success) {
+                setJobs(jobs.map(job =>
+                    job._id === jobId ? { ...job, isActive: !currentStatus } : job
+                ));
+            }
+        } catch (error) {
+            console.error("Error updating job status:", error);
+            alert("Failed to update job status");
         }
     };
 
@@ -141,9 +158,8 @@ export default function ManageJobs() {
                                             </div>
                                         </td>
                                         <td className="px-6 py-4">
-                                            <span className={`px-3 py-1 rounded-full text-[10px] font-bold uppercase border ${
-                                                job.isActive ? "text-green-600 bg-green-50 border-green-100" : "text-gray-600 bg-gray-50 border-gray-100"
-                                            }`}>
+                                            <span className={`px-3 py-1 rounded-full text-[10px] font-bold uppercase border ${job.isActive ? "text-green-600 bg-green-50 border-green-100" : "text-gray-600 bg-gray-50 border-gray-100"
+                                                }`}>
                                                 {job.isActive ? "Active" : "Inactive"}
                                             </span>
                                         </td>
@@ -155,6 +171,16 @@ export default function ManageJobs() {
                                                 <Link to={`/dashboard/edit-job/${job._id}`} className="p-2 text-gray-400 hover:text-[#00b4d8] hover:bg-blue-50 rounded-lg transition-all" title="Edit">
                                                     <Edit3 className="w-4 h-4" />
                                                 </Link>
+                                                <button
+                                                    onClick={() => handleToggleStatus(job._id, job.isActive)}
+                                                    className={`p-2 rounded-lg transition-all ${job.isActive
+                                                            ? "text-green-500 hover:text-red-500 hover:bg-red-50"
+                                                            : "text-gray-400 hover:text-green-500 hover:bg-green-50"
+                                                        }`}
+                                                    title={job.isActive ? "Close Job" : "Reopen Job"}
+                                                >
+                                                    <Power className="w-4 h-4" />
+                                                </button>
                                                 <button onClick={() => handleDelete(job._id)} className="p-2 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-lg transition-all" title="Delete">
                                                     <Trash2 className="w-4 h-4" />
                                                 </button>

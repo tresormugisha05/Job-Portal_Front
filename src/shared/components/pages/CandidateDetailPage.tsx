@@ -40,7 +40,7 @@ export default function CandidateDetailPage() {
               _id: user.id,
               name: user.name,
               email: user.email,
-              phone: user.phone || "",
+              contactPhone: user.contactPhone || "",
               password: "", // Not needed for display
               avatar: user.avatar,
               role: user.role,
@@ -159,10 +159,10 @@ export default function CandidateDetailPage() {
                     {candidateData.initials ||
                       (candidateData.name
                         ? candidateData.name
-                            .split(" ")
-                            .map((n) => n[0])
-                            .join("")
-                            .toUpperCase()
+                          .split(" ")
+                          .map((n) => n[0])
+                          .join("")
+                          .toUpperCase()
                         : "U")}
                   </span>
                 </div>
@@ -188,7 +188,7 @@ export default function CandidateDetailPage() {
                 <div className="flex items-center gap-3 text-gray-600">
                   <Phone className="w-4 h-4 text-[#00b4d8]" />
                   <span className="text-sm">
-                    {candidateData.phone || "No Phone Set"}
+                    {candidateData.contactPhone || "No Phone Set"}
                   </span>
                 </div>
                 <div className="flex items-center gap-3 text-gray-600">

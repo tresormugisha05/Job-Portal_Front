@@ -31,6 +31,7 @@ interface User {
   experience?: string;
   education?: string;
   summary?: string;
+  skills?: string[];
   contactPhone?: string;
   resume?: string;
   initials?: string;
@@ -129,12 +130,16 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         response = await api.post("/employers/register", {
           companyName: userData.name,
           email: userData.email,
-          phone: userData.phone,
+          phone: userData.contactPhone,
+          contactPhone: userData.contactPhone,
           password: userData.password,
         });
       } else {
         // Use candidate registration endpoint
-        response = await api.post("/auth/register", userData);
+        response = await api.post("/auth/register", {
+          ...userData,
+          contactPhone: userData.contactPhone
+        });
       }
 
       const data = response.data;

@@ -40,7 +40,7 @@ export interface JobResponse {
 // Get all jobs
 export const getAllJobs = async (): Promise<JobData[]> => {
   try {
-    const response = await api.get(`/jobs`);
+    const response = await api.get(`/jobs/all`);
 
     if (Array.isArray(response.data.data)) {
       return response.data.data.map((job: JobData) => ({
