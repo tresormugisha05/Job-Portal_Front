@@ -1,4 +1,4 @@
-const API_BASE_URL = "https://job-portal-back-fdlt.onrender.com/api";
+import api from "./ApiSetter";
 
 // Job interfaces
 export interface JobData {
@@ -39,18 +39,8 @@ export interface JobResponse {
 // Get all jobs
 export const getAllJobs = async (): Promise<JobData[]> => {
   try {
-    const response = await fetch(`${API_BASE_URL}/jobs`, {
-      method: "GET",
-      headers: {
-        "Content-Type": "application/json",
-      },
-    });
-
-    const data: JobResponse = await response.json();
-
-    if (!response.ok) {
-      throw new Error(data.message || "Failed to fetch jobs");
-    }
+    const response = await api.get("/jobs");
+    const data: JobResponse = response.data;
 
     if (Array.isArray(data.data)) {
       return data.data.map((job) => ({
@@ -60,7 +50,7 @@ export const getAllJobs = async (): Promise<JobData[]> => {
     }
 
     return [];
-  } catch (error) {
+  } catch (error: any) {
     console.error("Error fetching jobs:", error);
     throw error;
   }
@@ -69,20 +59,10 @@ export const getAllJobs = async (): Promise<JobData[]> => {
 // Get job by ID
 export const getJobById = async (id: string): Promise<JobData> => {
   try {
-    const response = await fetch(`${API_BASE_URL}/jobs/${id}`, {
-      method: "GET",
-      headers: {
-        "Content-Type": "application/json",
-      },
-    });
+    const response = await api.get(`/jobs/${id}`);
+    const data: JobResponse = response.data;
 
-    const data: JobResponse = await response.json();
-
-    if (!response.ok) {
-      throw new Error(data.message || "Failed to fetch job");
-    }
-
-    if (!Array.isArray(data.data)) {
+    if (data.data && !Array.isArray(data.data)) {
       return {
         ...data.data,
         id: data.data?._id || data.data?.id,
@@ -90,7 +70,7 @@ export const getJobById = async (id: string): Promise<JobData> => {
     }
 
     throw new Error("Invalid response format");
-  } catch (error) {
+  } catch (error: any) {
     console.error("Error fetching job:", error);
     throw error;
   }
@@ -101,24 +81,8 @@ export const getJobsByEmployer = async (
   employerId: string,
 ): Promise<JobData[]> => {
   try {
-    const token = localStorage.getItem("token");
-
-    const response = await fetch(
-      `${API_BASE_URL}/jobs/employer/${employerId}`,
-      {
-        method: "GET",
-        headers: {
-          "Content-Type": "application/json",
-          ...(token && { Authorization: `Bearer ${token}` }),
-        },
-      },
-    );
-
-    const data: JobResponse = await response.json();
-
-    if (!response.ok) {
-      throw new Error(data.message || "Failed to fetch jobs");
-    }
+    const response = await api.get(`/jobs/employer/${employerId}`);
+    const data: JobResponse = response.data;
 
     if (Array.isArray(data.data)) {
       return data.data.map((job) => ({
@@ -128,7 +92,7 @@ export const getJobsByEmployer = async (
     }
 
     return [];
-  } catch (error) {
+  } catch (error: any) {
     console.error("Error fetching employer jobs:", error);
     throw error;
   }
@@ -137,24 +101,10 @@ export const getJobsByEmployer = async (
 // Create a new job
 export const createJob = async (jobData: JobData): Promise<JobData> => {
   try {
-    const token = localStorage.getItem("token");
+    const response = await api.post("/jobs", jobData);
+    const data: JobResponse = response.data;
 
-    const response = await fetch(`${API_BASE_URL}/jobs`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        ...(token && { Authorization: `Bearer ${token}` }),
-      },
-      body: JSON.stringify(jobData),
-    });
-
-    const data: JobResponse = await response.json();
-
-    if (!response.ok) {
-      throw new Error(data.message || "Failed to create job");
-    }
-
-    if (!Array.isArray(data.data)) {
+    if (data.data && !Array.isArray(data.data)) {
       return {
         ...data.data,
         id: data.data?._id || data.data?.id,
@@ -162,7 +112,7 @@ export const createJob = async (jobData: JobData): Promise<JobData> => {
     }
 
     throw new Error("Invalid response format");
-  } catch (error) {
+  } catch (error: any) {
     console.error("Error creating job:", error);
     throw error;
   }
@@ -174,24 +124,10 @@ export const updateJob = async (
   jobData: Partial<JobData>,
 ): Promise<JobData> => {
   try {
-    const token = localStorage.getItem("token");
+    const response = await api.put(`/jobs/${id}`, jobData);
+    const data: JobResponse = response.data;
 
-    const response = await fetch(`${API_BASE_URL}/jobs/${id}`, {
-      method: "PUT",
-      headers: {
-        "Content-Type": "application/json",
-        ...(token && { Authorization: `Bearer ${token}` }),
-      },
-      body: JSON.stringify(jobData),
-    });
-
-    const data: JobResponse = await response.json();
-
-    if (!response.ok) {
-      throw new Error(data.message || "Failed to update job");
-    }
-
-    if (!Array.isArray(data.data)) {
+    if (data.data && !Array.isArray(data.data)) {
       return {
         ...data.data,
         id: data.data?._id || data.data?.id,
@@ -199,7 +135,7 @@ export const updateJob = async (
     }
 
     throw new Error("Invalid response format");
-  } catch (error) {
+  } catch (error: any) {
     console.error("Error updating job:", error);
     throw error;
   }
@@ -208,24 +144,14 @@ export const updateJob = async (
 // Delete a job
 export const deleteJob = async (id: string): Promise<boolean> => {
   try {
-    const token = localStorage.getItem("token");
+    const response = await api.delete(`/jobs/${id}`);
+    const data: JobResponse = response.data;
 
-    const response = await fetch(`${API_BASE_URL}/jobs/${id}`, {
-      method: "DELETE",
-      headers: {
-        "Content-Type": "application/json",
-        ...(token && { Authorization: `Bearer ${token}` }),
-      },
-    });
-
-    const data: JobResponse = await response.json();
-
-    if (!response.ok) {
-      throw new Error(data.message || "Failed to delete job");
+    if (data.success) {
+      return true;
     }
-
-    return true;
-  } catch (error) {
+    return false;
+  } catch (error: any) {
     console.error("Error deleting job:", error);
     throw error;
   }
@@ -234,21 +160,10 @@ export const deleteJob = async (id: string): Promise<boolean> => {
 // Search jobs
 export const searchJobs = async (query: string): Promise<JobData[]> => {
   try {
-    const response = await fetch(
-      `${API_BASE_URL}/jobs/search?q=${encodeURIComponent(query)}`,
-      {
-        method: "GET",
-        headers: {
-          "Content-Type": "application/json",
-        },
-      },
-    );
-
-    const data: JobResponse = await response.json();
-
-    if (!response.ok) {
-      throw new Error(data.message || "Failed to search jobs");
-    }
+    const response = await api.get(`/jobs/search`, {
+      params: { q: query }
+    });
+    const data: JobResponse = response.data;
 
     if (Array.isArray(data.data)) {
       return data.data.map((job) => ({
@@ -258,7 +173,7 @@ export const searchJobs = async (query: string): Promise<JobData[]> => {
     }
 
     return [];
-  } catch (error) {
+  } catch (error: any) {
     console.error("Error searching jobs:", error);
     throw error;
   }

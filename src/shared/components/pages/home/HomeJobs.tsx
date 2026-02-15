@@ -104,13 +104,13 @@ export default function HomeJobs() {
                     id: job._id || job.id || "",
                     salary: job.salary || "Negotiable",
                     type: job.jobType || job.type || "Full-time",
-                    logo: job.logo || "",
+                    company: typeof job.employerId === 'object' ? (job.employerId as any).companyName : (job.company || "Unknown"),
+                    location: job.location || (typeof job.employerId === 'object' ? (job.employerId as any).location : "Remote"),
+                    logo: typeof job.employerId === 'object' ? (job.employerId as any).logo : "",
                     logoBg: job.logoBg || "bg-gray-100",
                     typeBg: job.typeBg || "bg-blue-100 text-blue-600",
                     tags: job.tags || [],
-                    company: job.company || "Unknown",
-                    location: job.location || "Remote",
-                    employerId: job.employerId || ""
+                    employerId: typeof job.employerId === 'object' ? (job.employerId as any)._id : (job.employerId || "")
                   } as any}
                 />
               ))

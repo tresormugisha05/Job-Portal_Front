@@ -29,9 +29,8 @@ interface User {
   location?: string;
   experience?: string;
   education?: string;
-  skills?: string[];
   summary?: string;
-  phone?: string;
+  contactPhone?: string;
   resume?: string;
   initials?: string;
   workExperience?: WorkExperience[];
@@ -48,7 +47,7 @@ interface AuthContextType {
   register: (userData: {
     name: string;
     email: string;
-    phone: string;
+    contactPhone: string;
     password: string;
     role: "CANDIDATE" | "EMPLOYER";
   }) => Promise<void>;
@@ -114,7 +113,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const register = async (userData: {
     name: string;
     email: string;
-    phone: string;
+    contactPhone: string;
     password: string;
     role: "CANDIDATE" | "EMPLOYER";
     // Employer specific fields
@@ -123,17 +122,17 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     companySize?: string;
     description?: string;
     location?: string;
-    contactPhone?: string;
   }) => {
     try {
       let response;
-      
+
       if (userData.role === "EMPLOYER") {
         // Use employer registration endpoint
         response = await api.post("/employers/register", {
           companyName: userData.name,
           email: userData.email,
-          contactPhone: userData.phone,
+          phone: userData.contactPhone, // Bridge for old backend
+          contactPhone: userData.contactPhone, // Standard for new backend
           password: userData.password,
           industry: userData.industry || "Technology",
           companySize: userData.companySize || "1-10",

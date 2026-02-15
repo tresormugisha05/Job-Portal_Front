@@ -1,14 +1,14 @@
-const API_BASE_URL = "https://job-portal-back-fdlt.onrender.com/api";
+import api from "./ApiSetter";
 
 export interface EmployerData {
   _id?: string;
   id?: string;
   companyName: string;
-  industry: string;
-  companySize: string;
+  industry?: string;
+  companySize?: string;
   website?: string;
-  description: string;
-  location: string;
+  description?: string;
+  location?: string;
   email: string;
   contactPhone: string;
   logo?: string;
@@ -27,18 +27,8 @@ export interface EmployerResponse {
 // Get all employers
 export const getAllEmployers = async (): Promise<EmployerData[]> => {
   try {
-    const response = await fetch(`${API_BASE_URL}/employers`, {
-      method: "GET",
-      headers: {
-        "Content-Type": "application/json",
-      },
-    });
-
-    const data: EmployerResponse = await response.json();
-
-    if (!response.ok) {
-      throw new Error(data.message || "Failed to fetch employers");
-    }
+    const response = await api.get("/employers/all");
+    const data: EmployerResponse = response.data;
 
     if (Array.isArray(data.data)) {
       return data.data.map((employer) => ({
@@ -48,7 +38,7 @@ export const getAllEmployers = async (): Promise<EmployerData[]> => {
     }
 
     return [];
-  } catch (error) {
+  } catch (error: any) {
     console.error("Error fetching employers:", error);
     throw error;
   }
@@ -57,20 +47,10 @@ export const getAllEmployers = async (): Promise<EmployerData[]> => {
 // Get employer by ID
 export const getEmployerById = async (id: string): Promise<EmployerData> => {
   try {
-    const response = await fetch(`${API_BASE_URL}/employers/${id}`, {
-      method: "GET",
-      headers: {
-        "Content-Type": "application/json",
-      },
-    });
+    const response = await api.get(`/employers/${id}`);
+    const data: EmployerResponse = response.data;
 
-    const data: EmployerResponse = await response.json();
-
-    if (!response.ok) {
-      throw new Error(data.message || "Failed to fetch employer");
-    }
-
-    if (!Array.isArray(data.data)) {
+    if (data.data && !Array.isArray(data.data)) {
       return {
         ...data.data,
         id: data.data?._id || data.data?.id,
@@ -78,7 +58,7 @@ export const getEmployerById = async (id: string): Promise<EmployerData> => {
     }
 
     throw new Error("Invalid response format");
-  } catch (error) {
+  } catch (error: any) {
     console.error("Error fetching employer:", error);
     throw error;
   }
@@ -87,18 +67,8 @@ export const getEmployerById = async (id: string): Promise<EmployerData> => {
 // Get top hiring companies
 export const getTopHiringCompanies = async (): Promise<EmployerData[]> => {
   try {
-    const response = await fetch(`${API_BASE_URL}/employers/top-hiring`, {
-      method: "GET",
-      headers: {
-        "Content-Type": "application/json",
-      },
-    });
-
-    const data: EmployerResponse = await response.json();
-
-    if (!response.ok) {
-      throw new Error(data.message || "Failed to fetch top hiring companies");
-    }
+    const response = await api.get("/employers/top-hiring");
+    const data: EmployerResponse = response.data;
 
     if (Array.isArray(data.data)) {
       return data.data.map((employer) => ({
@@ -108,7 +78,7 @@ export const getTopHiringCompanies = async (): Promise<EmployerData[]> => {
     }
 
     return [];
-  } catch (error) {
+  } catch (error: any) {
     console.error("Error fetching top hiring companies:", error);
     throw error;
   }

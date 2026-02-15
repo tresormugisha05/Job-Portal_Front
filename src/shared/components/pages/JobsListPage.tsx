@@ -29,15 +29,10 @@ export default function JobsListPage() {
   };
 
   // Extract unique values for filters from fetched jobs
-  const uniqueLocations = useMemo(() => 
-    [...new Set(jobs.map((job) => job.location?.split(',').pop()?.trim() || job.location))].sort(),
+  const uniqueCategories = useMemo(() =>
+    [...new Set(jobs.map((job) => job.category))].filter(Boolean).sort(),
     [jobs]
   );
-  const uniqueJobTypes = useMemo(() => 
-    [...new Set(jobs.map((job) => job.jobType || job.type))].sort(),
-    [jobs]
-  );
-  const uniqueCategories = ["Developer", "Technology", "Medical", "Accounting", "Design", "Marketing"];
 
   const ITEMS_PER_PAGE = 5;
 
@@ -90,7 +85,7 @@ export default function JobsListPage() {
       const jobTags = job.tags || [];
       const matchesCategory =
         selectedCategories.length === 0 ||
-        selectedCategories.some((cat) => 
+        selectedCategories.some((cat) =>
           jobCategory?.toLowerCase().includes(cat.toLowerCase()) ||
           (Array.isArray(jobTags) && jobTags.some((tag: string) =>
             tag.toLowerCase().includes(cat.toLowerCase())
@@ -259,7 +254,16 @@ export default function JobsListPage() {
             <div className="space-y-4">
               {paginatedJobs.length > 0 ? (
                 paginatedJobs.map((job) => (
-                  <JobCard key={job._id || job.id} job={{ ...job, id: job._id || job.id }} />
+                  <JobCard
+                    key={job._id || job.id}
+                    job={{
+                      ...job,
+                      id: job._id || job.id,
+                      company: typeof job.employerId === 'object' ? (job.employerId as any).companyName : (job.company || "Unknown"),
+                      location: job.location || (typeof job.employerId === 'object' ? (job.employerId as any).location : "Remote"),
+                      logo: typeof job.employerId === 'object' ? (job.employerId as any).logo : "",
+                    }}
+                  />
                 ))
               ) : (
                 <div className="bg-white rounded-lg shadow p-8 text-center text-gray-500">

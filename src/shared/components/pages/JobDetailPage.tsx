@@ -22,7 +22,7 @@ export default function JobDetailPage() {
         setIsLoading(true);
         const jobData = await getJobById(id);
         setJob(jobData);
-        
+
         const allJobs = await getAllJobs();
         setSimilarJobs(allJobs.filter(j => (j._id || j.id) !== id).slice(0, 3));
       } catch (error) {
@@ -110,8 +110,8 @@ export default function JobDetailPage() {
                 <button
                   onClick={() => setIsSaved(!isSaved)}
                   className={`px-6 py-2 border rounded-lg transition-all flex items-center gap-2 font-bold uppercase tracking-wider text-xs active:scale-95 ${isSaved
-                      ? "bg-red-50 border-[#ff6b6b] text-[#ff6b6b]"
-                      : "bg-white border-gray-200 text-gray-700 hover:bg-gray-50"
+                    ? "bg-red-50 border-[#ff6b6b] text-[#ff6b6b]"
+                    : "bg-white border-gray-200 text-gray-700 hover:bg-gray-50"
                     }`}
                 >
                   <Heart className={`w-4 h-4 transition-colors ${isSaved ? "fill-current" : ""}`} />
@@ -143,11 +143,11 @@ export default function JobDetailPage() {
                       Responsibilities:
                     </h3>
                     <ul className="list-disc pl-5 mb-6 space-y-2">
-                      {(Array.isArray(job.responsibilities) 
-                        ? job.responsibilities 
-                        : job.responsibilities.split(', ')
+                      {(Array.isArray(job.responsibilities)
+                        ? job.responsibilities
+                        : (job.responsibilities as string).split('\n')
                       ).filter(item => item && item.trim()).map((item, idx) => (
-                        <li key={idx}>{item.trim()}</li>
+                        <li key={idx}>{(item as string).trim().replace(/^[•\-\*]\s*/, '')}</li>
                       ))}
                     </ul>
                   </>
@@ -157,11 +157,11 @@ export default function JobDetailPage() {
                   <>
                     <h3 className="text-lg font-bold text-gray-900 mb-3">Requirements:</h3>
                     <ul className="list-disc pl-5 mb-6 space-y-2">
-                      {(Array.isArray(job.requirements) 
-                        ? job.requirements 
-                        : job.requirements.split(', ')
+                      {(Array.isArray(job.requirements)
+                        ? job.requirements
+                        : (job.requirements as string).split('\n')
                       ).filter(item => item && item.trim()).map((item, idx) => (
-                        <li key={idx}>{item.trim()}</li>
+                        <li key={idx}>{(item as string).trim().replace(/^[•\-\*]\s*/, '')}</li>
                       ))}
                     </ul>
                   </>
