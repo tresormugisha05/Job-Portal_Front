@@ -6,7 +6,6 @@ export interface JobData {
   id?: string;
   title: string;
   description: string;
-  company: string;
   requirements: string;
   responsibilities: string;
   category: string;
@@ -26,6 +25,8 @@ export interface JobData {
   typeBg?: string;
   experience?: string;
   education?: string;
+  // Additional properties used in components
+  company?: string;
   tags?: string[];
   featured?: boolean;
 }
@@ -39,11 +40,10 @@ export interface JobResponse {
 // Get all jobs
 export const getAllJobs = async (): Promise<JobData[]> => {
   try {
-    const response = await api.get("/jobs");
-    const data: JobResponse = response.data;
+    const response = await api.get(`/jobs`);
 
-    if (Array.isArray(data.data)) {
-      return data.data.map((job) => ({
+    if (Array.isArray(response.data.data)) {
+      return response.data.data.map((job: JobData) => ({
         ...job,
         id: job._id || job.id,
       }));
@@ -60,12 +60,11 @@ export const getAllJobs = async (): Promise<JobData[]> => {
 export const getJobById = async (id: string): Promise<JobData> => {
   try {
     const response = await api.get(`/jobs/${id}`);
-    const data: JobResponse = response.data;
 
-    if (data.data && !Array.isArray(data.data)) {
+    if (!Array.isArray(response.data.data)) {
       return {
-        ...data.data,
-        id: data.data?._id || data.data?.id,
+        ...response.data.data,
+        id: response.data.data?._id || response.data.data?.id,
       } as JobData;
     }
 
@@ -82,10 +81,9 @@ export const getJobsByEmployer = async (
 ): Promise<JobData[]> => {
   try {
     const response = await api.get(`/jobs/employer/${employerId}`);
-    const data: JobResponse = response.data;
 
-    if (Array.isArray(data.data)) {
-      return data.data.map((job) => ({
+    if (Array.isArray(response.data.data)) {
+      return response.data.data.map((job: JobData) => ({
         ...job,
         id: job._id || job.id,
       }));
@@ -101,13 +99,12 @@ export const getJobsByEmployer = async (
 // Create a new job
 export const createJob = async (jobData: JobData): Promise<JobData> => {
   try {
-    const response = await api.post("/jobs", jobData);
-    const data: JobResponse = response.data;
+    const response = await api.post(`/jobs`, jobData);
 
-    if (data.data && !Array.isArray(data.data)) {
+    if (!Array.isArray(response.data.data)) {
       return {
-        ...data.data,
-        id: data.data?._id || data.data?.id,
+        ...response.data.data,
+        id: response.data.data?._id || response.data.data?.id,
       } as JobData;
     }
 
@@ -125,12 +122,11 @@ export const updateJob = async (
 ): Promise<JobData> => {
   try {
     const response = await api.put(`/jobs/${id}`, jobData);
-    const data: JobResponse = response.data;
 
-    if (data.data && !Array.isArray(data.data)) {
+    if (!Array.isArray(response.data.data)) {
       return {
-        ...data.data,
-        id: data.data?._id || data.data?.id,
+        ...response.data.data,
+        id: response.data.data?._id || response.data.data?.id,
       } as JobData;
     }
 
@@ -144,14 +140,9 @@ export const updateJob = async (
 // Delete a job
 export const deleteJob = async (id: string): Promise<boolean> => {
   try {
-    const response = await api.delete(`/jobs/${id}`);
-    const data: JobResponse = response.data;
-
-    if (data.success) {
-      return true;
-    }
-    return false;
-  } catch (error: any) {
+    await api.delete(`/jobs/${id}`);
+    return true;
+  } catch (error) {
     console.error("Error deleting job:", error);
     throw error;
   }
@@ -160,13 +151,12 @@ export const deleteJob = async (id: string): Promise<boolean> => {
 // Search jobs
 export const searchJobs = async (query: string): Promise<JobData[]> => {
   try {
-    const response = await api.get(`/jobs/search`, {
-      params: { q: query }
-    });
-    const data: JobResponse = response.data;
+    const response = await api.get(
+      `/jobs/search?q=${encodeURIComponent(query)}`,
+    );
 
-    if (Array.isArray(data.data)) {
-      return data.data.map((job) => ({
+    if (Array.isArray(response.data.data)) {
+      return response.data.data.map((job: JobData) => ({
         ...job,
         id: job._id || job.id,
       }));

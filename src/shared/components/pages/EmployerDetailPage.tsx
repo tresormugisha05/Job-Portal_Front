@@ -382,7 +382,9 @@ export default function EmployerDetailPage() {
                                                     salary: job.salary || 'Negotiable',
                                                     logo: job.logo || '',
                                                     logoBg: job.logoBg || 'bg-gray-100',
-                                                    tags: job.tags || []
+                                                    tags: job.tags || [],
+                                                    responsibilities: typeof job.responsibilities === 'string' ? job.responsibilities.split(',').map(r => r.trim()) : job.responsibilities || [],
+                                                    requirements: typeof job.requirements === 'string' ? job.requirements.split(',').map(r => r.trim()) : job.requirements || []
                                                 } as any}
                                             />)
                                         )) : (
