@@ -11,26 +11,31 @@ import {
     Link2,
 } from "lucide-react";
 import { getEmployerById, type EmployerData } from "../../services/employerService";
-import { getAllJobs, type JobData } from "../../services/jobService";
+import { getJobsByEmployer, type JobData } from "../../services/jobService";
 import JobCard from "../ui/JobCard";
 
 export default function EmployerDetailPage() {
     const { id } = useParams();
     const [employer, setEmployer] = useState<EmployerData | null>(null);
     const [employerJobs, setEmployerJobs] = useState<JobData[]>([]);
+    const [filteredJobs, setFilteredJobs] = useState<JobData[]>([]);
     const [isLoading, setIsLoading] = useState(true);
+    const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
+    const [selectedLocations, setSelectedLocations] = useState<string[]>([]);
+    const [selectedTypes, setSelectedTypes] = useState<string[]>([]);
 
     useEffect(() => {
         const fetchData = async () => {
             if (!id) return;
             try {
                 setIsLoading(true);
-                const [employerData, allJobs] = await Promise.all([
+                const [employerData, jobs] = await Promise.all([
                     getEmployerById(id),
-                    getAllJobs()
+                    getJobsByEmployer(id)
                 ]);
                 setEmployer(employerData);
-                setEmployerJobs(allJobs.filter(job => job.employerId === id));
+                setEmployerJobs(jobs);
+                setFilteredJobs(jobs);
             } catch (error) {
                 console.error("Error fetching employer:", error);
             } finally {
@@ -40,39 +45,70 @@ export default function EmployerDetailPage() {
         fetchData();
     }, [id]);
 
+    // Apply filters whenever selections change
+    useEffect(() => {
+        let filtered = employerJobs;
+
+        if (selectedCategories.length > 0) {
+            filtered = filtered.filter(job => selectedCategories.includes(job.category));
+        }
+
+        if (selectedLocations.length > 0) {
+            filtered = filtered.filter(job =>
+                selectedLocations.some(loc => job.location.toLowerCase().includes(loc.toLowerCase()))
+            );
+        }
+
+        if (selectedTypes.length > 0) {
+            filtered = filtered.filter(job => selectedTypes.includes(job.jobType || job.type || ''));
+        }
+
+        setFilteredJobs(filtered);
+    }, [selectedCategories, selectedLocations, selectedTypes, employerJobs]);
+
     if (isLoading) {
         return <Loader />;
     }
 
-    const categories = [
-        { name: "Accounting", count: 1 },
-        { name: "Developer", count: 7 },
-        { name: "Educations", count: 0 },
-        { name: "Government", count: 0 },
-        { name: "Media & News", count: 4 },
-        { name: "Medical", count: 2 },
-        { name: "Restaurants", count: 2 },
-        { name: "Technology", count: 3 },
-    ];
+    // Dynamically calculate categories, locations, and job types from employer jobs
+    const categories = Array.from(new Set(employerJobs.map(job => job.category)))
+        .map(category => ({
+            name: category,
+            count: employerJobs.filter(job => job.category === category).length
+        }))
+        .sort((a, b) => b.count - a.count);
 
-    const locations = [
-        { name: "Delhi", count: 6 },
-        { name: "Gurgaon", count: 0 },
-        { name: "Hawaii", count: 3 },
-        { name: "Hyderabad", count: 0 },
-        { name: "Kolkata", count: 0 },
-        { name: "New York", count: 5 },
-        { name: "Ohio", count: 2 },
-        { name: "Virginia", count: 2 },
-    ];
+    const locations = Array.from(new Set(employerJobs.map(job => job.location)))
+        .map(location => ({
+            name: location,
+            count: employerJobs.filter(job => job.location === location).length
+        }))
+        .sort((a, b) => b.count - a.count);
 
-    const jobTypes = [
-        { name: "Freelance", count: 9 },
-        { name: "Full Time", count: 3 },
-        { name: "Internship", count: 2 },
-        { name: "Part Time", count: 3 },
-        { name: "Temporary", count: 2 },
-    ];
+    const jobTypes = Array.from(new Set(employerJobs.map(job => job.jobType || job.type || 'Full-time')))
+        .map(type => ({
+            name: type,
+            count: employerJobs.filter(job => (job.jobType || job.type) === type).length
+        }))
+        .sort((a, b) => b.count - a.count);
+
+    const handleCategoryToggle = (category: string) => {
+        setSelectedCategories(prev =>
+            prev.includes(category) ? prev.filter(c => c !== category) : [...prev, category]
+        );
+    };
+
+    const handleLocationToggle = (location: string) => {
+        setSelectedLocations(prev =>
+            prev.includes(location) ? prev.filter(l => l !== location) : [...prev, location]
+        );
+    };
+
+    const handleTypeToggle = (type: string) => {
+        setSelectedTypes(prev =>
+            prev.includes(type) ? prev.filter(t => t !== type) : [...prev, type]
+        );
+    };
 
     if (!employer) {
         return (
@@ -140,6 +176,8 @@ export default function EmployerDetailPage() {
                                                 <div className="relative flex items-center">
                                                     <input
                                                         type="checkbox"
+                                                        checked={selectedCategories.includes(cat.name)}
+                                                        onChange={() => handleCategoryToggle(cat.name)}
                                                         className="peer h-4 w-4 cursor-pointer appearance-none rounded border border-gray-300 bg-white checked:border-[#00b4d8] checked:bg-[#00b4d8] transition-all"
                                                     />
                                                     <span className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 text-white opacity-0 peer-checked:opacity-100 pointer-events-none">
@@ -186,6 +224,8 @@ export default function EmployerDetailPage() {
                                                 <div className="relative flex items-center">
                                                     <input
                                                         type="checkbox"
+                                                        checked={selectedLocations.includes(location.name)}
+                                                        onChange={() => handleLocationToggle(location.name)}
                                                         className="peer h-4 w-4 cursor-pointer appearance-none rounded border border-gray-300 bg-white checked:border-[#00b4d8] checked:bg-[#00b4d8] transition-all"
                                                     />
                                                     <span className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 text-white opacity-0 peer-checked:opacity-100 pointer-events-none">
@@ -235,6 +275,8 @@ export default function EmployerDetailPage() {
                                                 <div className="relative flex items-center">
                                                     <input
                                                         type="checkbox"
+                                                        checked={selectedTypes.includes(type.name)}
+                                                        onChange={() => handleTypeToggle(type.name)}
                                                         className="peer h-4 w-4 cursor-pointer appearance-none rounded border border-gray-300 bg-white checked:border-[#00b4d8] checked:bg-[#00b4d8] transition-all"
                                                     />
                                                     <span className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 text-white opacity-0 peer-checked:opacity-100 pointer-events-none">
@@ -367,8 +409,8 @@ export default function EmployerDetailPage() {
                                     Open Positions
                                 </h3>
                                 <div className="grid grid-cols-1 gap-6">
-                                    {employerJobs.length > 0 ? (
-                                        employerJobs.map((job) => (
+                                    {filteredJobs.length > 0 ? (
+                                        filteredJobs.map((job) => (
                                             <JobCard
                                                 key={job._id || job.id}
                                                 job={{
