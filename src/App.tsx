@@ -1,48 +1,48 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom";
-import { AuthProvider } from "./shared/contexts/AuthContext";
-import HomePage from "./shared/components/pages/HomePage";
-import JobsListPage from "./shared/components/pages/JobsListPage";
-import JobDetailPage from "./shared/components/pages/JobDetailPage";
-import CandidatesListPage from "./shared/components/pages/CandidatesListPage";
-import CandidateDetailPage from "./shared/components/pages/CandidateDetailPage";
-import EmployerListPage from "./shared/components/pages/EmployerListPage";
-import EmployerDetailPage from "./shared/components/pages/EmployerDetailPage";
-import BlogPage from "./shared/components/pages/BlogPage";
-import BlogDetailPage from "./shared/components/pages/BlogDetailPage";
-import ContactPage from "./shared/components/pages/contactPage";
-import PricingTablesPage from "./shared/components/pages/PricingTablesPage";
-import PostJobPage from "./shared/components/pages/PostJobPage";
-import LoginPage from "./shared/components/pages/LoginPage";
-import RegisterPage from "./shared/components/pages/RegisterPage";
-import PendingVerification from "./shared/components/pages/PendingVerification";
+import { AuthProvider } from "./contexts/AuthContext";
+import HomePage from "./pages/HomePage";
+import JobsListPage from "./pages/JobsListPage";
+import JobDetailPage from "./pages/JobDetailPage";
+import CandidatesListPage from "./pages/CandidatesListPage";
+import CandidateDetailPage from "./pages/CandidateDetailPage";
+import EmployerListPage from "./pages/EmployerListPage";
+import EmployerDetailPage from "./pages/EmployerDetailPage";
+import BlogPage from "./pages/BlogPage";
+import BlogDetailPage from "./pages/BlogDetailPage";
+import ContactPage from "./pages/contactPage";
+import PricingTablesPage from "./pages/PricingTablesPage";
+import PostJobPage from "./pages/PostJobPage";
+import LoginPage from "./pages/LoginPage";
+import RegisterPage from "./pages/RegisterPage";
+import PendingVerification from "./pages/PendingVerification";
 
 // Dashboards
-import DashboardRedirect from "./shared/components/pages/dashboard/DashboardRedirect";
-import CandidateDashboard from "./shared/components/pages/dashboard/candidate/CandidateDashboard";
-import EmployerDashboard from "./shared/components/pages/dashboard/employer/EmployerDashboard";
-import AdminDashboard from "./shared/components/pages/dashboard/admin/AdminDashboard";
-import PostJob from "./shared/components/pages/dashboard/employer/PostJob";
-import CandidateProfile from "./shared/components/pages/dashboard/candidate/CandidateProfile";
-import CompanyProfile from "./shared/components/pages/dashboard/employer/CompanyProfile";
+import DashboardRedirect from "./pages/dashboard/DashboardRedirect";
+import CandidateDashboard from "./pages/dashboard/candidate/CandidateDashboard";
+import EmployerDashboard from "./pages/dashboard/employer/EmployerDashboard";
+import AdminDashboard from "./pages/dashboard/admin/AdminDashboard";
+import PostJob from "./pages/dashboard/employer/PostJob";
+import CandidateProfile from "./pages/dashboard/candidate/CandidateProfile";
+import CompanyProfile from "./pages/dashboard/employer/CompanyProfile";
 
 // Candidate Dashboard Pages
-import AppliedJobs from "./shared/components/pages/dashboard/candidate/AppliedJobs";
-import SavedJobs from "./shared/components/pages/dashboard/candidate/SavedJobs";
+import AppliedJobs from "./pages/dashboard/candidate/AppliedJobs";
+import SavedJobs from "./pages/dashboard/candidate/SavedJobs";
 
 // Employer Dashboard Pages
-import ManageJobs from "./shared/components/pages/dashboard/employer/ManageJobs";
-import Applicants from "./shared/components/pages/dashboard/employer/Applicants";
+import ManageJobs from "./pages/dashboard/employer/ManageJobs";
+import Applicants from "./pages/dashboard/employer/Applicants";
 
 // Admin Dashboard Pages
-import AdminStats from "./shared/components/pages/dashboard/admin/AdminStats";
-import AdminJobs from "./shared/components/pages/dashboard/admin/AdminJobs";
-import AdminUsers from "./shared/components/pages/dashboard/admin/AdminUsers";
-import AdminApplications from "./shared/components/pages/dashboard/admin/AdminApplications";
-import AdminCategories from "./shared/components/pages/dashboard/admin/AdminCategories";
-import AdminEmployers from "./shared/components/pages/dashboard/admin/AdminEmployers";
+import AdminStats from "./pages/dashboard/admin/AdminStats";
+import AdminJobs from "./pages/dashboard/admin/AdminJobs";
+import AdminUsers from "./pages/dashboard/admin/AdminUsers";
+import AdminApplications from "./pages/dashboard/admin/AdminApplications";
+import AdminCategories from "./pages/dashboard/admin/AdminCategories";
+import AdminEmployers from "./pages/dashboard/admin/AdminEmployers";
 
 // Shared Dashboard Pages
-import Settings from "./shared/components/pages/dashboard/components/Settings";
+import Settings from "./pages/dashboard/components/Settings";
 
 export default function App() {
   return (
@@ -63,7 +63,10 @@ export default function App() {
           <Route path="/post-job" element={<PostJobPage />} />
           <Route path="/login" element={<LoginPage />} />
           <Route path="/register" element={<RegisterPage />} />
-          <Route path="/pending-verification" element={<PendingVerification />} />
+          <Route
+            path="/pending-verification"
+            element={<PendingVerification />}
+          />
 
           {/* Dashboards */}
           <Route path="/dashboard" element={<DashboardRedirect />} />
@@ -79,7 +82,10 @@ export default function App() {
           <Route path="/dashboard/manage-jobs" element={<ManageJobs />} />
           <Route path="/dashboard/post-job" element={<PostJob />} />
           <Route path="/dashboard/applicants" element={<Applicants />} />
-          <Route path="/dashboard/company-profile" element={<CompanyProfile />} />
+          <Route
+            path="/dashboard/company-profile"
+            element={<CompanyProfile />}
+          />
 
           {/* Admin Dashboard */}
           <Route path="/dashboard/admin" element={<AdminDashboard />} />

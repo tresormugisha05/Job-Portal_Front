@@ -1,10 +1,10 @@
 import { useState, useMemo, useEffect } from "react";
-import PageWrapper from "../layouts/PageWrapper";
-import PageHeader from "../components/ui/PageHeader";
-import Loader from "../components/ui/Loader";
-import usePageLoader from "../hooks/usePageLoader";
+import PageWrapper from "../shared/layouts/PageWrapper";
+import PageHeader from "../shared/components/ui/PageHeader";
+import Loader from "../shared/components/ui/Loader";
+import usePageLoader from "../shared/components/hooks/usePageLoader";
 import { CandidateService, type UserModel } from "../services/Auth.Service";
-import CandidateCard from "../components/ui/CandidateCard";
+import CandidateCard from "../shared/components/ui/CandidateCard";
 
 // Extract unique values for filters
 const ITEMS_PER_PAGE = 5;
@@ -367,10 +367,11 @@ export default function CandidatesListPage() {
                       <button
                         key={page}
                         onClick={() => handlePageChange(page)}
-                        className={`px-3 py-2 rounded ${currentPage === page
+                        className={`px-3 py-2 rounded ${
+                          currentPage === page
                             ? "bg-[#00b4d8] text-white border border-[#00b4d8]"
                             : "border border-gray-300 hover:bg-gray-50"
-                          }`}
+                        }`}
                       >
                         {page}
                       </button>

@@ -2,7 +2,7 @@ import { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { useAuth } from "../contexts/AuthContext";
 import { Mail, Lock, LogIn, Loader2, ArrowRight } from "lucide-react";
-import PageWrapper from "../layouts/PageWrapper";
+import PageWrapper from "../shared/layouts/PageWrapper";
 
 export default function LoginPage() {
   const { login } = useAuth();
@@ -64,20 +64,22 @@ export default function LoginPage() {
                   <button
                     type="button"
                     onClick={() => setRole("CANDIDATE")}
-                    className={`py-4 px-4 rounded-2xl font-bold transition-all border-2 ${role === "CANDIDATE"
+                    className={`py-4 px-4 rounded-2xl font-bold transition-all border-2 ${
+                      role === "CANDIDATE"
                         ? "bg-[#00b4d8] text-white border-[#00b4d8] shadow-lg"
                         : "bg-gray-50 text-gray-600 border-transparent hover:border-gray-200"
-                      }`}
+                    }`}
                   >
                     Candidate
                   </button>
                   <button
                     type="button"
                     onClick={() => setRole("EMPLOYER")}
-                    className={`py-4 px-4 rounded-2xl font-bold transition-all border-2 ${role === "EMPLOYER"
+                    className={`py-4 px-4 rounded-2xl font-bold transition-all border-2 ${
+                      role === "EMPLOYER"
                         ? "bg-[#00b4d8] text-white border-[#00b4d8] shadow-lg"
                         : "bg-gray-50 text-gray-600 border-transparent hover:border-gray-200"
-                      }`}
+                    }`}
                   >
                     Employer
                   </button>

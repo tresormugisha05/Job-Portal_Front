@@ -13,7 +13,8 @@ import {
   FolderTree,
   Building2,
 } from "lucide-react";
-import { useAuth, type UserRole } from "../../contexts/AuthContext";
+import { useAuth } from "../../contexts/AuthContext";
+import type { UserRole } from "../../contexts/AuthContext";
 
 interface SidebarItem {
   label: string;

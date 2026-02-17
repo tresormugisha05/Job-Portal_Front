@@ -1,4 +1,4 @@
-import DashboardLayout from "../../../layouts/DashboardLayout";
+import DashboardLayout from "../../../shared/layouts/DashboardLayout";
 import { Search, Filter, Trash2, Eye, Calendar, Briefcase } from "lucide-react";
 
 export default function AdminApplications() {

@@ -1,8 +1,8 @@
 import { useState, useMemo } from "react";
 import { Link } from "react-router-dom";
-import PageWrapper from "../layouts/PageWrapper";
-import Loader from "../components/ui/Loader";
-import usePageLoader from "../hooks/usePageLoader";
+import PageWrapper from "../shared/layouts/PageWrapper";
+import Loader from "../shared/components/ui/Loader";
+import usePageLoader from "../shared/components/hooks/usePageLoader";
 import {
   FaFacebook,
   FaTwitter,
@@ -11,7 +11,7 @@ import {
   FaPinterest,
 } from "react-icons/fa";
 import { Calendar, Folder, Plus, ChevronRight } from "lucide-react";
-import PageHeader from "../components/ui/PageHeader";
+import PageHeader from "../shared/components/ui/PageHeader";
 
 interface BlogPost {
   id: number;
@@ -176,7 +176,8 @@ export default function BlogPage() {
                       <div className="p-6">
                         <div className="flex items-center gap-4 text-sm text-gray-600 mb-4">
                           <span className="flex items-center gap-1">
-                            <Calendar size={16} className="text-red-500" /> {post.date}
+                            <Calendar size={16} className="text-red-500" />{" "}
+                            {post.date}
                           </span>
                           <span className="flex items-center gap-1">
                             <Folder size={16} className="text-red-500" />{" "}
@@ -264,10 +265,11 @@ export default function BlogPage() {
                         <button
                           key={page}
                           onClick={() => setCurrentPage(page)}
-                          className={`px-4 py-2 rounded-lg transition-colors ${currentPage === page
-                            ? "bg-cyan-500 text-white"
-                            : "border border-gray-300 text-gray-700 hover:bg-gray-50"
-                            }`}
+                          className={`px-4 py-2 rounded-lg transition-colors ${
+                            currentPage === page
+                              ? "bg-cyan-500 text-white"
+                              : "border border-gray-300 text-gray-700 hover:bg-gray-50"
+                          }`}
                         >
                           {page}
                         </button>
@@ -325,10 +327,11 @@ export default function BlogPage() {
                     <div key={cat.name}>
                       <button
                         onClick={() => handleCategoryClick(cat.name)}
-                        className={`flex items-center gap-2 transition-colors ${selectedCategory === cat.name
-                          ? "text-cyan-600 font-semibold"
-                          : "text-gray-700 hover:text-cyan-600"
-                          }`}
+                        className={`flex items-center gap-2 transition-colors ${
+                          selectedCategory === cat.name
+                            ? "text-cyan-600 font-semibold"
+                            : "text-gray-700 hover:text-cyan-600"
+                        }`}
                       >
                         <ChevronRight
                           size={16}

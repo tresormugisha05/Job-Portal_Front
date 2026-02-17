@@ -1,5 +1,5 @@
 import { useState } from "react";
-import DashboardLayout from "../../../layouts/DashboardLayout";
+import DashboardLayout from "../../../shared/layouts/DashboardLayout";
 import { User, Lock, Bell, Shield, ChevronRight, Save } from "lucide-react";
 import { useAuth } from "../../../contexts/AuthContext";
 
@@ -47,10 +47,11 @@ export default function Settings() {
             <button
               key={tab.id}
               onClick={() => setActiveTab(tab.id)}
-              className={`w-full flex items-center justify-between px-4 py-3 rounded-xl transition-all ${activeTab === tab.id
+              className={`w-full flex items-center justify-between px-4 py-3 rounded-xl transition-all ${
+                activeTab === tab.id
                   ? "bg-white text-[#00b4d8] shadow-sm font-bold border border-gray-100"
                   : "text-gray-500 hover:bg-white/50 hover:text-gray-700"
-                }`}
+              }`}
             >
               <div className="flex items-center gap-3">
                 {tab.icon}

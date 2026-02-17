@@ -1,4 +1,4 @@
-import DashboardLayout from "../../../layouts/DashboardLayout";
+import DashboardLayout from "../../../shared/layouts/DashboardLayout";
 import {
   Users,
   Briefcase,

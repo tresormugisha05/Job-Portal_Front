@@ -10,11 +10,11 @@ import {
   User,
 } from "lucide-react";
 import { Link, useParams } from "react-router-dom";
-import PageWrapper from "../layouts/PageWrapper";
+import PageWrapper from "../shared/layouts/PageWrapper";
 import { useState, useEffect } from "react";
 import { useAuth } from "../contexts/AuthContext";
 import { CandidateService, type UserModel } from "../services/Auth.Service";
-import Loader from "../components/ui/Loader";
+import Loader from "../shared/components/ui/Loader";
 
 export default function CandidateDetailPage() {
   const { id } = useParams();
@@ -29,7 +29,12 @@ export default function CandidateDetailPage() {
       try {
         setLoading(true);
         setError(null);
-        console.log("CandidateDetailPage: useEffect triggered, id:", id, "user:", user);
+        console.log(
+          "CandidateDetailPage: useEffect triggered, id:",
+          id,
+          "user:",
+          user,
+        );
 
         if (!id) {
           // Viewing own profile
@@ -116,7 +121,9 @@ export default function CandidateDetailPage() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
           <div className="text-center">
             <p className="text-gray-600 text-lg">Candidate not found</p>
-            <p className="text-gray-500 text-sm mt-2">candidateData is null - received: {JSON.stringify(candidateData)}</p>
+            <p className="text-gray-500 text-sm mt-2">
+              candidateData is null - received: {JSON.stringify(candidateData)}
+            </p>
             <Link
               to="/candidates"
               className="inline-flex items-center gap-2 text-blue-600 hover:text-blue-700 mt-4"
@@ -159,10 +166,10 @@ export default function CandidateDetailPage() {
                     {candidateData.initials ||
                       (candidateData.name
                         ? candidateData.name
-                          .split(" ")
-                          .map((n) => n[0])
-                          .join("")
-                          .toUpperCase()
+                            .split(" ")
+                            .map((n) => n[0])
+                            .join("")
+                            .toUpperCase()
                         : "U")}
                   </span>
                 </div>

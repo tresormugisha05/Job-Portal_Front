@@ -1,7 +1,7 @@
 import { useState, useMemo, useEffect } from "react";
 import { getAllJobs } from "../../services/jobService";
 import type { JobData } from "../../services/jobService";
-import JobCard from "../../components/ui/JobCard";
+import JobCard from "../../shared/components/ui/JobCard";
 
 // Define filter types
 type FilterType = "RECENT JOBS" | "FEATURED" | "FULL TIME" | "PART TIME";

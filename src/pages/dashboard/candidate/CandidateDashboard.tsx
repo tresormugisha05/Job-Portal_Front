@@ -1,4 +1,4 @@
-import DashboardLayout from "../../../layouts/DashboardLayout";
+import DashboardLayout from "../../../shared/layouts/DashboardLayout";
 import { Briefcase, Heart, Bell, CheckCircle } from "lucide-react";
 import StatCard from "../components/StatCard";
 import DashboardSection from "../components/DashboardSection";

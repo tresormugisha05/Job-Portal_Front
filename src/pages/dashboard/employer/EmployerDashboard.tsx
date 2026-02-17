@@ -1,4 +1,4 @@
-import DashboardLayout from "../../../layouts/DashboardLayout";
+import DashboardLayout from "../../../shared/layouts/DashboardLayout";
 import {
   Briefcase,
   Users,
@@ -19,7 +19,7 @@ import { useNavigate } from "react-router-dom";
 import { getJobsByEmployer } from "../../../services/jobService";
 import { ApplicationService } from "../../../services/application.Service";
 import type { ApplicationModel } from "../../../services/application.Service";
-import Loader from "../../../components/ui/Loader";
+import Loader from "../../../shared/components/ui/Loader";
 
 export default function EmployerDashboard() {
   const { user } = useAuth();
@@ -152,10 +152,10 @@ export default function EmployerDashboard() {
       jobTitle: app.jobId?.title || "Unknown Job",
       appliedDate: app.submissionDate
         ? new Date(app.submissionDate).toLocaleDateString("en-US", {
-          year: "numeric",
-          month: "short",
-          day: "numeric",
-        })
+            year: "numeric",
+            month: "short",
+            day: "numeric",
+          })
         : "N/A",
       avatar: app.userId?.profilePicture,
     }));

@@ -1,7 +1,7 @@
 import React, { useState } from "react";
-import PageWrapper from "../layouts/PageWrapper";
-import Loader from "../components/ui/Loader";
-import usePageLoader from "../hooks/usePageLoader";
+import PageWrapper from "../shared/layouts/PageWrapper";
+import Loader from "../shared/components/ui/Loader";
+import usePageLoader from "../shared/components/hooks/usePageLoader";
 import {
   User,
   Mail,
@@ -11,7 +11,7 @@ import {
   Printer,
   Send,
 } from "lucide-react";
-import PageHeader from "../components/ui/PageHeader";
+import PageHeader from "../shared/components/ui/PageHeader";
 // import { MapContainer, TileLayer, Marker, Popup } from "react-leaflet";
 // import L from "leaflet";
 // import "leaflet/dist/leaflet.css";
@@ -170,10 +170,11 @@ const ContactPage: React.FC = () => {
           {/* Contact Info Card */}
           <aside className="flex flex-col gap-6">
             <div
-              className={`bg-linear-to-br from-teal-600 to-teal-700 rounded-3xl p-10 text-white shadow-2xl shadow-teal-600/25 transition-all duration-700 delay-300 ${isAnimated
-                ? "opacity-100 translate-y-0"
-                : "opacity-0 translate-y-8"
-                }`}
+              className={`bg-linear-to-br from-teal-600 to-teal-700 rounded-3xl p-10 text-white shadow-2xl shadow-teal-600/25 transition-all duration-700 delay-300 ${
+                isAnimated
+                  ? "opacity-100 translate-y-0"
+                  : "opacity-0 translate-y-8"
+              }`}
             >
               <h3
                 className="font-serif text-3xl mb-2.5 relative pb-4 after:absolute after:bottom-0 after:left-0 after:w-16 after:h-0.5 after:bg-white/50"
@@ -293,10 +294,11 @@ const ContactPage: React.FC = () => {
 
           {/* Contact Form Card */}
           <div
-            className={`bg-white rounded-3xl p-8 md:p-12 shadow-2xl transition-all duration-700 delay-300 ${isAnimated
-              ? "opacity-100 translate-y-0"
-              : "opacity-0 translate-y-8"
-              }`}
+            className={`bg-white rounded-3xl p-8 md:p-12 shadow-2xl transition-all duration-700 delay-300 ${
+              isAnimated
+                ? "opacity-100 translate-y-0"
+                : "opacity-0 translate-y-8"
+            }`}
           >
             <div className="mb-9">
               <h2
@@ -306,8 +308,8 @@ const ContactPage: React.FC = () => {
                 Leave a Message
               </h2>
               <p className="text-slate-600 text-base">
-                We'd love to hear from you. Send us a message and we'll
-                respond as soon as possible.
+                We'd love to hear from you. Send us a message and we'll respond
+                as soon as possible.
               </p>
             </div>
 
@@ -439,7 +441,7 @@ const ContactPage: React.FC = () => {
           </div>
         </div>
       </main>
-    </PageWrapper >
+    </PageWrapper>
   );
 };
 

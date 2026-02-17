@@ -1,8 +1,8 @@
 import { useState } from "react";
 import { useParams, Link } from "react-router-dom";
-import PageWrapper from "../layouts/PageWrapper";
-import Loader from "../components/ui/Loader";
-import usePageLoader from "../hooks/usePageLoader";
+import PageWrapper from "../shared/layouts/PageWrapper";
+import Loader from "../shared/components/ui/Loader";
+import usePageLoader from "../shared/components/hooks/usePageLoader";
 import {
   FaFacebook,
   FaTwitter,
@@ -10,8 +10,17 @@ import {
   FaGoogle,
   FaPinterest,
 } from "react-icons/fa";
-import { Calendar, Folder, Tag, User, Plus, ChevronRight, Mail, UserIcon } from "lucide-react";
-import PageHeader from "../components/ui/PageHeader";
+import {
+  Calendar,
+  Folder,
+  Tag,
+  User,
+  Plus,
+  ChevronRight,
+  Mail,
+  UserIcon,
+} from "lucide-react";
+import PageHeader from "../shared/components/ui/PageHeader";
 
 interface BlogPost {
   id: number;
@@ -354,7 +363,10 @@ export default function BlogDetailPage() {
                 <form onSubmit={handleSubmitComment} className="space-y-6">
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div className="relative">
-                      <UserIcon className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={20} />
+                      <UserIcon
+                        className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"
+                        size={20}
+                      />
                       <input
                         type="text"
                         name="name"
@@ -365,7 +377,10 @@ export default function BlogDetailPage() {
                       />
                     </div>
                     <div className="relative">
-                      <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={20} />
+                      <Mail
+                        className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"
+                        size={20}
+                      />
                       <input
                         type="email"
                         name="email"
@@ -458,17 +473,19 @@ export default function BlogDetailPage() {
                             selectedCategory === cat.name ? null : cat.name,
                           )
                         }
-                        className={`flex items-center gap-2 transition-colors ${selectedCategory === cat.name
-                          ? "text-cyan-600 font-semibold"
-                          : "text-gray-700 hover:text-cyan-600"
-                          }`}
+                        className={`flex items-center gap-2 transition-colors ${
+                          selectedCategory === cat.name
+                            ? "text-cyan-600 font-semibold"
+                            : "text-gray-700 hover:text-cyan-600"
+                        }`}
                       >
                         <ChevronRight
                           size={16}
-                          className={`${selectedCategory === cat.name
-                            ? "text-cyan-600"
-                            : "text-gray-400"
-                            }`}
+                          className={`${
+                            selectedCategory === cat.name
+                              ? "text-cyan-600"
+                              : "text-gray-400"
+                          }`}
                         />
                         <span>{cat.name}</span>
                         <span className="text-cyan-500 ml-auto font-semibold">

@@ -1,6 +1,6 @@
 import { MapPin, Briefcase, GraduationCap, Eye, Mail } from "lucide-react";
 import { Link } from "react-router-dom";
-import type { UserModel } from "../../services/Auth.Service";
+import type { UserModel } from "../../../services/Auth.Service";
 
 interface CandidateCardProps {
   candidate: UserModel;

@@ -1,4 +1,4 @@
-import DashboardLayout from "../../layouts/DashboardLayout";
+import DashboardLayout from "../../shared/layouts/DashboardLayout";
 import {
   Briefcase,
   Users,
@@ -18,7 +18,7 @@ import { getJobsByEmployer } from "../../services/jobService";
 import { getEmployerById } from "../../services/employerService";
 import { ApplicationService } from "../../services/application.Service";
 import type { ApplicationModel } from "../../services/application.Service";
-import Loader from "../../components/ui/Loader";
+import Loader from "../../shared/components/ui/Loader";
 
 export default function EmployerDashboard() {
   const { user } = useAuth();
@@ -138,14 +138,15 @@ export default function EmployerDashboard() {
       id: app.id || app._id || index,
       name: app.userId?.fullName || app.userId?.name || "Unknown Candidate",
       role: app.userId?.jobTitle || "Candidate",
-      professionalTitle: app.userId?.professionalTitle || app.userId?.jobTitle || "Candidate",
+      professionalTitle:
+        app.userId?.professionalTitle || app.userId?.jobTitle || "Candidate",
       jobTitle: app.jobId?.title || "Unknown Job",
       appliedDate: app.submissionDate
         ? new Date(app.submissionDate).toLocaleDateString("en-US", {
-          year: "numeric",
-          month: "short",
-          day: "numeric",
-        })
+            year: "numeric",
+            month: "short",
+            day: "numeric",
+          })
         : "N/A",
       avatar: app.userId?.profilePicture,
     }));

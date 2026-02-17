@@ -1,6 +1,5 @@
 import { useState, useEffect, useMemo } from "react";
 import { Briefcase, Plus, ChevronLeft, ChevronRight } from "lucide-react";
-import { candidates } from "../../data/candidates";
 import { Link } from "react-router-dom";
 
 export default function HomeResumes() {
@@ -9,7 +8,38 @@ export default function HomeResumes() {
 
   // Use latest candidates for "Recent"
   const recentCandidates = useMemo(() => {
-    return candidates.slice(0, 8); // Take first 8 as recent
+    return [
+      {
+        id: 1,
+        name: "John Doe",
+        initials: "JD",
+        professionalTitle: "Software Engineer",
+      },
+      {
+        id: 2,
+        name: "Jane Smith",
+        initials: "JS",
+        professionalTitle: "Product Manager",
+      },
+      {
+        id: 3,
+        name: "Michael Johnson",
+        initials: "MJ",
+        professionalTitle: "UI/UX Designer",
+      },
+      {
+        id: 4,
+        name: "Emily Brown",
+        initials: "EB",
+        professionalTitle: "Data Analyst",
+      },
+      {
+        id: 5,
+        name: "David Wilson",
+        initials: "DW",
+        professionalTitle: "Marketing Specialist",
+      },
+    ];
   }, []);
 
   // Responsive visible count
@@ -20,8 +50,8 @@ export default function HomeResumes() {
     };
 
     updateVisibleCount();
-    window.addEventListener('resize', updateVisibleCount);
-    return () => window.removeEventListener('resize', updateVisibleCount);
+    window.addEventListener("resize", updateVisibleCount);
+    return () => window.removeEventListener("resize", updateVisibleCount);
   }, []);
 
   const maxIndex = Math.max(0, recentCandidates.length - visibleCount);
@@ -67,13 +97,17 @@ export default function HomeResumes() {
         <div className="relative mb-12 max-w-5xl mx-auto">
           <div
             className="flex transition-transform duration-500 ease-out gap-6"
-            style={{ transform: `translateX(-${currentIndex * (100 / visibleCount)}%)` }}
+            style={{
+              transform: `translateX(-${currentIndex * (100 / visibleCount)}%)`,
+            }}
           >
             {recentCandidates.map((candidate: any) => (
               <div
                 key={candidate.id}
                 className="flex-shrink-0 bg-white p-6 sm:p-8 border border-gray-100 flex flex-col sm:flex-row items-center justify-between hover:shadow-xl transition-all relative group"
-                style={{ width: `calc(${(100 / visibleCount)}% - ${(6 * (visibleCount - 1)) / visibleCount}px)` }}
+                style={{
+                  width: `calc(${100 / visibleCount}% - ${(6 * (visibleCount - 1)) / visibleCount}px)`,
+                }}
               >
                 {/* Bottom border accent */}
                 <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-gray-100 group-hover:bg-[#00b4d8] transition-colors"></div>
@@ -81,16 +115,22 @@ export default function HomeResumes() {
                 <div className="flex items-center gap-4 mb-4 sm:mb-0">
                   {/* Initials Avatar */}
                   <div className="w-16 h-16 bg-gradient-to-br from-gray-100 to-gray-200 rounded-sm flex items-center justify-center border border-gray-200 shrink-0 shadow-sm transition-transform group-hover:scale-105 duration-300">
-                    <span className="text-xl font-bold text-gray-500">{candidate.initials}</span>
+                    <span className="text-xl font-bold text-gray-500">
+                      {candidate.initials}
+                    </span>
                   </div>
 
                   <div>
                     <h3 className="text-base font-bold text-gray-900 mb-1 group-hover:text-[#00b4d8] transition-colors">
-                      <Link to={`/candidates/${candidate.id}`}>{candidate.name}</Link>
+                      <Link to={`/candidates/${candidate.id}`}>
+                        {candidate.name}
+                      </Link>
                     </h3>
                     <div className="flex items-center gap-1.5 text-sm">
                       <Briefcase className="w-3.5 h-3.5 text-[#ff6b6b]" />
-                      <span className="text-gray-500 font-medium">{candidate.professionalTitle}</span>
+                      <span className="text-gray-500 font-medium">
+                        {candidate.professionalTitle}
+                      </span>
                     </div>
                   </div>
                 </div>

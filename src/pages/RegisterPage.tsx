@@ -11,7 +11,7 @@ import {
   CheckCircle2,
   Phone,
 } from "lucide-react";
-import PageWrapper from "../layouts/PageWrapper";
+import PageWrapper from "../shared/layouts/PageWrapper";
 import { useAuth } from "../contexts/AuthContext";
 type RegRole = "CANDIDATE" | "EMPLOYER";
 
@@ -80,10 +80,11 @@ export default function RegisterPage() {
           <div className="grid grid-cols-2 gap-6 max-w-lg mx-auto">
             <button
               onClick={() => setRole("CANDIDATE")}
-              className={`p-6 rounded-[2rem] border-2 transition-all flex flex-col items-center gap-3 relative overflow-hidden ${role === "CANDIDATE"
+              className={`p-6 rounded-[2rem] border-2 transition-all flex flex-col items-center gap-3 relative overflow-hidden ${
+                role === "CANDIDATE"
                   ? "border-[#00b4d8] bg-blue-50/50 shadow-lg shadow-blue-100/50"
                   : "border-gray-100 hover:border-gray-200 bg-white"
-                }`}
+              }`}
             >
               {role === "CANDIDATE" && (
                 <div className="absolute top-4 right-4 text-[#00b4d8]">
@@ -104,10 +105,11 @@ export default function RegisterPage() {
 
             <button
               onClick={() => setRole("EMPLOYER")}
-              className={`p-6 rounded-[2rem] border-2 transition-all flex flex-col items-center gap-3 relative overflow-hidden ${role === "EMPLOYER"
+              className={`p-6 rounded-[2rem] border-2 transition-all flex flex-col items-center gap-3 relative overflow-hidden ${
+                role === "EMPLOYER"
                   ? "border-[#ff6b6b] bg-red-50/50 shadow-lg shadow-red-100/50"
                   : "border-gray-100 hover:border-gray-200 bg-white"
-                }`}
+              }`}
             >
               {role === "EMPLOYER" && (
                 <div className="absolute top-4 right-4 text-[#ff6b6b]">
@@ -250,10 +252,11 @@ export default function RegisterPage() {
               <button
                 type="submit"
                 disabled={isLoading}
-                className={`w-full flex items-center justify-center gap-3 py-5 px-4 rounded-2xl font-black uppercase tracking-widest text-white transition-all transform active:scale-[0.98] shadow-lg disabled:opacity-50 mt-4 ${role === "CANDIDATE"
+                className={`w-full flex items-center justify-center gap-3 py-5 px-4 rounded-2xl font-black uppercase tracking-widest text-white transition-all transform active:scale-[0.98] shadow-lg disabled:opacity-50 mt-4 ${
+                  role === "CANDIDATE"
                     ? "bg-[#00b4d8] hover:bg-[#009bc2] shadow-blue-100"
                     : "bg-[#ff6b6b] hover:bg-[#ff5252] shadow-red-100"
-                  }`}
+                }`}
               >
                 {isLoading ? (
                   <Loader2 className="w-6 h-6 animate-spin" />

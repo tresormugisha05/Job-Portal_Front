@@ -1,20 +1,22 @@
-import PageWrapper from "../layouts/PageWrapper";
-import Loader from "../components/ui/Loader";
-import usePageLoader from "../hooks/usePageLoader";
+import PageWrapper from "../shared/layouts/PageWrapper";
+import Loader from "../shared/components/ui/Loader";
+import usePageLoader from "../shared/components/hooks/usePageLoader";
 
 export default function PostJobPage() {
   const isLoading = usePageLoader(1000);
-  
+
   if (isLoading) {
     return <Loader />;
   }
-  
+
   return (
     <PageWrapper>
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="bg-white rounded-lg shadow-lg p-8">
           <h1 className="text-3xl font-bold text-gray-900 mb-2">Post a Job</h1>
-          <p className="text-gray-600 mb-8">Find the perfect candidate for your position</p>
+          <p className="text-gray-600 mb-8">
+            Find the perfect candidate for your position
+          </p>
 
           <form className="space-y-6">
             <div className="border-b pb-6">
@@ -129,7 +131,9 @@ export default function PostJobPage() {
 
             {/* Company Information Section */}
             <div className="border-b pb-6">
-              <h2 className="text-xl font-semibold mb-4">Company Information</h2>
+              <h2 className="text-xl font-semibold mb-4">
+                Company Information
+              </h2>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
@@ -169,7 +173,9 @@ export default function PostJobPage() {
 
             {/* Application Settings */}
             <div className="border-b pb-6">
-              <h2 className="text-xl font-semibold mb-4">Application Settings</h2>
+              <h2 className="text-xl font-semibold mb-4">
+                Application Settings
+              </h2>
 
               <div className="space-y-4">
                 <div>
