@@ -3,8 +3,10 @@ import axios from "axios";
 const api = axios.create({
   baseURL:
     import.meta.env.VITE_APP_API_URL ||
-    (window.location.hostname === "localhost" ? "http://localhost:5000/api" : "https://job-portal-back-fdlt.onrender.com/api"),
-  timeout: 10000,
+    (window.location.hostname === "localhost"
+      ? "http://localhost:5000/api"
+      : "https://job-portal-back-fdlt.onrender.com/api"),
+  timeout: 20000,
   headers: {
     "Content-Type": "application/json",
   },
