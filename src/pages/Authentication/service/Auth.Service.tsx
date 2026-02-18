@@ -1,4 +1,4 @@
-import api from "./ApiSetter";
+import api from "../../../services/ApiSetter";
 
 export interface WorkExperience {
   id: string;

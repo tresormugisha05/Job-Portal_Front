@@ -3,7 +3,7 @@ import { ChevronLeft, ChevronRight } from "lucide-react";
 import {
   getTopHiringCompanies,
   type EmployerData,
-} from "../../services/employerService";
+} from "../Employer/service/employerService";
 
 interface CompanyWithOpenings extends EmployerData {
   openings: number;

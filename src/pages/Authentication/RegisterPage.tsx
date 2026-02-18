@@ -11,8 +11,8 @@ import {
   CheckCircle2,
   Phone,
 } from "lucide-react";
-import PageWrapper from "../shared/layouts/PageWrapper";
-import { useAuth } from "../contexts/AuthContext";
+import PageWrapper from "../../shared/layouts/PageWrapper";
+import { useAuth } from "../../contexts/AuthContext";
 type RegRole = "CANDIDATE" | "EMPLOYER";
 
 export default function RegisterPage() {

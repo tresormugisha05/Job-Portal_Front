@@ -16,7 +16,7 @@ import { useEffect, useState } from "react";
 import { useAuth } from "../../../contexts/AuthContext";
 import { useNavigate } from "react-router-dom";
 
-import { getJobsByEmployer } from "../../../services/jobService";
+import { getJobsByEmployer } from "../../Jobs/service/jobService";
 import { ApplicationService } from "../../../services/application.Service";
 import type { ApplicationModel } from "../../../services/application.Service";
 import Loader from "../../../shared/components/ui/Loader";

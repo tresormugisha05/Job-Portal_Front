@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { useParams, Link } from "react-router-dom";
-import PageWrapper from "../shared/layouts/PageWrapper";
-import Loader from "../shared/components/ui/Loader";
+import PageWrapper from "../../shared/layouts/PageWrapper";
+import Loader from "../../shared/components/ui/Loader";
 import {
   ChevronRight,
   MapPin,
@@ -13,9 +13,9 @@ import {
 import {
   getEmployerById,
   type EmployerData,
-} from "../services/employerService";
-import { getJobsByEmployer, type JobData } from "../services/jobService";
-import JobCard from "../shared/components/ui/JobCard";
+} from "../Employer/service/employerService";
+import { getJobsByEmployer, type JobData } from "../Jobs/service/jobService";
+import JobCard from "../../shared/components/ui/JobCard";
 
 export default function EmployerDetailPage() {
   const { id } = useParams();

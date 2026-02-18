@@ -1,8 +1,8 @@
 import { useState } from "react";
 import { useParams, Link } from "react-router-dom";
-import PageWrapper from "../shared/layouts/PageWrapper";
-import Loader from "../shared/components/ui/Loader";
-import usePageLoader from "../shared/components/hooks/usePageLoader";
+import PageWrapper from "../../shared/layouts/PageWrapper";
+import Loader from "../../shared/components/ui/Loader";
+import usePageLoader from "../../shared/components/hooks/usePageLoader";
 import {
   FaFacebook,
   FaTwitter,
@@ -20,7 +20,7 @@ import {
   Mail,
   UserIcon,
 } from "lucide-react";
-import PageHeader from "../shared/components/ui/PageHeader";
+import PageHeader from "../../shared/components/ui/PageHeader";
 
 interface BlogPost {
   id: number;

@@ -1,8 +1,8 @@
 import { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
-import { useAuth } from "../contexts/AuthContext";
+import { useAuth } from "../../contexts/AuthContext";
 import { Mail, Lock, LogIn, Loader2, ArrowRight } from "lucide-react";
-import PageWrapper from "../shared/layouts/PageWrapper";
+import PageWrapper from "../../shared/layouts/PageWrapper";
 
 export default function LoginPage() {
   const { login } = useAuth();

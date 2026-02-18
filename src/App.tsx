@@ -1,22 +1,20 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { AuthProvider } from "./contexts/AuthContext";
-import HomePage from "./pages/HomePage";
-import JobsListPage from "./pages/JobsListPage";
-import JobDetailPage from "./pages/JobDetailPage";
-import CandidatesListPage from "./pages/CandidatesListPage";
-import CandidateDetailPage from "./pages/CandidateDetailPage";
-import EmployerListPage from "./pages/EmployerListPage";
-import EmployerDetailPage from "./pages/EmployerDetailPage";
-import BlogPage from "./pages/BlogPage";
-import BlogDetailPage from "./pages/BlogDetailPage";
+import HomePage from "./pages/home/HomePage";
+import JobsListPage from "./pages/Jobs/JobsListPage";
+import JobDetailPage from "./pages/Jobs/JobDetailPage";
+import CandidatesListPage from "./pages/Candidates/CandidatesListPage";
+import CandidateDetailPage from "./pages/Candidates/CandidateDetailPage";
+import EmployerListPage from "./pages/Employer/EmployerListPage";
+import EmployerDetailPage from "./pages/Employer/EmployerDetailPage";
+import BlogPage from "./pages/Blogs/BlogPage";
+import BlogDetailPage from "./pages/Blogs/BlogDetailPage";
 import ContactPage from "./pages/contactPage";
 import PricingTablesPage from "./pages/PricingTablesPage";
-import PostJobPage from "./pages/PostJobPage";
-import LoginPage from "./pages/LoginPage";
-import RegisterPage from "./pages/RegisterPage";
+import PostJobPage from "./pages/Jobs/PostJobPage";
+import LoginPage from "./pages/Authentication/LoginPage";
+import RegisterPage from "./pages/Authentication/RegisterPage";
 import PendingVerification from "./pages/PendingVerification";
-
-// Dashboards
 import DashboardRedirect from "./pages/dashboard/DashboardRedirect";
 import CandidateDashboard from "./pages/dashboard/candidate/CandidateDashboard";
 import EmployerDashboard from "./pages/dashboard/employer/EmployerDashboard";
@@ -24,26 +22,17 @@ import AdminDashboard from "./pages/dashboard/admin/AdminDashboard";
 import PostJob from "./pages/dashboard/employer/PostJob";
 import CandidateProfile from "./pages/dashboard/candidate/CandidateProfile";
 import CompanyProfile from "./pages/dashboard/employer/CompanyProfile";
-
-// Candidate Dashboard Pages
 import AppliedJobs from "./pages/dashboard/candidate/AppliedJobs";
 import SavedJobs from "./pages/dashboard/candidate/SavedJobs";
-
-// Employer Dashboard Pages
 import ManageJobs from "./pages/dashboard/employer/ManageJobs";
 import Applicants from "./pages/dashboard/employer/Applicants";
-
-// Admin Dashboard Pages
 import AdminStats from "./pages/dashboard/admin/AdminStats";
 import AdminJobs from "./pages/dashboard/admin/AdminJobs";
 import AdminUsers from "./pages/dashboard/admin/AdminUsers";
 import AdminApplications from "./pages/dashboard/admin/AdminApplications";
 import AdminCategories from "./pages/dashboard/admin/AdminCategories";
 import AdminEmployers from "./pages/dashboard/admin/AdminEmployers";
-
-// Shared Dashboard Pages
 import Settings from "./pages/dashboard/components/Settings";
-
 export default function App() {
   return (
     <AuthProvider>

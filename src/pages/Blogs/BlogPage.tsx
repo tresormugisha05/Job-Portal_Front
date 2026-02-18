@@ -1,8 +1,8 @@
 import { useState, useMemo } from "react";
 import { Link } from "react-router-dom";
-import PageWrapper from "../shared/layouts/PageWrapper";
-import Loader from "../shared/components/ui/Loader";
-import usePageLoader from "../shared/components/hooks/usePageLoader";
+import PageWrapper from "../../shared/layouts/PageWrapper";
+import Loader from "../../shared/components/ui/Loader";
+import usePageLoader from "../../shared/components/hooks/usePageLoader";
 import {
   FaFacebook,
   FaTwitter,
@@ -11,7 +11,7 @@ import {
   FaPinterest,
 } from "react-icons/fa";
 import { Calendar, Folder, Plus, ChevronRight } from "lucide-react";
-import PageHeader from "../shared/components/ui/PageHeader";
+import PageHeader from "../../shared/components/ui/PageHeader";
 
 interface BlogPost {
   id: number;

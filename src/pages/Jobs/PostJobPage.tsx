@@ -1,6 +1,6 @@
-import PageWrapper from "../shared/layouts/PageWrapper";
-import Loader from "../shared/components/ui/Loader";
-import usePageLoader from "../shared/components/hooks/usePageLoader";
+import PageWrapper from "../../shared/layouts/PageWrapper";
+import Loader from "../../shared/components/ui/Loader";
+import usePageLoader from "../../shared/components/hooks/usePageLoader";
 
 export default function PostJobPage() {
   const isLoading = usePageLoader(1000);

@@ -1,10 +1,10 @@
 import { useState, useMemo, useEffect } from "react";
-import PageWrapper from "../shared/layouts/PageWrapper";
-import PageHeader from "../shared/components/ui/PageHeader";
-import Loader from "../shared/components/ui/Loader";
-import usePageLoader from "../shared/components/hooks/usePageLoader";
-import { CandidateService, type UserModel } from "../services/Auth.Service";
-import CandidateCard from "../shared/components/ui/CandidateCard";
+import PageWrapper from "../../shared/layouts/PageWrapper";
+import PageHeader from "../../shared/components/ui/PageHeader";
+import Loader from "../../shared/components/ui/Loader";
+import usePageLoader from "../../shared/components/hooks/usePageLoader";
+import { CandidateService, type UserModel } from "../Authentication/service/Auth.Service";
+import CandidateCard from "../../shared/components/ui/CandidateCard";
 
 // Extract unique values for filters
 const ITEMS_PER_PAGE = 5;

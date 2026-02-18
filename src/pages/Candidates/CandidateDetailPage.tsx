@@ -10,11 +10,11 @@ import {
   User,
 } from "lucide-react";
 import { Link, useParams } from "react-router-dom";
-import PageWrapper from "../shared/layouts/PageWrapper";
+import PageWrapper from "../../shared/layouts/PageWrapper";
 import { useState, useEffect } from "react";
-import { useAuth } from "../contexts/AuthContext";
-import { CandidateService, type UserModel } from "../services/Auth.Service";
-import Loader from "../shared/components/ui/Loader";
+import { useAuth } from "../../contexts/AuthContext";
+import { CandidateService, type UserModel } from "../Authentication/service/Auth.Service";
+import Loader from "../../shared/components/ui/Loader";
 
 export default function CandidateDetailPage() {
   const { id } = useParams();

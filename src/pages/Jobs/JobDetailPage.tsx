@@ -1,11 +1,11 @@
 import { useState, useEffect } from "react";
 import { MapPin, Briefcase, DollarSign, Calendar, Heart } from "lucide-react";
 import { useParams, Link } from "react-router-dom";
-import PageWrapper from "../shared/layouts/PageWrapper";
-import Loader from "../shared/components/ui/Loader";
-import { getJobById, getAllJobs } from "../services/jobService";
-import type { JobData } from "../services/jobService";
-import ApplyJobModal from "../shared/components/ui/ApplyJobModal";
+import PageWrapper from "../../shared/layouts/PageWrapper";
+import Loader from "../../shared/components/ui/Loader";
+import { getJobById, getAllJobs } from "../Jobs/service/jobService";
+import type { JobData } from "../Jobs/service/jobService";
+import ApplyJobModal from "../../shared/components/ui/ApplyJobModal";
 
 export default function JobDetailPage() {
   const { id } = useParams();

@@ -1,13 +1,13 @@
 import { useState, useEffect } from "react";
-import PageWrapper from "../shared/layouts/PageWrapper";
-import PageHeader from "../shared/components/ui/PageHeader";
+import PageWrapper from "../../shared/layouts/PageWrapper";
+import PageHeader from "../../shared/components/ui/PageHeader";
 import { Link } from "react-router-dom";
-import Loader from "../shared/components/ui/Loader";
+import Loader from "../../shared/components/ui/Loader";
 import {
   getAllEmployers,
   type EmployerData,
-} from "../services/employerService";
-import { getAllJobs } from "../services/jobService";
+} from "../Employer/service/employerService";
+import { getAllJobs } from "../Jobs/service/jobService";
 
 export default function EmployerListPage() {
   const [employers, setEmployers] = useState<EmployerData[]>([]);

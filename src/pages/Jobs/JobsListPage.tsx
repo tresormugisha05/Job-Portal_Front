@@ -1,12 +1,12 @@
 import { useState, useMemo, useEffect } from "react";
 import { useSearchParams } from "react-router-dom";
-import PageWrapper from "../shared/layouts/PageWrapper";
-import Loader from "../shared/components/ui/Loader";
-import usePageLoader from "../shared/components/hooks/usePageLoader";
-import JobCard from "../shared/components/ui/JobCard";
-import PageHeader from "../shared/components/ui/PageHeader";
+import PageWrapper from "../../shared/layouts/PageWrapper";
+import Loader from "../../shared/components/ui/Loader";
+import usePageLoader from "../../shared/components/hooks/usePageLoader";
+import JobCard from "../../shared/components/ui/JobCard";
+import PageHeader from "../../shared/components/ui/PageHeader";
 
-import { getAllJobs, type JobData } from "../services/jobService";
+import { getAllJobs, type JobData } from "../Jobs/service/jobService";
 
 export default function JobsListPage() {
   const isLoading = usePageLoader(1000);

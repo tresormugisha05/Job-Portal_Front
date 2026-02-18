@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import DashboardLayout from "../../../shared/layouts/DashboardLayout";
 import { Building2, CheckCircle, XCircle, Mail, Phone } from "lucide-react";
-import { getAllEmployers } from "../../../services/employerService";
+import { getAllEmployers } from "../../Employer/service/employerService";
 import api from "../../../services/ApiSetter";
 import Loader from "../../../shared/components/ui/Loader";
 
